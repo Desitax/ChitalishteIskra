@@ -1,0 +1,37 @@
+﻿@model ChitalishteIskra.Data.Entities.BookLesson
+
+<h2 class="mb-3">Add booking</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input class="form-control" type="date" asp-for="Date" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Start time</label>
+        <input class="form-control" type="time" asp-for="StartTime" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">End time</label>
+        <input class="form-control" type="time" asp-for="EndTime" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Teacher</label>
+        <select asp-for="TeacherId" asp-items="ViewBag.Teacher" class="form-control" required>
+            <option selected disabled>Select Teacher</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Lesson</label>
+        <select asp-for="LessonId" asp-items="ViewBag.Lesson" class="form-control" required>
+            <option selected disabled>Select Lesson</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary btn-lg" type="submit">Create</button>
+</form>
+

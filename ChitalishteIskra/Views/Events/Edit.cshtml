@@ -1,0 +1,32 @@
+﻿@model ChitalishteIskra.Data.Entities.Event
+
+<h2 class="mb-3">Edit event</h2>
+
+<form asp-action="Edit" method="post">
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input class="form-control" asp-for="Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input class="form-control" type="date" asp-for="Date" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Start time</label>
+        <input class="form-control" type="time" asp-for="StartTime" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">End time</label>
+        <input class="form-control" type="time" asp-for="EndTime" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Location</label>
+        <input class="form-control" asp-for="Location" />
+    </div>
+
+    <button class="btn btn-primary btn-lg" type="submit">Save</button>
+</form>

@@ -1,0 +1,19 @@
+﻿@model ChitalishteIskra.Data.Entities.Lesson
+
+<h2 class="mb-3">Add lesson</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input class="form-control" asp-for="Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Type</label>
+        <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control" required>
+            <option selected disabled>Select type of lesson</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary btn-lg" type="submit">Create</button>
+</form>

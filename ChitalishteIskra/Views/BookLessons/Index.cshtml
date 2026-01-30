@@ -1,0 +1,37 @@
+﻿@model IEnumerable<ChitalishteIskra.Data.Entities.BookLesson>
+
+<h2 class="mb-3">Bookings</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Add book</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Start time</th>
+            <th>End time</th>
+            <th>Teacher</th>
+            <th>Lesson</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model)
+        {
+            <tr>
+                <td>@booking.Date</td>
+                <td>@booking.StartTime</td>
+                <td>@booking.EndTime</td>
+                <td>@booking.Teacher.FirstName</td>
+                <td>@booking.Lesson.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@booking.Id" method="post" class="btn btn-warning btn-sm" style="display:inline">Edit</a>
+
+                    <form asp-action="Delete" asp-route-id="@booking.Id" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

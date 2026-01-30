@@ -1,0 +1,28 @@
+﻿@model IEnumerable<ChitalishteIskra.Data.Entities.Lesson>
+
+<h2 class="mb-3">Lessons</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Add lesson</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type of lesson</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lesson in Model)
+        {
+            <tr>
+                <td>@lesson.Name</td>
+                <td>@lesson.TypeName</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm" method="Post" style="display:inline">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@lesson.Id" style="display:inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
