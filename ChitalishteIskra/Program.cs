@@ -1,5 +1,6 @@
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
+using ChitalishteIskra.Data.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 
 	options.Password.RequireDigit = false;
 	options.Password.RequireUppercase = false;
-	options.Password.RequiredLength = 6;
+	options.Password.RequiredLength = 5;
 	options.Password.RequireNonAlphanumeric = false;
 })
 .AddEntityFrameworkStores<ChitalishteIskraDbContext>()
@@ -37,9 +38,15 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-
-
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    await IdentitySeeder.SeedRolesAsync(roleManager);
+    await IdentitySeeder.SeedAdminAsync(userManager);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

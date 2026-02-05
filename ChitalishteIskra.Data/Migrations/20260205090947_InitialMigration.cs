@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChitalishteIskra.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -218,7 +218,8 @@ namespace ChitalishteIskra.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    TypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TypeName = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

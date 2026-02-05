@@ -55,6 +55,11 @@
                 <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
             </div>
 
+            <div class="text-center mb-3">
+                <label asp-for="Role">Register as</label>
+                <select class="form-control" aria-required="true" asp-for="Role" asp-items="ViewBag.Roles"></select>
+            </div>
+
             <div class="text-center">
                 <button id="registerSubmit" type="submit" class="btn btn-primary">Register</button>
             </div>

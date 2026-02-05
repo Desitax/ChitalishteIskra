@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChitalishteIskra.Data.Migrations
 {
     [DbContext(typeof(ChitalishteIskraDbContext))]
-    [Migration("20260129105109_NewDatasetMigration")]
-    partial class NewDatasetMigration
+    [Migration("20260205090947_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,8 +93,11 @@ namespace ChitalishteIskra.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("TypeId")
+                    b.Property<Guid?>("TypeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TypeName")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -117,7 +120,7 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("LessonType");
+                    b.ToTable("Types");
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.StudentBookLesson", b =>
@@ -396,8 +399,7 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasOne("ChitalishteIskra.Data.Entities.LessonType", "Type")
                         .WithMany("Lessons")
                         .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Type");
                 });

@@ -32,5 +32,8 @@ namespace ChitalishteIskra.Models
         [DataType(DataType.Password)]
 
         public string ConfirmPassword { get; set; } = null!;
+
+        [Required]
+        public string Role { get; set; }
     }
 }
