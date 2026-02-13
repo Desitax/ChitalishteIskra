@@ -6,6 +6,7 @@ namespace ChitalishteIskra.Models.BookLessons
 {
     public class BookLessonIndexViewModel
     {
+        public Guid Id { get; set; }
         public DateOnly Date { get; set; }
 
         public TimeOnly StartTime { get; set; }

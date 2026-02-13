@@ -3,7 +3,9 @@ using ChitalishteIskra.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Controllers
 {
@@ -24,48 +26,61 @@ namespace ChitalishteIskra.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            string[] roles = new string[] { "Teacher", "Parent", "Student" };
-            ViewBag.Roles = roles;
             if (User?.Identity?.IsAuthenticated ?? false)
             {
                 return RedirectToAction("Index", "Home");
             }
+
             var model = new RegisterViewModel();
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                string[] roles = new string[] { "Teacher", "Parent", "Student" };
-                ViewBag.Roles = roles;
-                return View(model);
-            }
 
-            var user = new User()
+            var child = new User()
             {
-                Email = model.Email,
-                UserName = model.UserName,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Age = model.Age
+                FirstName = model.ChildInfo.FirstName,
+                LastName = model.ChildInfo.LastName,
+                Age = model.ChildInfo.Age,
             };
 
-            var result = await userManager.CreateAsync(user, model.Password);
+            if (!string.IsNullOrEmpty(model.ParentInfo.FirstName))
+            {
+                var parent = new User()
+                {
+                    Email = model.Email,
+                    UserName = model.UserName,
+                    FirstName = model.ParentInfo.FirstName,
+                    LastName = model.ParentInfo.LastName,
+                    Age = model.ParentInfo.Age,
+                };
 
-            if (model.Role == "Teacher")
-            {
-                await userManager.AddToRoleAsync(user, "Teacher");
-            }
-            else if (model.Role == "Parent")
-            {
-                await userManager.AddToRoleAsync(user, "Parent");
+                child.Email = "child_" + model.Email;
+                child.UserName = "child" + model.UserName;
+
+                var parentResult = await userManager.CreateAsync(parent, model.Password);
+                await userManager.AddToRoleAsync(parent, "Parent");
+
+                if (!parentResult.Succeeded)
+                {
+                    foreach (var item in parentResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, item.Description);
+                    }
+
+                    return View(model);
+                }
             }
             else
             {
-                await userManager.AddToRoleAsync(user, "Student");
+                child.Email = model.Email;
+                child.UserName = model.UserName;
             }
+
+            var result = await userManager.CreateAsync(child, model.Password);
+            await userManager.AddToRoleAsync(child, "Student");
 
             if (result.Succeeded)
             {
@@ -140,6 +155,6 @@ namespace ChitalishteIskra.Controllers
         //    }
         //    return Content("Roles seeded (created if missing).");
         //}
-        
+
     }
 }

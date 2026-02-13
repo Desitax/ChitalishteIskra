@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChitalishteIskra.Models.User;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChitalishteIskra.Models
 {
@@ -19,21 +20,13 @@ namespace ChitalishteIskra.Models
         [DataType(DataType.Password)]
         public string Password { get; set; } = null!;
 
-        [Required]
-        public string FirstName { get; set; } = null!;
-
-        [Required]
-        public string LastName { get; set; } = null!;
-
-        [Required]
-        public int Age { get; set; }
-
         [Compare(nameof(Password))]
         [DataType(DataType.Password)]
 
         public string ConfirmPassword { get; set; } = null!;
 
-        [Required]
-        public string Role { get; set; }
+        public UserRegisterViewModel ParentInfo { get; set; }
+
+        public UserRegisterViewModel ChildInfo { get; set; }
     }
 }

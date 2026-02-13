@@ -1,4 +1,5 @@
-﻿@model ChitalishteIskra.Data.Entities.BookLesson
+﻿@using ChitalishteIskra.Models.BookLessons
+@model BookLessonCreateViewModel
 
 <h2 class="mb-3">Add booking</h2>
 
@@ -20,15 +21,15 @@
 
     <div class="mb-3">
         <label class="form-label">Teacher</label>
-        <select asp-for="TeacherId" asp-items="ViewBag.Teacher" class="form-control" required>
-            <option selected disabled>Select Teacher</option>
+        <select asp-for="TeacherId" asp-items="ViewBag.Teachers" class="form-control" required>
+            <option selected disabled value="">Select Teacher</option>
         </select>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Lesson</label>
-        <select asp-for="LessonId" asp-items="ViewBag.Lesson" class="form-control" required>
-            <option selected disabled>Select Lesson</option>
+        <select asp-for="LessonId" asp-items="ViewBag.Lessons" class="form-control" required>
+            <option selected disabled value="">Select Lesson</option>
         </select>
     </div>
 

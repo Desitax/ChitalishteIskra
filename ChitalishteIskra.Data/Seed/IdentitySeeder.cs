@@ -31,11 +31,11 @@ namespace ChitalishteIskra.Data.Seed
             string username = "admin";
             string email = "admin@amdin.com";
 
-            var user = await userManager.FindByNameAsync(username);
+            var adminUser = await userManager.FindByNameAsync(username);
 
-            if (user == null)
+            if (adminUser == null)
             {
-                user = new User
+                adminUser = new User
                 {
                     UserName = username,
                     Email = email,
@@ -44,13 +44,14 @@ namespace ChitalishteIskra.Data.Seed
                     Age = 30
                 };
 
-                await userManager.CreateAsync(user, "admin");
+                await userManager.CreateAsync(adminUser, "admin");
             }
 
-            if (!await userManager.IsInRoleAsync(user, "Admin"))
+            if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
             {
-                await userManager.AddToRoleAsync(user, "Admin");
+                await userManager.AddToRoleAsync(adminUser, "Admin");
             }
         }
+
     }
 }

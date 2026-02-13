@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ChitalishteIskra.Data.Entities.BookLesson>
+﻿@using ChitalishteIskra.Models.BookLessons
+@model IEnumerable<BookLessonIndexViewModel>
 
 <h2 class="mb-3">Bookings</h2>
 
@@ -21,8 +22,8 @@
                 <td>@booking.Date</td>
                 <td>@booking.StartTime</td>
                 <td>@booking.EndTime</td>
-                <td>@booking.Teacher.FirstName</td>
-                <td>@booking.Lesson.Name</td>
+                <td>@booking.TeacherName</td>
+                <td>@booking.LessonName</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@booking.Id" method="post" class="btn btn-warning btn-sm" style="display:inline">Edit</a>
 
