@@ -46,7 +46,7 @@ namespace ChitalishteIskra.Controllers
             return View(booking);
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {

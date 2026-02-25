@@ -17,7 +17,6 @@ namespace ChitalishteIskra.Models.BookLessons
 
         public string LessonName { get; set; } = null!;
 
-        //public int StudentsCount { get; set; }
 
     }
 }

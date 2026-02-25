@@ -29,8 +29,7 @@ namespace ChitalishteIskra.Data.Seed
         {
 
             string username = "admin";
-            string email = "admin@amdin.com";
-
+            string email = "admin@admin.com";
             var adminUser = await userManager.FindByNameAsync(username);
 
             if (adminUser == null)

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ChitalishteIskra.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class DesiChitalishte : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -241,7 +241,8 @@ namespace ChitalishteIskra.Data.Migrations
                     StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     TeacherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -252,6 +253,12 @@ namespace ChitalishteIskra.Data.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BookLessons_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BookLessons_Lessons_LessonId",
                         column: x => x.LessonId,
@@ -333,6 +340,11 @@ namespace ChitalishteIskra.Data.Migrations
                 name: "IX_BookLessons_TeacherId",
                 table: "BookLessons",
                 column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookLessons_UserId",
+                table: "BookLessons",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lessons_TypeId",

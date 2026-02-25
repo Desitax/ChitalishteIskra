@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChitalishteIskra.Data.Migrations
 {
     [DbContext(typeof(ChitalishteIskraDbContext))]
-    [Migration("20260205090947_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260225091504_DesiChitalishte")]
+    partial class DesiChitalishte
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,11 +46,16 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");
 
                     b.HasIndex("TeacherId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("BookLessons");
                 });
@@ -384,14 +389,22 @@ namespace ChitalishteIskra.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
-                        .WithMany("TeacherBookLessons")
+                        .WithMany("BookLessons")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ChitalishteIskra.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Lesson");
 
                     b.Navigation("Teacher");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.Lesson", b =>
@@ -515,9 +528,9 @@ namespace ChitalishteIskra.Data.Migrations
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.User", b =>
                 {
-                    b.Navigation("StudentBookLessons");
+                    b.Navigation("BookLessons");
 
-                    b.Navigation("TeacherBookLessons");
+                    b.Navigation("StudentBookLessons");
 
                     b.Navigation("TeacherEvents");
                 });

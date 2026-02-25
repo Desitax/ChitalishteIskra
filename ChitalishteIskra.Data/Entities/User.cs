@@ -21,7 +21,7 @@ namespace ChitalishteIskra.Data.Entities
         public int Age { get; set; }
 
 		public ICollection<StudentBookLesson> StudentBookLessons { get; set; } = new List<StudentBookLesson>();
-		public ICollection<BookLesson> TeacherBookLessons { get; set; } = new List<BookLesson>();
+		public ICollection<BookLesson> BookLessons { get; set; } = new List<BookLesson>();
 
 		public ICollection<TeacherEvent> TeacherEvents { get; set; } = new List<TeacherEvent>();
 	}    

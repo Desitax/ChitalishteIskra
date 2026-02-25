@@ -133,6 +133,7 @@ namespace ChitalishteIskra.Controllers
             ModelState.AddModelError(string.Empty, "Invalid login");
             return View(model);
         }
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -141,20 +142,20 @@ namespace ChitalishteIskra.Controllers
         }
 
 
-        //[AllowAnonymous]
-        //public async Task<IActionResult> SeedRoles()
-        //{
-        //    string[] roles = { "Admin", "Teacher", "Parent", "Student" };​
+        [AllowAnonymous]
+        public async Task<IActionResult> SeedRoles()
+        {
+            string[] roles = { "Admin", "Teacher", "Parent", "Student" };
 
-        //    foreach (var role in roles)
-        //    {
-        //        if (!await roleManager.RoleExistsAsync(role))
-        //        {
-        //            await roleManager.CreateAsync(new IdentityRole(role));
-        //        }
-        //    }
-        //    return Content("Roles seeded (created if missing).");
-        //}
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                }
+            }
+            return Content("Roles seeded (created if missing).");
+        }
 
     }
 }

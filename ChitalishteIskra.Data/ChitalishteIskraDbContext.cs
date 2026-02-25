@@ -35,7 +35,7 @@ namespace ChitalishteIskra.Data
 			
 			builder.Entity<BookLesson>()
 				.HasOne(bl => bl.Teacher)
-				.WithMany(u => u.TeacherBookLessons)
+				.WithMany(u => u.BookLessons)
 				.HasForeignKey(bl => bl.TeacherId)
 				.OnDelete(DeleteBehavior.Restrict); 
 

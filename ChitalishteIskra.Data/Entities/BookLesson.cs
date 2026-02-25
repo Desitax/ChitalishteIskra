@@ -30,7 +30,11 @@ namespace ChitalishteIskra.Data.Entities
 		public Guid LessonId { get; set; }
 		public Lesson Lesson { get; set; } = null!;
 
-		public ICollection<StudentBookLesson> StudentBookLessons { get; set; } = new List<StudentBookLesson>();
+        [ForeignKey(nameof(User))]
+        public Guid UserId { get; set; }
+        public User User { get; set; } = null!;
+
+        public ICollection<StudentBookLesson> StudentBookLessons { get; set; } = new List<StudentBookLesson>();
 
 	}
 }
