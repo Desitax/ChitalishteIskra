@@ -1,30 +1,33 @@
 ﻿using ChitalishteIskra.Models.User;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using static ChitalishteIskra.Data.Entities.LessonType;
 
 namespace ChitalishteIskra.Models.BookLessons
 {
     public class BookLessonCreateViewModel
     {
-        [Required(ErrorMessage = "Моля изберете дата")]
-        [DataType(DataType.Date)]
+        [Required]
         public DateOnly Date { get; set; }
 
-        [Required(ErrorMessage = "Моля въведете начален час")]
-        [DataType(DataType.Time)]
+        [Required]
         public TimeOnly StartTime { get; set; }
 
-        [Required(ErrorMessage = "Моля въведете краен час")]
-        [DataType(DataType.Time)]
+        [Required]
         public TimeOnly EndTime { get; set; }
 
-        [Required(ErrorMessage = "Изберете учител")]
+        [Required]
         public Guid TeacherId { get; set; }
 
-        [Required(ErrorMessage = "Изберете урок")]
+        [Required]
         public Guid LessonId { get; set; }
 
+
+        [Required]
+        public LessonTypeName SelectedLessonType { get; set; }
+
         public IEnumerable<SelectListItem> Teachers { get; set; } = new List<SelectListItem>();
+
         public IEnumerable<SelectListItem> Lessons { get; set; } = new List<SelectListItem>();
     }
 }

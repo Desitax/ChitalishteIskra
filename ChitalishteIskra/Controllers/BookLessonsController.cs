@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using static ChitalishteIskra.Data.Entities.LessonType;
 
 namespace ChitalishteIskra.Controllers
@@ -29,7 +30,8 @@ namespace ChitalishteIskra.Controllers
             var teachers = await userManager.GetUsersInRoleAsync("Teacher");
             var teachersIds = teachers.Select(t => t.Id).ToList();
 
-            var booking = await context.BookLessons.Include(b => b.Teacher)
+            var booking = await context.BookLessons
+                .Include(b => b.Teacher)
                 .Include(b => b.Lesson)
                 .Where(x => teachersIds.Contains(x.Teacher.Id))
                 .Select(b => new BookLessonIndexViewModel
@@ -46,15 +48,71 @@ namespace ChitalishteIskra.Controllers
             return View(booking);
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        //[HttpGet]
+        //public async Task<IActionResult> Create()
+        //{
+        //    var teachers = await context.Users.ToListAsync();
+        //    ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
+
+        //    var lessons = await context.Lessons.Include(t=>t.Type)
+        //        .Select(l => new
+        //    {
+        //        l.Id,
+        //        Text = l.Name + " (" + (l.Type != null ? l.Type.Name.ToString() : "No type") + ")"
+        //    })
+        //.ToListAsync();
+
+        //    ViewBag.Lessons = new SelectList(lessons, "Id", "Text");
+
+        //    var model = new BookLessonCreateViewModel
+        //    {
+        //        Teachers = context.Users
+        //    .Select(u => new SelectListItem
+        //    {
+        //        Value = u.Id.ToString(),
+        //        Text = u.FirstName + " " + u.LastName
+        //    }),
+
+        //        Lessons = context.Lessons
+        //    .Select(l => new SelectListItem
+        //    {
+        //        Value = l.Id.ToString(),
+        //        Text = l.Name
+        //    })
+        //    };
+
+        //    var lessonType = new LessonType();
+
+        //    ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
+        //   .Cast<LessonTypeName>()
+        //   .Select(e => new SelectListItem
+        //   {
+        //       Value = ((int)e).ToString(),
+        //       Text = e.ToString()
+        //   })
+        //   .ToList();
+
+        //    return View(model);
+        //}
+
+        [Authorize()]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             var teachers = await context.Users.ToListAsync();
             ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
 
-            var lessons = await context.Lessons.ToListAsync();
-            ViewBag.Lessons = new SelectList(lessons, "Id", "Name");
+            var lessons = await context.Lessons
+                .Include(t => t.Type)
+                .Select(l => new
+                {
+                    l.Id,
+                    Text = l.Name
+                })
+                .ToListAsync();
+
+            ViewBag.Lessons = new SelectList(lessons, "Id", "Text");
 
             var model = new BookLessonCreateViewModel
             {
@@ -87,47 +145,82 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Create(BookLessonCreateViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        var teachers = await context.Users.ToListAsync();
+        //        ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
+
+        //        var lessons = await context.Lessons.ToListAsync();
+        //        ViewBag.Lessons = new SelectList(lessons, "Id", "Name");
+
+        //        model.Teachers = context.Users.Select(u => new SelectListItem
+        //        {
+        //            Value = u.Id.ToString(),
+        //            Text = u.FirstName + " " + u.LastName
+        //        }).ToList();
+
+        //        model.Lessons = context.Lessons.Select(l => new SelectListItem
+        //        {
+        //            Value = l.Id.ToString(),
+        //            Text = l.Name
+        //        }).ToList();
+
+        //        ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
+        //    .Cast<LessonTypeName>()
+        //    .Select(e => new SelectListItem
+        //    {
+        //        Value = ((int)e).ToString(),
+        //        Text = e.ToString()
+        //    }).ToList();
+
+        //        return View(model);
+        //    }
+
+        //    var booking = new BookLesson
+        //    {
+        //        Date = model.Date,
+        //        StartTime = model.StartTime,
+        //        EndTime = model.EndTime,
+        //        TeacherId = model.TeacherId,
+        //        LessonId = model.LessonId
+        //    };
+
+        //    await context.BookLessons.AddAsync(booking);
+        //    await context.SaveChangesAsync();
+
+        //    return RedirectToAction(nameof(Index));
+        //}
+
         [HttpPost]
         public async Task<IActionResult> Create(BookLessonCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 var teachers = await context.Users.ToListAsync();
-                ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
+                ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName", model.TeacherId);
 
-                var lessons = await context.Lessons.ToListAsync();
-                ViewBag.Lessons = new SelectList(lessons, "Id", "Name");
-
-                model.Teachers = context.Users.Select(u => new SelectListItem
-                {
-                    Value = u.Id.ToString(),
-                    Text = u.FirstName + " " + u.LastName
-                }).ToList();
-
-                model.Lessons = context.Lessons.Select(l => new SelectListItem
-                {
-                    Value = l.Id.ToString(),
-                    Text = l.Name
-                }).ToList();
-
-                ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
-            .Cast<LessonTypeName>()
-            .Select(e => new SelectListItem
-            {
-                Value = ((int)e).ToString(),
-                Text = e.ToString()
-            }).ToList();
+                var lessons = await context.Lessons
+                    .Select(l => new { l.Id, l.Name })
+                    .ToListAsync();
+                ViewBag.Lessons = new SelectList(lessons, "Id", "Name", model.LessonId);
 
                 return View(model);
             }
 
+            Guid currentUserId = Guid.Parse(GetCurrentClientId());
+
             var booking = new BookLesson
             {
+                Id = Guid.NewGuid(),
                 Date = model.Date,
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
                 TeacherId = model.TeacherId,
-                LessonId = model.LessonId
+                LessonId = model.LessonId,
+                UserId = currentUserId
             };
 
             await context.BookLessons.AddAsync(booking);
@@ -229,6 +322,11 @@ namespace ChitalishteIskra.Controllers
                 await context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
+        }
+
+        private string GetCurrentClientId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
         }
     }
 }
