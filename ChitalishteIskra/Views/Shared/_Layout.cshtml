@@ -55,6 +55,7 @@
                             <a class="nav-link" asp-controller="Lessons" asp-action="Index">Lessons</a>
                         </li>
 
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                                 Читалището
@@ -70,9 +71,27 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Groups" asp-action="Index">Групи и школи</a>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                Групи и школи
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/Groups/ANPT.html">АНПТ</a></li>
+                                <li><a class="dropdown-item" href="/Groups/Babsbg.html">Бабсбг</a></li>
+                                <li><a class="dropdown-item" href="/Groups/Iskritsa.html">ВС „Искрица”</a></li>
+                                <li><a class="dropdown-item" href="/Groups/Sevtopolis.html">ВС „Севтополис”</a></li>
+                                <li><a class="dropdown-item" href="/Groups/Ekarte.html">Студио за модерен балет „Екарте”</a></li>
+                                <li><a class="dropdown-item" href="/Groups/PetkoStainov.html">СХ „Петко Стайнов”</a></li>
+                                <li><a class="dropdown-item" href="/Groups/DetskaTeatralna.html">Детска театрална школа</a></li>
+                                <li><a class="dropdown-item" href="/Groups/MladejkaTeatralna.html">Младежка театрална студия</a></li>
+                                <li><a class="dropdown-item" href="/Groups/ArtSchool.html">Школа по изкуствата „Емануил Манолов”</a></li>
+                                <li><a class="dropdown-item" href="/Groups/Blue.html">Школа по изобразително изкуство „Синьо”</a></li>
+                                <li><a class="dropdown-item" href="/Groups/SportniTantsi.html">Школа по спортни танци</a></li>
+                            </ul>                          
                         </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Stage" asp-action="Index">Сцена</a>

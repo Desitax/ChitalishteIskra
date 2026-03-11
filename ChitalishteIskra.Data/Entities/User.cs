@@ -23,7 +23,8 @@ namespace ChitalishteIskra.Data.Entities
 		public ICollection<StudentBookLesson> StudentBookLessons { get; set; } = new List<StudentBookLesson>();
 		public ICollection<BookLesson> BookLessons { get; set; } = new List<BookLesson>();
 
-		public ICollection<TeacherEvent> TeacherEvents { get; set; } = new List<TeacherEvent>();
+        public ICollection<TeacherAvailability> TeacherAvailabilities { get; set; } = new List<TeacherAvailability>();
+        public ICollection<TeacherEvent> TeacherEvents { get; set; } = new List<TeacherEvent>();
 	}    
   
 }
