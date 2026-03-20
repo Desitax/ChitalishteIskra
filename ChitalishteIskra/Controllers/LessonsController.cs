@@ -3,7 +3,7 @@ using ChitalishteIskra.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using static ChitalishteIskra.Data.Entities.LessonType;
+using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Controllers
 {
@@ -18,16 +18,13 @@ namespace ChitalishteIskra.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var lesson = await context.Lessons
-                .Include(l => l.Type)
-                .ToListAsync();
+            var lesson = await context.Lessons.ToListAsync();
             return View(lesson);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            var lessonType = new LessonType();
 
             ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
                .Cast<LessonTypeName>()

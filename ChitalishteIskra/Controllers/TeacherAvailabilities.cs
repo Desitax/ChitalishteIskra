@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Controllers
 {
-    public class GroupsController:Controller
+    public class TeacherAvailabilities:Controller
     {
         public readonly ChitalishteIskraDbContext context;
 
-        public GroupsController(ChitalishteIskraDbContext _context)
+        public TeacherAvailabilities(ChitalishteIskraDbContext _context)
         {
             this.context = _context;
         }
@@ -19,8 +19,8 @@ namespace ChitalishteIskra.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var groups = await context.Groups.ToListAsync();
-            return View(groups);
+            var teacherAvailabilities = await context.TeacherAvailabilities.ToListAsync();
+            return View(teacherAvailabilities);
         }
 
         [HttpGet]
@@ -30,9 +30,9 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Group group)
+        public async Task<IActionResult> Create(TeacherAvailability availabilities)
         {
-            await context.Groups.AddAsync(group);
+            await context.TeacherAvailabilities.AddAsync(availabilities);
             await context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
@@ -49,9 +49,9 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Group group)
+        public async Task<IActionResult> Edit(TeacherAvailability teacherAvailabilities)
         {
-            context.Groups.Update(group);
+            context.TeacherAvailabilities.Update(teacherAvailabilities);
             await context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
@@ -59,28 +59,14 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var edit = await context.Groups.FirstOrDefaultAsync(e => e.Id == id);
+            var edit = await context.TeacherAvailabilities.FirstOrDefaultAsync(e => e.Id == id);
             if (edit != null)
             {
-                context.Groups.Remove(edit);
+                context.TeacherAvailabilities.Remove(edit);
                 await context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
         }
 
-
-
-
-        public IActionResult ANPT() => View();
-        public IActionResult Babsbg() => View();
-        public IActionResult Iskritsa() => View();
-        public IActionResult Sevtopolis() => View();
-        public IActionResult Ekarte() => View();
-        public IActionResult PetkoStainov() => View();
-        public IActionResult DetskaTeatralna() => View();
-        public IActionResult MladeshkaTeatralna() => View();
-        public IActionResult ArtSchool() => View();
-        public IActionResult Blue() => View();
-        public IActionResult SportniTantsi() => View();
     }
 }

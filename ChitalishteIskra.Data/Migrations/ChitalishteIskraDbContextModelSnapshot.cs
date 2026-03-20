@@ -34,25 +34,31 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("LessonId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
 
-                    b.Property<Guid>("TeacherId")
+                    b.Property<Guid?>("StudentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("LessonId");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("StudentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TeacherId", "Date", "StartTime", "EndTime")
+                        .IsUnique();
 
                     b.ToTable("BookLessons");
                 });
@@ -71,11 +77,13 @@ namespace ChitalishteIskra.Data.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
@@ -83,6 +91,44 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.Group", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.GroupStudent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("GroupId", "StudentId")
+                        .IsUnique();
+
+                    b.ToTable("GroupStudents");
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.Lesson", b =>
@@ -93,58 +139,44 @@ namespace ChitalishteIskra.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("TypeId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("TypeName")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TypeId");
-
                     b.ToTable("Lessons");
                 });
 
-            modelBuilder.Entity("ChitalishteIskra.Data.Entities.LessonType", b =>
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.TeacherAvailability", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
-                    b.HasKey("Id");
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
 
-                    b.ToTable("Types");
-                });
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
-            modelBuilder.Entity("ChitalishteIskra.Data.Entities.StudentBookLesson", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BookLessonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StudentId")
+                    b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookLessonId");
-
-                    b.HasIndex("StudentId", "BookLessonId")
+                    b.HasIndex("TeacherId", "Date", "StartTime", "EndTime")
                         .IsUnique();
 
-                    b.ToTable("StudentBookLessons");
+                    b.ToTable("TeacherAvailabilities");
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.TeacherEvent", b =>
@@ -194,11 +226,19 @@ namespace ChitalishteIskra.Data.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsApprovedTeacher")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTeacherRequest")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -379,11 +419,21 @@ namespace ChitalishteIskra.Data.Migrations
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.BookLesson", b =>
                 {
+                    b.HasOne("ChitalishteIskra.Data.Entities.Group", "Group")
+                        .WithMany("BookLessons")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ChitalishteIskra.Data.Entities.Lesson", "Lesson")
                         .WithMany("BookLessons")
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ChitalishteIskra.Data.Entities.User", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
                         .WithMany("BookLessons")
@@ -391,46 +441,43 @@ namespace ChitalishteIskra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ChitalishteIskra.Data.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Group");
 
                     b.Navigation("Lesson");
 
+                    b.Navigation("Student");
+
                     b.Navigation("Teacher");
-
-                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ChitalishteIskra.Data.Entities.Lesson", b =>
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.GroupStudent", b =>
                 {
-                    b.HasOne("ChitalishteIskra.Data.Entities.LessonType", "Type")
-                        .WithMany("Lessons")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Type");
-                });
-
-            modelBuilder.Entity("ChitalishteIskra.Data.Entities.StudentBookLesson", b =>
-                {
-                    b.HasOne("ChitalishteIskra.Data.Entities.BookLesson", "BookLesson")
-                        .WithMany("StudentBookLessons")
-                        .HasForeignKey("BookLessonId")
+                    b.HasOne("ChitalishteIskra.Data.Entities.Group", "Group")
+                        .WithMany("GroupStudents")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ChitalishteIskra.Data.Entities.User", "Student")
-                        .WithMany("StudentBookLessons")
+                        .WithMany("GroupStudents")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("BookLesson");
+                    b.Navigation("Group");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.TeacherAvailability", b =>
+                {
+                    b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
+                        .WithMany("TeacherAvailabilities")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.TeacherEvent", b =>
@@ -503,14 +550,16 @@ namespace ChitalishteIskra.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ChitalishteIskra.Data.Entities.BookLesson", b =>
-                {
-                    b.Navigation("StudentBookLessons");
-                });
-
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.Event", b =>
                 {
                     b.Navigation("TeacherEvents");
+                });
+
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.Group", b =>
+                {
+                    b.Navigation("BookLessons");
+
+                    b.Navigation("GroupStudents");
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.Lesson", b =>
@@ -518,16 +567,13 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Navigation("BookLessons");
                 });
 
-            modelBuilder.Entity("ChitalishteIskra.Data.Entities.LessonType", b =>
-                {
-                    b.Navigation("Lessons");
-                });
-
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.User", b =>
                 {
                     b.Navigation("BookLessons");
 
-                    b.Navigation("StudentBookLessons");
+                    b.Navigation("GroupStudents");
+
+                    b.Navigation("TeacherAvailabilities");
 
                     b.Navigation("TeacherEvents");
                 });

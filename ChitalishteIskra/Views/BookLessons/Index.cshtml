@@ -3,7 +3,16 @@
 
 <h2 class="mb-3">Bookings</h2>
 
-<a asp-action="Create" class="btn btn-primary mb-3">Add book</a>
+@if (User.IsInRole("Student") || User.IsInRole("Parent"))
+
+{
+    <a asp-action="Create" class="btn btn-primary mb-3">Запази час</a>
+}
+@if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+
+{
+    <a asp-action="CreateGroup" class="btn btn-primary mb-3">Добави групов урок</a>
+}
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -17,6 +26,7 @@
     </thead>
     <tbody>
         @foreach (var booking in Model)
+
         {
             <tr>
                 <td>@booking.Date</td>

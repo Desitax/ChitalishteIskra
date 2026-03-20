@@ -52,5 +52,32 @@ namespace ChitalishteIskra.Data.Seed
             }
         }
 
+        public static async Task SeedTeacherAsync(UserManager<User> userManager)
+        {
+            string username = "teacher";
+            string email = "teacher@teacher.com";
+
+            var teacherUser = await userManager.FindByNameAsync(username);
+
+            if (teacherUser == null)
+            {
+                teacherUser = new User
+                {
+                    UserName = username,
+                    Email = email,
+                    FirstName = "Ivan",
+                    LastName = "Ivanov",
+                    Age = 35
+                };
+
+                await userManager.CreateAsync(teacherUser, "teacher");
+            }
+
+            if (!await userManager.IsInRoleAsync(teacherUser, "Teacher"))
+            {
+                await userManager.AddToRoleAsync(teacherUser, "Teacher");
+            }
+        }
+
     }
 }

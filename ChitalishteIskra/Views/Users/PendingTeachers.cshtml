@@ -1,0 +1,31 @@
+﻿@using ChitalishteIskra.Data.Entities
+@model IEnumerable<User>
+
+<h2>Pending Teacher Requests</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var teacher in Model)
+        {
+            <tr>
+                <td>@teacher.FirstName @teacher.LastName</td>
+                <td>@teacher.Email</td>
+                <td>@teacher.Age</td>
+                <td>
+                    <form asp-action="ApproveTeacher" asp-route-id="@teacher.Id" method="post">
+                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

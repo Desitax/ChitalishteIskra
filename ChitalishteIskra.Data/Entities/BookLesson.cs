@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data.Entities
@@ -31,10 +32,15 @@ namespace ChitalishteIskra.Data.Entities
 		public Lesson Lesson { get; set; } = null!;
 
         [ForeignKey(nameof(User))]
-        public Guid UserId { get; set; }
-        public User User { get; set; } = null!;
+        public Guid? StudentId { get; set; }
+        public User? Student { get; set; }
 
-        public ICollection<StudentBookLesson> StudentBookLessons { get; set; } = new List<StudentBookLesson>();
+        public Guid? GroupId { get; set; }
+        public Group? Group { get; set; }
+
+        //[ForeignKey(nameof(User))]
+        //public Guid UserId { get; set; }
+        //public User User { get; set; } = null!;
 
 	}
 }

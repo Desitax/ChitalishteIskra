@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static ChitalishteIskra.Data.Entities.LessonType;
 
 namespace ChitalishteIskra.Data.Entities
 {
@@ -16,11 +15,17 @@ namespace ChitalishteIskra.Data.Entities
         [Required]
         public string Name { get; set; } = null!;
 
-		[ForeignKey(nameof(Type))]
-		public Guid? TypeId { get; set; }
-		public LessonType? Type { get; set; }
+		//[ForeignKey(nameof(Type))]
+		//public Guid? TypeId { get; set; }
+		//public LessonType? Type { get; set; }
 
         public LessonTypeName TypeName { get; set; }
         public ICollection<BookLesson> BookLessons { get; set; }=new List<BookLesson>();
+
+        public enum LessonTypeName
+        {
+            Individual,
+            Group
+        }
     }
 }

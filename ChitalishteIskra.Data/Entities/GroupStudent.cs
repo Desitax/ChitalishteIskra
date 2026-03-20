@@ -7,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data.Entities
 {
-    public class LessonType
+    public class GroupStudent
     {
         [Key]
         public Guid Id { get; set; }
-		public LessonTypeName Name { get; set; }
-		public enum LessonTypeName { Individual, Group }
-		public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
-	}
+
+        [Required]
+        public Guid GroupId { get; set; }
+        public Group Group { get; set; } = null!;
+
+        [Required]
+        public Guid StudentId { get; set; }
+        public User Student { get; set; } = null!;
+    }
 }

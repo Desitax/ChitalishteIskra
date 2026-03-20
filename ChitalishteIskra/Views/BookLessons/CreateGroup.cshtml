@@ -1,0 +1,53 @@
+﻿@using ChitalishteIskra.Models.BookLessons
+@model BookLessonCreateGroupViewModel
+
+<h2 class="mb-3">Добави групов урок</h2>
+
+<form asp-action="CreateGroup" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label"></label>
+        <input asp-for="Date"
+               type="date"
+               class="form-control"
+               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartTime" class="form-label"></label>
+        <input asp-for="StartTime" type="time" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EndTime" class="form-label"></label>
+        <input asp-for="EndTime" type="time" class="form-control" />
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LessonId" class="form-label">Урок</label>
+        <select asp-for="LessonId" asp-items="Model.Lessons" class="form-control">
+            <option value="">Избери групов урок</option>
+        </select>
+        <span asp-validation-for="LessonId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="GroupId" class="form-label">Група</label>
+        <select asp-for="GroupId" asp-items="Model.Groups" class="form-control">
+            <option value="">Избери възрастова група</option>
+        </select>
+        <span asp-validation-for="GroupId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Създай</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

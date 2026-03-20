@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using static ChitalishteIskra.Data.Entities.LessonType;
+using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Controllers
 {
@@ -96,54 +96,44 @@ namespace ChitalishteIskra.Controllers
         //    return View(model);
         //}
 
-        [Authorize()]
+
+        [Authorize(Roles = "Student,Parent")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var teachers = await context.Users.ToListAsync();
-            ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
-
             var lessons = await context.Lessons
-                .Include(t => t.Type)
-                .Select(l => new
+                .Where(l => l.TypeName == LessonTypeName.Individual)
+                .Select(l => new SelectListItem
                 {
-                    l.Id,
+                    Value = l.Id.ToString(),
                     Text = l.Name
                 })
                 .ToListAsync();
 
-            ViewBag.Lessons = new SelectList(lessons, "Id", "Text");
+            var availableSlots = await context.TeacherAvailabilities
+                .Where(x => x.IsAvailable)
+                .Include(x => x.Teacher)
+                .OrderBy(x => x.Date)
+                .ThenBy(x => x.StartTime)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Teacher.FirstName + " " + x.Teacher.LastName
+                           + " - " + x.Date.ToString()
+                           + " - " + x.StartTime.ToString()
+                           + " - " + x.EndTime.ToString()
+                })
+                .ToListAsync();
 
             var model = new BookLessonCreateViewModel
             {
-                Teachers = context.Users
-            .Select(u => new SelectListItem
-            {
-                Value = u.Id.ToString(),
-                Text = u.FirstName + " " + u.LastName
-            }),
-
-                Lessons = context.Lessons
-            .Select(l => new SelectListItem
-            {
-                Value = l.Id.ToString(),
-                Text = l.Name
-            })
+                Lessons = lessons,
+                AvailableSlots = availableSlots
             };
-
-            var lessonType = new LessonType();
-
-            ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
-           .Cast<LessonTypeName>()
-           .Select(e => new SelectListItem
-           {
-               Value = ((int)e).ToString(),
-               Text = e.ToString()
-           })
-           .ToList();
 
             return View(model);
         }
+
 
         //[HttpPost]
         //public async Task<IActionResult> Create(BookLessonCreateViewModel model)
@@ -194,34 +184,127 @@ namespace ChitalishteIskra.Controllers
         //    return RedirectToAction(nameof(Index));
         //}
 
+        [Authorize(Roles = "Student,Parent")]
         [HttpPost]
         public async Task<IActionResult> Create(BookLessonCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var teachers = await context.Users.ToListAsync();
-                ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName", model.TeacherId);
-
-                var lessons = await context.Lessons
-                    .Select(l => new { l.Id, l.Name })
+                model.Lessons = await context.Lessons
+                    .Where(l => l.TypeName == LessonTypeName.Individual)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = l.Name
+                    })
                     .ToListAsync();
-                ViewBag.Lessons = new SelectList(lessons, "Id", "Name", model.LessonId);
+
+                model.AvailableSlots = await context.TeacherAvailabilities
+                    .Where(x => x.IsAvailable)
+                    .Include(x => x.Teacher)
+                    .OrderBy(x => x.Date)
+                    .ThenBy(x => x.StartTime)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.Id.ToString(),
+                        Text = x.Teacher.FirstName + " " + x.Teacher.LastName
+                               + " - " + x.Date.ToString()
+                               + " - " + x.StartTime.ToString()
+                               + " - " + x.EndTime.ToString()
+                    })
+                    .ToListAsync();
 
                 return View(model);
             }
 
-            Guid currentUserId = Guid.Parse(GetCurrentClientId());
+            string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(currentUserIdString))
+            {
+                return Unauthorized();
+            }
+
+            Guid currentUserId = Guid.Parse(currentUserIdString);
+
+            var slot = await context.TeacherAvailabilities
+                .FirstOrDefaultAsync(x => x.Id == model.TeacherAvailabilityId && x.IsAvailable);
+
+            if (slot == null)
+            {
+                ModelState.AddModelError(string.Empty, "Избраният час вече не е свободен.");
+
+                model.Lessons = await context.Lessons
+                    .Where(l => l.TypeName == LessonTypeName.Individual)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = l.Name
+                    })
+                    .ToListAsync();
+
+                model.AvailableSlots = await context.TeacherAvailabilities
+                    .Where(x => x.IsAvailable)
+                    .Include(x => x.Teacher)
+                    .OrderBy(x => x.Date)
+                    .ThenBy(x => x.StartTime)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.Id.ToString(),
+                        Text = x.Teacher.FirstName + " " + x.Teacher.LastName
+                               + " - " + x.Date.ToString()
+                               + " - " + x.StartTime.ToString()
+                               + " - " + x.EndTime.ToString()
+                    })
+                    .ToListAsync();
+
+                return View(model);
+            }
+
+            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == model.LessonId);
+
+            if (lesson == null || lesson.TypeName != LessonTypeName.Individual)
+            {
+                ModelState.AddModelError(string.Empty, "Невалиден урок.");
+
+                model.Lessons = await context.Lessons
+                    .Where(l => l.TypeName == LessonTypeName.Individual)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = l.Name
+                    })
+                    .ToListAsync();
+
+                model.AvailableSlots = await context.TeacherAvailabilities
+                    .Where(x => x.IsAvailable)
+                    .Include(x => x.Teacher)
+                    .OrderBy(x => x.Date)
+                    .ThenBy(x => x.StartTime)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.Id.ToString(),
+                        Text = x.Teacher.FirstName + " " + x.Teacher.LastName
+                               + " - " + x.Date.ToString()
+                               + " - " + x.StartTime.ToString()
+                               + " - " + x.EndTime.ToString()
+                    })
+                    .ToListAsync();
+
+                return View(model);
+            }
 
             var booking = new BookLesson
             {
                 Id = Guid.NewGuid(),
-                Date = model.Date,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
-                TeacherId = model.TeacherId,
+                Date = slot.Date,
+                StartTime = slot.StartTime,
+                EndTime = slot.EndTime,
+                TeacherId = slot.TeacherId,
                 LessonId = model.LessonId,
-                UserId = currentUserId
+                StudentId = currentUserId
             };
+
+            slot.IsAvailable = false;
 
             await context.BookLessons.AddAsync(booking);
             await context.SaveChangesAsync();
@@ -268,6 +351,117 @@ namespace ChitalishteIskra.Controllers
 
             return View(model);
         }
+
+
+
+        [Authorize(Roles = "Admin,Teacher")]
+        [HttpGet]
+        public async Task<IActionResult> CreateGroup()
+        {
+            var model = new BookLessonCreateGroupViewModel
+            {
+                Lessons = await context.Lessons
+                    .Where(l => l.TypeName == LessonTypeName.Group)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = l.Name
+                    })
+                    .ToListAsync(),
+
+                Groups = await context.Groups
+                    .Select(g => new SelectListItem
+                    {
+                        Value = g.Id.ToString(),
+                        Text = g.Name
+                    })
+                    .ToListAsync()
+            };
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Admin,Teacher")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateGroup(BookLessonCreateGroupViewModel model)
+        {
+            if (model.EndTime <= model.StartTime)
+            {
+                ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
+            }
+
+            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == model.LessonId);
+            if (lesson == null || lesson.TypeName != LessonTypeName.Group)
+            {
+                ModelState.AddModelError(string.Empty, "Избраният урок не е групов.");
+            }
+
+            var groupExists = await context.Groups.AnyAsync(g => g.Id == model.GroupId);
+            if (!groupExists)
+            {
+                ModelState.AddModelError(string.Empty, "Избраната група не съществува.");
+            }
+
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            Guid teacherId = Guid.Parse(currentUserId);
+
+            bool hasConflict = await context.BookLessons.AnyAsync(bl =>
+                bl.TeacherId == teacherId &&
+                bl.Date == model.Date &&
+                bl.StartTime == model.StartTime &&
+                bl.EndTime == model.EndTime);
+
+            if (hasConflict)
+            {
+                ModelState.AddModelError(string.Empty, "Вече има урок за този час.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Lessons = await context.Lessons
+                    .Where(l => l.TypeName == LessonTypeName.Group)
+                    .Select(l => new SelectListItem
+                    {
+                        Value = l.Id.ToString(),
+                        Text = l.Name
+                    })
+                    .ToListAsync();
+
+                model.Groups = await context.Groups
+                    .Select(g => new SelectListItem
+                    {
+                        Value = g.Id.ToString(),
+                        Text = g.Name
+                    })
+                    .ToListAsync();
+
+                return View(model);
+            }
+
+            var booking = new BookLesson
+            {
+                Id = Guid.NewGuid(),
+                Date = model.Date,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                TeacherId = teacherId,
+                LessonId = model.LessonId,
+                GroupId = model.GroupId,
+                StudentId = null
+            };
+
+            await context.BookLessons.AddAsync(booking);
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Edit(BookLessonEditViewModel model)

@@ -1,5 +1,6 @@
 ﻿using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models;
+using ChitalishteIskra.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -31,12 +32,25 @@ namespace ChitalishteIskra.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            //var model = new RegisterViewModel();
+            return View();
+        }
+
+
+        [HttpGet]
+        public IActionResult RegisterStudent()
+        {
+            if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var model = new RegisterViewModel();
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> RegisterStudent(RegisterViewModel model)
         {
 
             var child = new User()
@@ -155,6 +169,87 @@ namespace ChitalishteIskra.Controllers
                 }
             }
             return Content("Roles seeded (created if missing).");
+        }
+
+
+        [HttpGet]
+        public IActionResult RegisterTeacher()
+        {
+            if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(new TeacherRegisterViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterTeacher(TeacherRegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var teacher = new User
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Age = model.Age,
+                IsTeacherRequest = true,
+                IsApprovedTeacher = false
+            };
+
+            var result = await userManager.CreateAsync(teacher, model.Password);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(Login));
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> PendingTeachers()
+        {
+            var users = await userManager.Users
+                .Where(u => u.IsTeacherRequest && !u.IsApprovedTeacher)
+                .ToListAsync();
+
+            return View(users);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> ApproveTeacher(Guid id)
+        {
+            var user = await userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.IsApprovedTeacher = true;
+            user.IsTeacherRequest = false;
+
+            await userManager.UpdateAsync(user);
+
+            if (!await userManager.IsInRoleAsync(user, "Teacher"))
+            {
+                await userManager.AddToRoleAsync(user, "Teacher");
+            }
+
+            return RedirectToAction(nameof(PendingTeachers));
         }
 
     }
