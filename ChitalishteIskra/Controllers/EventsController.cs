@@ -1,5 +1,8 @@
-﻿using ChitalishteIskra.Data;
+﻿using ChitalishteIskra.Core.Contracts;
+using ChitalishteIskra.Core.DTOs.Events;
+using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
+using ChitalishteIskra.Models.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,18 +10,29 @@ namespace ChitalishteIskra.Controllers
 {
     public class EventsController:Controller
     {
-        public readonly ChitalishteIskraDbContext context;
+        private readonly IEventService eventService;
 
-        public EventsController(ChitalishteIskraDbContext _context)
+        public EventsController(IEventService eventService)
         {
-            this.context = _context;
+            this.eventService = eventService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var events = await context.Events.ToListAsync();
-            return View(events);
+            var data = await eventService.GetAllAsync();
+
+            var model = data.Select(e => new EventIndexViewModel
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Date = e.Date,
+                StartTime = e.StartTime,
+                EndTime = e.EndTime,
+                Location = e.Location
+            });
+
+            return View(model);
         }
 
         [HttpGet]
@@ -28,42 +42,78 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Event evnt)
+        public async Task<IActionResult> Create(EventCreateViewModel model)
         {
-            await context.Events.AddAsync(evnt);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var dto = new CreateEventDto
+            {
+                Name = model.Name,
+                Date = model.Date,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                Location = model.Location
+            };
+
+            await eventService.CreateAsync(dto);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var edit = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
-            if (edit == null)
+            var data = await eventService.GetByIdAsync(id);
+
+            if (data == null)
             {
                 return NotFound();
             }
-            return View(edit);
+
+            var model = new EventEditViewModel
+            {
+                Id = data.Id,
+                Name = data.Name,
+                Date = data.Date,
+                StartTime = data.StartTime,
+                EndTime = data.EndTime,
+                Location = data.Location
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Event evnt)
+        public async Task<IActionResult> Edit(EventEditViewModel model)
         {
-            context.Events.Update(evnt);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var dto = new CreateEventDto
+            {
+                Name = model.Name,
+                Date = model.Date,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                Location = model.Location
+            };
+
+            await eventService.UpdateAsync(model.Id, dto);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var edit = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
-            if (edit != null)
-            {
-                context.Events.Remove(edit);
-                await context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
+            await eventService.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿@model IEnumerable<ChitalishteIskra.Data.Entities.Event>
+﻿@using ChitalishteIskra.Models.Events
+@model IEnumerable<EventIndexViewModel>
+
 
 <h2 class="mb-3">Events</h2>
 
@@ -16,6 +18,7 @@
     </thead>
     <tbody>
         @foreach (var item in Model)
+
         {
             <tr>
                 <td>@item.Name</td>

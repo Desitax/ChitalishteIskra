@@ -52,34 +52,53 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterStudent(RegisterViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
-            var child = new User()
+            var child = new User
             {
                 FirstName = model.ChildInfo.FirstName,
                 LastName = model.ChildInfo.LastName,
-                Age = model.ChildInfo.Age,
+                Age = model.ChildInfo.Age
             };
 
-            if (!string.IsNullOrEmpty(model.ParentInfo.FirstName))
+            bool hasParentInfo =
+                !string.IsNullOrWhiteSpace(model.ParentInfo.FirstName) &&
+                !string.IsNullOrWhiteSpace(model.ParentInfo.LastName) &&
+                model.ParentInfo.Age.HasValue;
+
+            if (hasParentInfo)
             {
-                var parent = new User()
+                var parent = new User
                 {
                     Email = model.Email,
                     UserName = model.UserName,
                     FirstName = model.ParentInfo.FirstName,
-                    LastName = model.ParentInfo.LastName,
-                    Age = model.ParentInfo.Age,
+                    LastName = model.ParentInfo.LastName!,
+                    Age = model.ParentInfo.Age.Value
                 };
 
                 child.Email = "child_" + model.Email;
-                child.UserName = "child" + model.UserName;
+                child.UserName = "child_" + model.UserName;
 
                 var parentResult = await userManager.CreateAsync(parent, model.Password);
-                await userManager.AddToRoleAsync(parent, "Parent");
 
                 if (!parentResult.Succeeded)
                 {
                     foreach (var item in parentResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, item.Description);
+                    }
+
+                    return View(model);
+                }
+
+                var parentRoleResult = await userManager.AddToRoleAsync(parent, "Parent");
+                if (!parentRoleResult.Succeeded)
+                {
+                    foreach (var item in parentRoleResult.Errors)
                     {
                         ModelState.AddModelError(string.Empty, item.Description);
                     }
@@ -94,30 +113,52 @@ namespace ChitalishteIskra.Controllers
             }
 
             var result = await userManager.CreateAsync(child, model.Password);
-            await userManager.AddToRoleAsync(child, "Student");
 
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                return RedirectToAction("Login", "Users");
+                foreach (var item in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, item.Description);
+                }
+
+                return View(model);
             }
 
-            foreach (var item in result.Errors)
+            var childRoleResult = await userManager.AddToRoleAsync(child, "Student");
+            if (!childRoleResult.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, item.Description);
+                foreach (var item in childRoleResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, item.Description);
+                }
+
+                return View(model);
+            }
+
+            await signInManager.SignInAsync(child, isPersistent: false);
+
+            return RedirectToAction("Login", "Users", new
+            {
+                username = child.UserName,
+                password = model.Password
+            });
+        }
+
+        public IActionResult Login(string? username, string? password)
+        {
+            var model = new LoginViewModel();
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                model.UserName = username;
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                model.Password = password;
             }
 
             return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            if (User.Identity?.IsAuthenticated ?? false)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            return View(new LoginViewModel());
         }
 
         [HttpPost]

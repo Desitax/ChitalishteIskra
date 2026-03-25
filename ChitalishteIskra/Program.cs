@@ -1,3 +1,5 @@
+using ChitalishteIskra.Core.Contracts;
+using ChitalishteIskra.Core.Services;
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data.Seed;
@@ -19,12 +21,12 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 {
-	options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedAccount = false;
 
-	options.Password.RequireDigit = false;
-	options.Password.RequireUppercase = false;
-	options.Password.RequiredLength = 5;
-	options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 5;
+    options.Password.RequireNonAlphanumeric = false;
 })
 .AddEntityFrameworkStores<ChitalishteIskraDbContext>()
 .AddDefaultTokenProviders();
@@ -38,6 +40,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IBookLessonService, BookLessonService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -46,6 +51,9 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     await IdentitySeeder.SeedRolesAsync(roleManager);
     await IdentitySeeder.SeedAdminAsync(userManager);
+    await IdentitySeeder.SeedTeacherAsync(userManager);
+    await IdentitySeeder.SeedStudentAsync(userManager);
+    await IdentitySeeder.SeedParentAsync(userManager);
 }
 
 // Configure the HTTP request pipeline.

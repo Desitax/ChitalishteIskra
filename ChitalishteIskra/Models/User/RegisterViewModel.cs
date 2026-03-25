@@ -25,8 +25,8 @@ namespace ChitalishteIskra.Models
 
         public string ConfirmPassword { get; set; } = null!;
 
-        public UserRegisterViewModel ParentInfo { get; set; }
+        public ParentInfoRegisterViewModel ParentInfo { get; set; }
 
-        public UserRegisterViewModel ChildInfo { get; set; }
+        public StudentInfoRegisterViewModel ChildInfo { get; set; }
     }
 }

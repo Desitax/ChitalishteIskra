@@ -18,7 +18,7 @@ namespace ChitalishteIskra.Data.Seed
 
             foreach (var role in roles)
             {
-                if(!await roleManager.RoleExistsAsync(role))
+                if (!await roleManager.RoleExistsAsync(role))
                 {
                     await roleManager.CreateAsync(new IdentityRole<Guid>(role));
                 }
@@ -76,6 +76,60 @@ namespace ChitalishteIskra.Data.Seed
             if (!await userManager.IsInRoleAsync(teacherUser, "Teacher"))
             {
                 await userManager.AddToRoleAsync(teacherUser, "Teacher");
+            }
+        }
+
+        public static async Task SeedStudentAsync(UserManager<User> userManager)
+        {
+            string username = "student";
+            string email = "student@student.com";
+
+            var studentUser = await userManager.FindByNameAsync(username);
+
+            if (studentUser == null)
+            {
+                studentUser = new User
+                {
+                    UserName = username,
+                    Email = email,
+                    FirstName = "Petko",
+                    LastName = "Petkov",
+                    Age = 18
+                };
+
+                await userManager.CreateAsync(studentUser, "student");
+            }
+
+            if (!await userManager.IsInRoleAsync(studentUser, "Student"))
+            {
+                await userManager.AddToRoleAsync(studentUser, "Student");
+            }
+        }
+
+        public static async Task SeedParentAsync(UserManager<User> userManager)
+        {
+            string username = "parent";
+            string email = "parent@parent.com";
+
+            var parentUser = await userManager.FindByNameAsync(username);
+
+            if (parentUser == null)
+            {
+                parentUser = new User
+                {
+                    UserName = username,
+                    Email = email,
+                    FirstName = "Maria",
+                    LastName = "Petrova",
+                    Age = 40
+                };
+
+                await userManager.CreateAsync(parentUser, "parent");
+            }
+
+            if (!await userManager.IsInRoleAsync(parentUser, "Parent"))
+            {
+                await userManager.AddToRoleAsync(parentUser, "Parent");
             }
         }
 

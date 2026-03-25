@@ -1,10 +1,17 @@
-﻿namespace ChitalishteIskra.Models.Events
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ChitalishteIskra.Core.DTOs.Events
 {
-    public class EventIndexViewModel
+    public class EventDto
     {
         public Guid Id { get; set; }
 
         public string Name { get; set; } = null!;
+
         public DateOnly Date { get; set; }
 
         public TimeOnly StartTime { get; set; }
