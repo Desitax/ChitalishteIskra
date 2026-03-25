@@ -19,5 +19,6 @@ namespace ChitalishteIskra.Core.DTOs.Events
         public TimeOnly EndTime { get; set; }
 
         public string Location { get; set; } = null!;
+
     }
 }

@@ -42,6 +42,8 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IBookLessonService, BookLessonService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
 
 var app = builder.Build();
 

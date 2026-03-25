@@ -1,5 +1,8 @@
-﻿using ChitalishteIskra.Data;
+﻿using ChitalishteIskra.Core.Contracts;
+using ChitalishteIskra.Core.DTOs.Lessons;
+using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
+using ChitalishteIskra.Models.Lessons;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,73 +12,131 @@ namespace ChitalishteIskra.Controllers
 {
     public class LessonsController:Controller
     {
-        public readonly ChitalishteIskraDbContext context;
-        public LessonsController(ChitalishteIskraDbContext _context)
+        private readonly ILessonService lessonService;
+
+        public LessonsController(ILessonService lessonService)
         {
-            this.context = _context;
+            this.lessonService = lessonService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var lesson = await context.Lessons.ToListAsync();
-            return View(lesson);
+            var data = await lessonService.GetAllAsync();
+
+            var model = data.Select(l => new LessonIndexViewModel
+            {
+                Id = l.Id,
+                Name = l.Name,
+                TypeName = l.TypeName
+            });
+
+            return View(model);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-
-            ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
-               .Cast<LessonTypeName>()
-               .ToList()
-               .Select(d => new SelectListItem()
-               {
-                   Text = d.ToString(),
-                   Value = d.ToString()
-               })
-               .ToList();
+            ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
+                .Cast<Lesson.LessonTypeName>()
+                .Select(d => new SelectListItem
+                {
+                    Text = d.ToString(),
+                    Value = d.ToString()
+                })
+                .ToList();
 
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Lesson lesson)
+        public async Task<IActionResult> Create(LessonCreateViewModel model)
         {
-            await context.Lessons.AddAsync(lesson);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
+                    .Cast<Lesson.LessonTypeName>()
+                    .Select(d => new SelectListItem
+                    {
+                        Text = d.ToString(),
+                        Value = d.ToString()
+                    })
+                    .ToList();
+
+                return View(model);
+            }
+
+            var dto = new CreateLessonDto
+            {
+                Name = model.Name,
+                TypeName = model.TypeName
+            };
+
+            await lessonService.CreateAsync(dto);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == id);
-            if (lesson == null)
+            var data = await lessonService.GetByIdAsync(id);
+
+            if (data == null)
             {
                 return NotFound();
             }
-            return View(lesson);
+
+            ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
+                .Cast<Lesson.LessonTypeName>()
+                .Select(d => new SelectListItem
+                {
+                    Text = d.ToString(),
+                    Value = d.ToString()
+                })
+                .ToList();
+
+            var model = new LessonEditViewModel
+            {
+                Id = data.Id,
+                Name = data.Name,
+                TypeName = data.TypeName
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Lesson lesson)
+        public async Task<IActionResult> Edit(LessonEditViewModel model)
         {
-            context.Lessons.Update(lesson);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
+                    .Cast<Lesson.LessonTypeName>()
+                    .Select(d => new SelectListItem
+                    {
+                        Text = d.ToString(),
+                        Value = d.ToString()
+                    })
+                    .ToList();
+
+                return View(model);
+            }
+
+            var dto = new CreateLessonDto
+            {
+                Name = model.Name,
+                TypeName = model.TypeName
+            };
+
+            await lessonService.UpdateAsync(model.Id, dto);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == id);
-            if (lesson != null)
-            {
-                context.Lessons.Remove(lesson);
-                await context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
+            await lessonService.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

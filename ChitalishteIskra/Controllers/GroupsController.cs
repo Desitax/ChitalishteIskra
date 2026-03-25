@@ -1,5 +1,8 @@
-﻿using ChitalishteIskra.Data;
+﻿using ChitalishteIskra.Core.Contracts;
+using ChitalishteIskra.Core.DTOs.Groups;
+using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
+using ChitalishteIskra.Models.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,19 +11,26 @@ namespace ChitalishteIskra.Controllers
 {
     public class GroupsController:Controller
     {
-        public readonly ChitalishteIskraDbContext context;
+        private readonly IGroupService groupService;
 
-        public GroupsController(ChitalishteIskraDbContext _context)
+        public GroupsController(IGroupService groupService)
         {
-            this.context = _context;
+            this.groupService = groupService;
         }
 
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var groups = await context.Groups.ToListAsync();
-            return View(groups);
+            var data = await groupService.GetAllAsync();
+
+            var model = data.Select(g => new GroupIndexViewModel
+            {
+                Id = g.Id,
+                Name = g.Name
+            });
+
+            return View(model);
         }
 
         [HttpGet]
@@ -30,42 +40,65 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Group group)
+        public async Task<IActionResult> Create(GroupCreateViewModel model)
         {
-            await context.Groups.AddAsync(group);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var dto = new CreateGroupDto
+            {
+                Name = model.Name
+            };
+
+            await groupService.CreateAsync(dto);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var edit = await context.Groups.FirstOrDefaultAsync(e => e.Id == id);
-            if (edit == null)
+            var data = await groupService.GetByIdAsync(id);
+
+            if (data == null)
             {
                 return NotFound();
             }
-            return View(edit);
+
+            var model = new GroupEditViewModel
+            {
+                Id = data.Id,
+                Name = data.Name
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Group group)
+        public async Task<IActionResult> Edit(GroupEditViewModel model)
         {
-            context.Groups.Update(group);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var dto = new CreateGroupDto
+            {
+                Name = model.Name
+            };
+
+            await groupService.UpdateAsync(model.Id, dto);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var edit = await context.Groups.FirstOrDefaultAsync(e => e.Id == id);
-            if (edit != null)
-            {
-                context.Groups.Remove(edit);
-                await context.SaveChangesAsync();
-            }
-            return RedirectToAction("Index");
+            await groupService.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
 

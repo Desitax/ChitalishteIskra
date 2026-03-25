@@ -1,10 +1,13 @@
 ﻿@using ChitalishteIskra.Models.Events
 @model IEnumerable<EventIndexViewModel>
 
-
 <h2 class="mb-3">Events</h2>
 
-<a asp-action="Create" class="btn btn-primary mb-3">Add event</a>
+@if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+{
+    <a asp-action="Create" class="btn btn-primary mb-3">Запази час</a>
+}
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -26,12 +29,19 @@
                 <td>@item.StartTime</td>
                 <td>@item.EndTime</td>
                 <td>@item.Location</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm" style="display:inline">Edit</a>
-                    <form asp-action="Delete" asp-route-id="@item.Id" style="display:inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                </td>
+
+                @if (User.IsInRole("Admin"))
+
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+
+                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                }
             </tr>
         }
     </tbody>

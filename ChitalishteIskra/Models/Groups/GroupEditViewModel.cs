@@ -1,15 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChitalishteIskra.Models.Lessons
+namespace ChitalishteIskra.Models.Groups
 {
-    public class LessonEditViewModel
+    public class GroupEditViewModel
     {
         public Guid Id { get; set; }
 
         [Required]
         public string Name { get; set; } = null!;
-
-        [Required]
-        public string TypeName { get; set; } = null!;
     }
 }

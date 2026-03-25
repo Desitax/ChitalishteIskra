@@ -173,11 +173,19 @@ namespace ChitalishteIskra.Controllers
 
             if (user != null)
             {
+                if (user.IsTeacherRequest == true && user.IsApprovedTeacher == false)
+                {
+
+                    ModelState.AddModelError(string.Empty, "Teacher not approved, contact admin to continue");
+                    return View(model);
+                }
+
                 var result = await signInManager.PasswordSignInAsync(
                     user,
                     model.Password,
                     false,
                     false);
+                
 
                 if (result.Succeeded)
                 {

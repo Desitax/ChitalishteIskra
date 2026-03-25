@@ -32,8 +32,4 @@
     <ProjectReference Include="..\ChitalishteIskra.Data\ChitalishteIskra.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Groups\" />
-  </ItemGroup>
-
 </Project>

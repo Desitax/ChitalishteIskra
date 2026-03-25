@@ -3,11 +3,14 @@ using ChitalishteIskra.Core.DTOs.Events;
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.Events;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ChitalishteIskra.Controllers
 {
+    [Authorize]
     public class EventsController:Controller
     {
         private readonly IEventService eventService;
@@ -17,6 +20,7 @@ namespace ChitalishteIskra.Controllers
             this.eventService = eventService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -35,12 +39,15 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
         public async Task<IActionResult> Create(EventCreateViewModel model)
         {
@@ -63,6 +70,7 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -72,6 +80,7 @@ namespace ChitalishteIskra.Controllers
             {
                 return NotFound();
             }
+
 
             var model = new EventEditViewModel
             {
@@ -86,6 +95,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(EventEditViewModel model)
         {
@@ -108,6 +118,7 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)

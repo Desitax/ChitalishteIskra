@@ -46,55 +46,6 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        //[Authorize(Roles = "Admin")]
-        //[HttpGet]
-        //public async Task<IActionResult> Create()
-        //{
-        //    var teachers = await context.Users.ToListAsync();
-        //    ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
-
-        //    var lessons = await context.Lessons.Include(t=>t.Type)
-        //        .Select(l => new
-        //    {
-        //        l.Id,
-        //        Text = l.Name + " (" + (l.Type != null ? l.Type.Name.ToString() : "No type") + ")"
-        //    })
-        //.ToListAsync();
-
-        //    ViewBag.Lessons = new SelectList(lessons, "Id", "Text");
-
-        //    var model = new BookLessonCreateViewModel
-        //    {
-        //        Teachers = context.Users
-        //    .Select(u => new SelectListItem
-        //    {
-        //        Value = u.Id.ToString(),
-        //        Text = u.FirstName + " " + u.LastName
-        //    }),
-
-        //        Lessons = context.Lessons
-        //    .Select(l => new SelectListItem
-        //    {
-        //        Value = l.Id.ToString(),
-        //        Text = l.Name
-        //    })
-        //    };
-
-        //    var lessonType = new LessonType();
-
-        //    ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
-        //   .Cast<LessonTypeName>()
-        //   .Select(e => new SelectListItem
-        //   {
-        //       Value = ((int)e).ToString(),
-        //       Text = e.ToString()
-        //   })
-        //   .ToList();
-
-        //    return View(model);
-        //}
-
-
         [Authorize(Roles = "Student,Parent")]
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -118,55 +69,6 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-
-        //[HttpPost]
-        //public async Task<IActionResult> Create(BookLessonCreateViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var teachers = await context.Users.ToListAsync();
-        //        ViewBag.Teachers = new SelectList(teachers, "Id", "FirstName");
-
-        //        var lessons = await context.Lessons.ToListAsync();
-        //        ViewBag.Lessons = new SelectList(lessons, "Id", "Name");
-
-        //        model.Teachers = context.Users.Select(u => new SelectListItem
-        //        {
-        //            Value = u.Id.ToString(),
-        //            Text = u.FirstName + " " + u.LastName
-        //        }).ToList();
-
-        //        model.Lessons = context.Lessons.Select(l => new SelectListItem
-        //        {
-        //            Value = l.Id.ToString(),
-        //            Text = l.Name
-        //        }).ToList();
-
-        //        ViewBag.LessonTypes = Enum.GetValues(typeof(LessonTypeName))
-        //    .Cast<LessonTypeName>()
-        //    .Select(e => new SelectListItem
-        //    {
-        //        Value = ((int)e).ToString(),
-        //        Text = e.ToString()
-        //    }).ToList();
-
-        //        return View(model);
-        //    }
-
-        //    var booking = new BookLesson
-        //    {
-        //        Date = model.Date,
-        //        StartTime = model.StartTime,
-        //        EndTime = model.EndTime,
-        //        TeacherId = model.TeacherId,
-        //        LessonId = model.LessonId
-        //    };
-
-        //    await context.BookLessons.AddAsync(booking);
-        //    await context.SaveChangesAsync();
-
-        //    return RedirectToAction(nameof(Index));
-        //}
 
         [Authorize(Roles = "Student,Parent")]
         [HttpPost]
