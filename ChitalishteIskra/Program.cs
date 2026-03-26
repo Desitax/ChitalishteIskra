@@ -3,8 +3,11 @@ using ChitalishteIskra.Core.Services;
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data.Seed;
+using ChitalishteIskra.Data.Utilities;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -31,6 +34,11 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 .AddEntityFrameworkStores<ChitalishteIskraDbContext>()
 .AddDefaultTokenProviders();
 
+var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+builder.Services.AddSingleton<Cloudinary>((sp) =>
+{
+    return new Cloudinary(new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret));
+});
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -44,6 +52,7 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IBookLessonService, BookLessonService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<ITeacherAvailabilityService, TeacherAvailabilityService>();
 
 var app = builder.Build();
 

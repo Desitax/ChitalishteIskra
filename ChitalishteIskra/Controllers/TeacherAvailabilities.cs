@@ -1,71 +1,139 @@
-﻿using ChitalishteIskra.Data;
+﻿using ChitalishteIskra.Core.Contracts;
+using ChitalishteIskra.Core.DTOs.TeacherAvailabilities;
+using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
+using ChitalishteIskra.Models.TeacherAvailabilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ChitalishteIskra.Controllers
 {
+    [Authorize]
     public class TeacherAvailabilities:Controller
     {
-        public readonly ChitalishteIskraDbContext context;
 
-        public TeacherAvailabilities(ChitalishteIskraDbContext _context)
+        private readonly ITeacherAvailabilityService service;
+
+        public TeacherAvailabilities(ITeacherAvailabilityService service)
         {
-            this.context = _context;
+            this.service = service;
         }
 
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var teacherAvailabilities = await context.TeacherAvailabilities.ToListAsync();
-            return View(teacherAvailabilities);
+            var data = await service.GetAllAsync();
+
+            var model = data.Select(x => new TeacherAvailabilityIndexViewModel
+            {
+                Id = x.Id,
+                TeacherName = x.TeacherName,
+                Date = x.Date,
+                StartTime = x.StartTime,
+                EndTime = x.EndTime,
+                IsAvailable = x.IsAvailable
+            });
+
+            return View(model);
         }
 
+        [Authorize(Roles = "Teacher,Admin")]
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new TeacherAvailabilitiesCreateViewModel());
         }
 
+
+        [Authorize(Roles = "Teacher,Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create(TeacherAvailability availabilities)
+        public async Task<IActionResult> Create(TeacherAvailabilitiesCreateViewModel model)
         {
-            await context.TeacherAvailabilities.AddAsync(availabilities);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Edit(Guid id)
-        {
-            var edit = await context.Groups.FirstOrDefaultAsync(e => e.Id == id);
-            if (edit == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View(model);
             }
-            return View(edit);
+
+            if (model.EndTime <= model.StartTime)
+            {
+                ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
+                return View(model);
+            }
+
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            var dto = new CreateTeacherAvailabilityDto
+            {
+                Date = model.Date,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                TeacherId = Guid.Parse(currentUserId)
+            };
+
+            await service.CreateAsync(dto);
+
+            return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(TeacherAvailability teacherAvailabilities)
-        {
-            context.TeacherAvailabilities.Update(teacherAvailabilities);
-            await context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
-
+        [Authorize(Roles = "Teacher,Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var edit = await context.TeacherAvailabilities.FirstOrDefaultAsync(e => e.Id == id);
-            if (edit != null)
+            await service.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Teacher,Admin")]
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var data = await service.GetByIdAsync(id);
+
+            var model = new TeacherAvailabilitiesCreateViewModel
             {
-                context.TeacherAvailabilities.Remove(edit);
-                await context.SaveChangesAsync();
+                Date = data.Date,
+                StartTime = data.StartTime,
+                EndTime = data.EndTime
+            };
+
+            ViewBag.Id = id;
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Teacher,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Guid id, TeacherAvailabilitiesCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
             }
-            return RedirectToAction("Index");
+
+            if (model.EndTime <= model.StartTime)
+            {
+                ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
+                return View(model);
+            }
+
+            var dto = new CreateTeacherAvailabilityDto
+            {
+                Date = model.Date,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime
+            };
+
+            await service.UpdateAsync(id, dto);
+
+            return RedirectToAction(nameof(Index));
         }
 
     }

@@ -1,4 +1,4 @@
-/*:root {
+:root {
     --primary: #8B0000;
     --primary-dark: #5a0000;
     --accent: #D4AF37;
@@ -12,20 +12,20 @@ body {
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: var(--text);
     background: var(--bg);
-}*/
+    line-height: 1.6;
+}
 
-/* Headings */
-/*h1, h2, h3, .display-title {
+h1, h2, h3 {
     font-family: "Playfair Display", serif;
-}*/
+}
 
-/* Navbar look (if not already) */
-/*.navbar {
+ Navbar look (if not already) 
+.navbar {
     background: linear-gradient(to right, var(--primary), var(--primary-dark)) !important;
-}*/
+}
 
-/* Page sections */
-/*.section {
+ Page sections 
+.section {
     padding: 72px 0;
 }
 
@@ -33,10 +33,10 @@ body {
     color: var(--primary);
     font-weight: 700;
     margin-bottom: 28px;
-}*/
+}
 
-/* Nice cards */
-/*.ui-card {
+ Nice cards 
+.ui-card {
     background: var(--card);
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,.06);
@@ -46,10 +46,10 @@ body {
     .ui-card:hover {
         transform: translateY(-4px);
         transition: .2s ease;
-    }*/
+    }
 
-/* Buttons */
-/*.btn-primary {
+ Buttons 
+.btn-primary {
     background: var(--primary);
     border-color: var(--primary);
 }
@@ -57,9 +57,100 @@ body {
     .btn-primary:hover {
         background: var(--primary-dark);
         border-color: var(--primary-dark);
-    }*/
+    }
 
-/* Utility */
-/*.text-muted2 {
+ Utility 
+.text-muted2 {
     color: var(--muted) !important;
-}*/
+}
+
+.about-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    min-height: 320px;
+    color: white;
+    margin: 2rem 0;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,.12);
+}
+
+    .about-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0,0,0,.68), rgba(0,0,0,.28));
+    }
+
+.about-hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 3rem;
+    max-width: 760px;
+}
+
+.about-section {
+    margin: 2rem 0 3rem 0;
+}
+
+.about-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.05);
+    padding: 1.5rem;
+    height: 100%;
+}
+
+.about-img {
+    width: 100%;
+    height: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
+
+.about-title {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.about-lead {
+    font-size: 1.1rem;
+    color: #495057;
+}
+
+.board-list li,
+.doc-list li,
+.project-list li {
+    margin-bottom: 0.8rem;
+}
+
+.team-card img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+}
+
+.statute-box {
+    white-space: pre-line;
+    line-height: 1.8;
+}
+.card p {
+    font-size: 1.05rem;
+    line-height: 1.9;
+}
+
+.card h2 {
+    color: #8B0000;
+}
+
+@media (min-width: 768px) {
+    .card-body {
+        padding: 2.5rem !important;
+    }
+}
