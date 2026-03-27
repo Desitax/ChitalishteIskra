@@ -27,6 +27,13 @@ namespace ChitalishteIskra.Data
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<BookLesson> BookLessons { get; set; } = null!;
 
+        //protected override void OnModelCreating(ModelBuilder builder)
+        //{
+        //    base.OnModelCreating(builder);
+
+        //    builder.ApplyConfigurationsFromAssembly(typeof(ChitalishteIskraDbContext).Assembly);
+        //}
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
