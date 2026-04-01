@@ -51,6 +51,16 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EventCreateViewModel model)
         {
+            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
+            }
+
+            if (model.EndTime <= model.StartTime)
+            {
+                ModelState.AddModelError(nameof(model.EndTime), "Крайният час трябва да е след началния час.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -99,6 +109,16 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EventEditViewModel model)
         {
+            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
+            }
+
+            if (model.EndTime <= model.StartTime)
+            {
+                ModelState.AddModelError(nameof(model.EndTime), "Крайният час трябва да е след началния час.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);

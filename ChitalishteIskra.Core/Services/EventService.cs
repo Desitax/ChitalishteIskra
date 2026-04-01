@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,6 +48,16 @@ namespace ChitalishteIskra.Core.Services
             };
 
             await context.Events.AddAsync(entity);
+            //var users = await context.Users.ToListAsync();
+            //foreach(var user in users)
+            //{
+            //    var notification = new Notification
+            //    {
+            //        recipient = user.Id,
+            //        TextReader = "Event " + model.Name + " was created on " + model.Date + " at " + model.StartTime + <a href="/event/id"> </a>,
+            //        Checked = false,
+            //    };
+            //}
             await context.SaveChangesAsync();
         }
 

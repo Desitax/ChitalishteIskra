@@ -4,9 +4,12 @@
 <h2 class="mb-3">Edit booking</h2>
 
 <form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
     <div class="mb-3">
         <label class="form-label">Date</label>
-        <input class="form-control" type="date" asp-for="Date" />
+        <input class="form-control" type="date" asp-for="Date"
+               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
     </div>
 
     <div class="mb-3">

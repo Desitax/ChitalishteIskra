@@ -52,6 +52,11 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(TeacherAvailabilitiesCreateViewModel model)
         {
+            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -61,6 +66,12 @@ namespace ChitalishteIskra.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
                 return View(model);
+            }
+
+            if (model.Date == DateOnly.FromDateTime(DateTime.Today) &&
+    model.StartTime < TimeOnly.FromDateTime(DateTime.Now))
+            {
+                ModelState.AddModelError(nameof(model.StartTime), "Не може да избирате час, който вече е минал.");
             }
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -83,13 +94,6 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Teacher,Admin")]
-        [HttpPost]
-        public async Task<IActionResult> Delete(Guid id)
-        {
-            await service.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
-        }
 
         [Authorize(Roles = "Teacher,Admin")]
         [HttpGet]
@@ -113,6 +117,11 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, TeacherAvailabilitiesCreateViewModel model)
         {
+            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -124,6 +133,12 @@ namespace ChitalishteIskra.Controllers
                 return View(model);
             }
 
+            if (model.Date == DateOnly.FromDateTime(DateTime.Today) &&
+    model.StartTime < TimeOnly.FromDateTime(DateTime.Now))
+            {
+                ModelState.AddModelError(nameof(model.StartTime), "Не може да избирате час, който вече е минал.");
+            }
+
             var dto = new CreateTeacherAvailabilityDto
             {
                 Date = model.Date,
@@ -133,6 +148,15 @@ namespace ChitalishteIskra.Controllers
 
             await service.UpdateAsync(id, dto);
 
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [Authorize(Roles = "Teacher,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
