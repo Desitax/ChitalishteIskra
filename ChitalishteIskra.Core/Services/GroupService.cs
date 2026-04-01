@@ -23,12 +23,15 @@ namespace ChitalishteIskra.Core.Services
         public async Task<IEnumerable<GroupDto>> GetAllAsync()
         {
             return await context.Groups
-                .Select(g => new GroupDto
-                {
-                    Id = g.Id,
-                    Name = g.Name
-                })
-                .ToListAsync();
+                 .Include(g => g.Teacher)
+                 .Select(g => new GroupDto
+                 {
+                     Id = g.Id,
+                     Name = g.Name,
+                     TeacherId = g.TeacherId,
+                     TeacherName = g.Teacher.FirstName + " " + g.Teacher.LastName
+                 })
+                 .ToListAsync();
         }
 
         public async Task CreateAsync(CreateGroupDto model)
@@ -36,7 +39,8 @@ namespace ChitalishteIskra.Core.Services
             var group = new Group
             {
                 Id = Guid.NewGuid(),
-                Name = model.Name
+                Name = model.Name,
+                TeacherId = model.TeacherId
             };
 
             await context.Groups.AddAsync(group);
@@ -46,11 +50,14 @@ namespace ChitalishteIskra.Core.Services
         public async Task<GroupDto?> GetByIdAsync(Guid id)
         {
             return await context.Groups
+                .Include(g => g.Teacher)
                 .Where(g => g.Id == id)
                 .Select(g => new GroupDto
                 {
                     Id = g.Id,
-                    Name = g.Name
+                    Name = g.Name,
+                    TeacherId = g.TeacherId,
+                    TeacherName = g.Teacher.FirstName + " " + g.Teacher.LastName
                 })
                 .FirstOrDefaultAsync();
         }
@@ -65,6 +72,7 @@ namespace ChitalishteIskra.Core.Services
             }
 
             group.Name = model.Name;
+            group.TeacherId = model.TeacherId;
 
             await context.SaveChangesAsync();
         }

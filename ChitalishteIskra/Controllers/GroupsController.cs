@@ -4,7 +4,9 @@ using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.Groups;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Controllers
@@ -12,10 +14,12 @@ namespace ChitalishteIskra.Controllers
     public class GroupsController:Controller
     {
         private readonly IGroupService groupService;
+        private readonly UserManager<User> userManager;
 
-        public GroupsController(IGroupService groupService)
+        public GroupsController(IGroupService groupService, UserManager<User> userManager)
         {
             this.groupService = groupService;
+            this.userManager = userManager;
         }
 
         [AllowAnonymous]
@@ -27,15 +31,27 @@ namespace ChitalishteIskra.Controllers
             var model = data.Select(g => new GroupIndexViewModel
             {
                 Id = g.Id,
-                Name = g.Name
+                Name = g.Name,
+                TeacherId = g.TeacherId,
+                TeacherName = g.TeacherName
             });
 
             return View(model);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+            ViewBag.Teachers = teachers
+                .Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.FirstName + " " + t.LastName
+                })
+                .ToList();
+
             return View();
         }
 
@@ -44,12 +60,23 @@ namespace ChitalishteIskra.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+                ViewBag.Teachers = teachers
+                    .Select(t => new SelectListItem
+                    {
+                        Value = t.Id.ToString(),
+                        Text = t.FirstName + " " + t.LastName
+                    })
+                    .ToList();
+
                 return View(model);
             }
 
             var dto = new CreateGroupDto
             {
-                Name = model.Name
+                Name = model.Name,
+                TeacherId = model.TeacherId
             };
 
             await groupService.CreateAsync(dto);
@@ -67,10 +94,21 @@ namespace ChitalishteIskra.Controllers
                 return NotFound();
             }
 
+            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+            ViewBag.Teachers = teachers
+                .Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.FirstName + " " + t.LastName
+                })
+                .ToList();
+
             var model = new GroupEditViewModel
             {
                 Id = data.Id,
-                Name = data.Name
+                Name = data.Name,
+                TeacherId = data.TeacherId
             };
 
             return View(model);
@@ -81,12 +119,23 @@ namespace ChitalishteIskra.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+                ViewBag.Teachers = teachers
+                    .Select(t => new SelectListItem
+                    {
+                        Value = t.Id.ToString(),
+                        Text = t.FirstName + " " + t.LastName
+                    })
+                    .ToList();
+
                 return View(model);
             }
 
             var dto = new CreateGroupDto
             {
-                Name = model.Name
+                Name = model.Name,
+                TeacherId = model.TeacherId
             };
 
             await groupService.UpdateAsync(model.Id, dto);
@@ -100,8 +149,6 @@ namespace ChitalishteIskra.Controllers
             await groupService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
-
-
 
 
         public IActionResult ANPT() => View();

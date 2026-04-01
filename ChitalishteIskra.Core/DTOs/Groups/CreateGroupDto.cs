@@ -9,5 +9,6 @@ namespace ChitalishteIskra.Core.DTOs.Groups
     public class CreateGroupDto
     {
         public string Name { get; set; } = null!;
+        public Guid TeacherId { get; set; }
     }
 }

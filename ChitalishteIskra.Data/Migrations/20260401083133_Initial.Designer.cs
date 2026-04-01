@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChitalishteIskra.Data.Migrations
 {
     [DbContext(typeof(ChitalishteIskraDbContext))]
-    [Migration("20260320090037_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260401083133_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,7 +107,12 @@ namespace ChitalishteIskra.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Groups");
                 });
@@ -453,6 +458,17 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.Group", b =>
+                {
+                    b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
+                        .WithMany("Groups")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.GroupStudent", b =>
                 {
                     b.HasOne("ChitalishteIskra.Data.Entities.Group", "Group")
@@ -575,6 +591,8 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Navigation("BookLessons");
 
                     b.Navigation("GroupStudents");
+
+                    b.Navigation("Groups");
 
                     b.Navigation("TeacherAvailabilities");
 

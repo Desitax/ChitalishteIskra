@@ -17,6 +17,12 @@ namespace ChitalishteIskra.Data.Configurations
                 .Property(g => g.Name)
                 .HasMaxLength(100)
                 .IsRequired();
+
+            builder
+             .HasOne(g => g.Teacher)
+             .WithMany(t => t.Groups)
+             .HasForeignKey(g => g.TeacherId)
+             .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

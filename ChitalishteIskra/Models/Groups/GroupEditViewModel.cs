@@ -8,5 +8,8 @@ namespace ChitalishteIskra.Models.Groups
 
         [Required]
         public string Name { get; set; } = null!;
+
+        [Required]
+        public Guid TeacherId { get; set; }
     }
 }

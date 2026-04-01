@@ -23,7 +23,9 @@ namespace ChitalishteIskra.Data.Entities
         public bool IsApprovedTeacher { get; set; } = false;
         public bool IsTeacherRequest { get; set; } = false;
 
-		public ICollection<BookLesson> BookLessons { get; set; } = new List<BookLesson>();
+        public ICollection<Group> Groups { get; set; } = new List<Group>();
+
+        public ICollection<BookLesson> BookLessons { get; set; } = new List<BookLesson>();
 
         public ICollection<TeacherAvailability> TeacherAvailabilities { get; set; } = new List<TeacherAvailability>();
 
