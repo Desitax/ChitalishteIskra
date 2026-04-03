@@ -1,6 +1,9 @@
-﻿namespace ChitalishteIskra.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace ChitalishteIskra.Controllers
 {
-    public class StageController
+    public class StageController:Controller
     {
+        public IActionResult Stage() => View("Stage");
     }
 }
