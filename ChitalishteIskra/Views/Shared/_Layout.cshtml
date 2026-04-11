@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-   @*  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"> *@
+    @*  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"> *@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -42,6 +42,13 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Начало</a>
                         </li>
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Image" asp-action="Upload">Качи снимка</a>
+                            </li>
+                        }
 
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="BookLessons" asp-action="Index">
@@ -99,7 +106,7 @@
                                 <li><a class="dropdown-item" href="/Groups/ArtSchool.html">Школа по изкуствата „Емануил Манолов”</a></li>
                                 <li><a class="dropdown-item" href="/Groups/Blue.html">Школа по изобразително изкуство „Синьо”</a></li>
                                 <li><a class="dropdown-item" href="/Groups/SportniTantsi.html">Школа по спортни танци</a></li>
-                            </ul>                          
+                            </ul>
                         </li>
 
 

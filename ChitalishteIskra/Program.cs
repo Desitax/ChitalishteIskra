@@ -34,11 +34,14 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 .AddEntityFrameworkStores<ChitalishteIskraDbContext>()
 .AddDefaultTokenProviders();
 
-var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
-builder.Services.AddSingleton<Cloudinary>((sp) =>
-{
-    return new Cloudinary(new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret));
-});
+//var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+//builder.Services.AddSingleton<Cloudinary>((sp) =>
+//{
+//    return new Cloudinary(new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret));
+//});
+
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
