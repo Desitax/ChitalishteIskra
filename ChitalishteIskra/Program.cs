@@ -57,6 +57,9 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ITeacherAvailabilityService, TeacherAvailabilityService>();
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

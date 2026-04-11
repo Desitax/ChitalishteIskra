@@ -4,9 +4,11 @@ using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.Events;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace ChitalishteIskra.Controllers
 {
@@ -14,10 +16,14 @@ namespace ChitalishteIskra.Controllers
     public class EventsController:Controller
     {
         private readonly IEventService eventService;
+        private readonly IEmailSender emailSender;
+        private readonly UserManager<User> userManager;
 
-        public EventsController(IEventService eventService)
+        public EventsController(IEventService eventService,IEmailSender emailSender,UserManager<User> userManager)
         {
             this.eventService = eventService;
+            this.emailSender = emailSender;
+            this.userManager = userManager;
         }
 
         [AllowAnonymous]
@@ -77,6 +83,45 @@ namespace ChitalishteIskra.Controllers
 
             await eventService.CreateAsync(dto);
 
+            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+            var students = await userManager.GetUsersInRoleAsync("Student");
+            var parents = await userManager.GetUsersInRoleAsync("Parent");
+
+            var recipients = teachers
+                .Concat(students)
+                .Concat(parents)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .GroupBy(u => u.Id)
+                .Select(g => g.First())
+                .ToList();
+            TempData["WarningMessage"] = $"Teacher: {teachers.Count}, Student: {students.Count}," +
+                $" Parent: {parents.Count}, Получатели с email: {recipients.Count}";
+
+            string subject = "Предстоящо събитие в Читалище Искра";
+
+            string message = $@"
+        <h2>Имате ново събитие</h2>
+        <p><strong>Име:</strong> {model.Name}</p>
+        <p><strong>Дата:</strong> {model.Date}</p>
+        <p><strong>Начало:</strong> {model.StartTime}</p>
+        <p><strong>Край:</strong> {model.EndTime}</p>
+        <p><strong>Място:</strong> {model.Location}</p>
+    ";
+
+            try
+            {
+                await emailSender.SendEmailAsync(
+                    "desislavagudova@gmail.com",
+                    "Тестов имейл",
+                    "<h2>Тест</h2><p>Това е тестов имейл.</p>"
+                );
+
+                TempData["SuccessMessage"] = "Тестовият имейл е изпратен успешно.";
+            }
+            catch (Exception ex)
+            {
+                TempData["WarningMessage"] = $"Грешка при изпращане: {ex.Message}";
+            }
             return RedirectToAction(nameof(Index));
         }
 

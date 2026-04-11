@@ -1,6 +1,20 @@
 ﻿@using ChitalishteIskra.Models.Events
 @model IEnumerable<EventIndexViewModel>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["WarningMessage"]
+    </div>
+}
+
 <h2 class="mb-3">Events</h2>
 
 @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
