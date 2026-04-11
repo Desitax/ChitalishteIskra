@@ -80,6 +80,7 @@ namespace ChitalishteIskra.Controllers
                 EndTime = model.EndTime,
                 Location = model.Location
             };
+            // SUPER TEST 999
 
             await eventService.CreateAsync(dto);
 
