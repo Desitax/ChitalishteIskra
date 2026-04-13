@@ -1,0 +1,103 @@
+﻿@{
+    ViewData["Title"] = "Смесен хор „Петко Стайнов“";
+
+    var heroImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776088915/q9hysqh3qcameshac56i.jpg";
+    var contentImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776088889/jxete8iqu4sbqevf2s8u.jpg";
+}
+
+<div class="container py-5">
+
+    <!-- HERO -->
+    <div class="rounded-4 overflow-hidden mb-5 text-white d-flex align-items-center"
+         style="min-height: 360px;
+                background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.45)),
+                url('@heroImage') center/cover no-repeat;">
+
+        <div class="p-5">
+            <p class="text-uppercase mb-2" style="letter-spacing: 2px;">Народно читалище „Искра-1860”</p>
+            <h1 class="fw-bold mb-3">Смесен хор „Петко Стайнов“</h1>
+            <p class="mb-0 col-lg-8 fs-5">
+                Една от водещите хорови формации в България с богата история и значими постижения.
+            </p>
+        </div>
+    </div>
+
+    <!-- ЗА ХОРА (СНИМКА ВДЯСНО) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center gx-5">
+
+                <!-- ТЕКСТ -->
+                <div class="col-lg-7">
+                    <h2 class="mb-4">За хора</h2>
+                    <p>
+                        Смесен хор „Петко Стайнов“ е създаден през 1972 година по идея на големия
+                        български композитор и почетен гражданин на Казанлък Петко Стайнов.
+                    </p>
+                    <p>
+                        С неговото основаване се завършва изграждането на първата в България хорова школа,
+                        която включва Детски хор „Искра“, Хор на момчетата и Дамски камерен хор.
+                    </p>
+                    <p>
+                        През годините хорът се утвърждава като водеща формация в хоровото изкуство
+                        и е лауреат на всички републикански хорови фестивали.
+                    </p>
+                </div>
+
+                <!-- СНИМКА -->
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <img src="@contentImage"
+                         class="img-fluid rounded-4 shadow w-100"
+                         style="max-width: 520px; margin: 0 auto; display: block;"
+                         alt="Смесен хор Петко Стайнов" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- РЕПЕРТОАР -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Репертоар</h2>
+            <p>
+                Репертоарът на Смесен хор „Петко Стайнов“ е богат и разнообразен и включва
+                църковнославянски песнопения, обработки на народни песни, популярни песни от мюзикъли,
+                хорове от известни опери и оперети, както и патриотични произведения.
+            </p>
+        </div>
+    </div>
+
+    <!-- НАГРАДИ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Награди и дейност</h2>
+            <p>
+                Хорът е носител на множество призови награди от национални и международни фестивали
+                и конкурси.
+            </p>
+            <p class="mb-0">
+                В своята дългогодишна история съставът реализира и звукозаписи за Златния фонд
+                на Българското национално радио.
+            </p>
+        </div>
+    </div>
+
+    <!-- ЕКИП -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Екип</h2>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Диригент:</strong> Младен Станев
+                </li>
+                <li class="list-group-item">
+                    <strong>Корепетитор:</strong> Светослава Петрова
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+</div>

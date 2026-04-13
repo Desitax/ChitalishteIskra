@@ -8,6 +8,12 @@
     --card: #ffffff;
 }
 
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
 body {
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     color: var(--text);
@@ -19,12 +25,18 @@ h1, h2, h3 {
     font-family: "Playfair Display", serif;
 }
 
-Navbar look (if not already)
+/* Navbar look */
+header,
+.navbar,
+.navbar .container-fluid {
+    width: 100%;
+}
+
 .navbar {
     background: linear-gradient(to right, var(--primary), var(--primary-dark)) !important;
 }
 
-Page sections
+/* Page sections */
 .section {
     padding: 72px 0;
 }
@@ -35,7 +47,7 @@ Page sections
     margin-bottom: 28px;
 }
 
-Nice cards
+/* Nice cards */
 .ui-card {
     background: var(--card);
     border-radius: 16px;
@@ -43,30 +55,30 @@ Nice cards
     border: 1px solid rgba(0,0,0,.06);
 }
 
-.ui-card:hover {
-    transform: translateY(-4px);
-    transition: .2s ease;
-}
+    .ui-card:hover {
+        transform: translateY(-4px);
+        transition: .2s ease;
+    }
 
-Buttons
+/* Buttons */
 .btn-primary {
     background: var(--primary);
     border-color: var(--primary);
 }
 
-.btn-primary:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
-}
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+    }
 
-Utility
+/* Utility */
 .text-muted2 {
     color: var(--muted) !important;
 }
 
 .about-hero {
     position: relative;
-    overflow: hidden;
+    overflow: auto;
     border-radius: 20px;
     min-height: 320px;
     color: white;

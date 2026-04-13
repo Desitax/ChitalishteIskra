@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Вокална студия „Искрица“";
+
+    var heroImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776086154/xnuphrpnutjpygvjdsmh.webp";
+    var contentImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776086192/raamw3ere8fl5ckva5up.jpg";
+}
+
+<div class="container py-5">
+
+    <!-- HERO -->
+    <div class="rounded-4 overflow-hidden mb-5 text-white d-flex align-items-center"
+         style="min-height: 360px;
+                background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.45)),
+                url('@heroImage') center/cover no-repeat;">
+
+        <div class="p-5">
+            <p class="text-uppercase mb-2" style="letter-spacing: 2px;">Народно читалище „Искра-1860”</p>
+            <h1 class="fw-bold mb-3">Вокална студия „Искрица“</h1>
+            <p class="mb-0 col-lg-8 fs-5">
+                Една от най-успешните музикални формации в Казанлък с дългогодишна история и множество награди.
+            </p>
+        </div>
+    </div>
+
+    <!-- ЗА СТУДИЯТА (СНИМКА ВЛЯВО) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center">
+
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <img src="@contentImage"
+                         class="img-fluid rounded-4 shadow w-100"
+                         style="max-width: 480px; display: block; margin: 0 auto;"
+                         alt="Вокална студия Искрица" />
+                </div>
+
+                <!-- ТЕКСТ -->
+                <div class="col-lg-7">
+                    <h2 class="mb-4">За студията</h2>
+                    <p>
+                        Вокална студия „Искрица“ е създадена през 1995 година. С течение на времето
+                        формацията се развива и разширява дейността си, превръщайки се във вокална студия
+                        с три възрастови групи – „Искрица-бейби“, „Искрица-джуниър“ и „Искрица-гранд“.
+                    </p>
+                    <p>
+                        Днес студия „Искрица“ е утвърдена музикална формация и една от разпознаваемите
+                        културни визитки на град Казанлък. Нейните възпитаници редовно печелят призови
+                        отличия от национални и международни музикални конкурси и фестивали.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОСТИЖЕНИЯ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Постижения</h2>
+            <p>
+                Резултатите от дългогодишната творческа и педагогическа работа на студията са повече от
+                400 награди, спечелени в рамките на нейната над 27-годишна история.
+            </p>
+            <p class="mb-0">
+                Високата професионална оценка за дейността ѝ се потвърждава и от многократните покани
+                за участие в съвместни проекти и музикални предавания на Българското национално радио.
+            </p>
+        </div>
+    </div>
+
+    <!-- РЪКОВОДИТЕЛ -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Художествен ръководител</h2>
+            <p class="mb-0">
+                <strong>Стефка Денева</strong>
+            </p>
+        </div>
+    </div>
+
+</div>

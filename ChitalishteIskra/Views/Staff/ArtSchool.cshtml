@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Школа по изкуствата „Емануил Манолов“";
+
+    var heroImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776090164/cohsvmrscntlvmrrqspj.jpg";
+    var contentImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776090198/mfgb4hhahahywvqnq70j.jpg";
+}
+
+<div class="container py-5">
+
+    <!-- HERO -->
+    <div class="rounded-4 overflow-hidden mb-5 text-white d-flex align-items-center"
+         style="min-height: 360px;
+                background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.45)),
+                url('@heroImage') center/cover no-repeat;">
+
+        <div class="p-5">
+            <p class="text-uppercase mb-2" style="letter-spacing: 2px;">Народно читалище „Искра-1860”</p>
+            <h1 class="fw-bold mb-3">Школа по изкуствата „Емануил Манолов“</h1>
+            <p class="mb-0 col-lg-8 fs-5">
+                Една от водещите музикални и артистични школи в България с дългогодишна традиция.
+            </p>
+        </div>
+    </div>
+
+    <!-- ЗА ШКОЛАТА (СНИМКА ВЛЯВО) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center gx-5">
+
+                <!-- СНИМКА -->
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <img src="@contentImage"
+                         class="img-fluid rounded-4 shadow w-100"
+                         style="max-width: 520px; margin: 0 auto; display: block;"
+                         alt="Школа Емануил Манолов" />
+                </div>
+
+                <!-- ТЕКСТ -->
+                <div class="col-lg-7">
+                    <h2 class="mb-4">За школата</h2>
+                    <p>
+                        Школа по изкуствата „Емануил Манолов“ е създадена през 1956 г. и носи името
+                        на първия български композитор.
+                    </p>
+                    <p>
+                        От създаването си досега, школата се утвърждава като водеща институция
+                        в областта на музикалното и артистичното образование.
+                    </p>
+                    <p>
+                        В школата се обучават над 150 деца и младежи, които печелят множество
+                        награди от национални и международни конкурси.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ОБУЧЕНИЕ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Обучение</h2>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Пиано</li>
+                <li class="list-group-item">Цигулка</li>
+                <li class="list-group-item">Синтезатор</li>
+                <li class="list-group-item">Акордеон</li>
+                <li class="list-group-item">Китара</li>
+                <li class="list-group-item">Солфеж</li>
+                <li class="list-group-item">Вокално пеене</li>
+                <li class="list-group-item">Английски език</li>
+            </ul>
+
+            <p class="mt-4 mb-0">
+                Школата редовно се нарежда сред най-добрите музикални школи в страната
+                и многократно е печелила приз за „Най-добре представена музикална школа в България“.
+            </p>
+        </div>
+    </div>
+
+    <!-- ПРЕПОДАВАТЕЛИ -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Преподаватели</h2>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Пиано:</strong> Елена Юлиянова, Валя Костова, Йорданка Русинова</li>
+                <li class="list-group-item"><strong>Китара:</strong> Ивайло Петков</li>
+                <li class="list-group-item"><strong>Синтезатор:</strong> Валя Костова</li>
+                <li class="list-group-item"><strong>Акордеон:</strong> Йорданка Русинова</li>
+                <li class="list-group-item"><strong>Цигулка:</strong> Любена Койчева-Тянова</li>
+                <li class="list-group-item"><strong>Солфеж:</strong> Марияна Георгиева</li>
+                <li class="list-group-item"><strong>Английски език:</strong> Йорданка Русинова</li>
+                <li class="list-group-item"><strong>Вокално пеене:</strong> Стефка Денева</li>
+            </ul>
+
+        </div>
+    </div>
+
+</div>

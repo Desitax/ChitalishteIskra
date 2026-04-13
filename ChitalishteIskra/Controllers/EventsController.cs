@@ -80,7 +80,6 @@ namespace ChitalishteIskra.Controllers
                 EndTime = model.EndTime,
                 Location = model.Location
             };
-            // SUPER TEST 999
 
             await eventService.CreateAsync(dto);
 
@@ -95,34 +94,36 @@ namespace ChitalishteIskra.Controllers
                 .GroupBy(u => u.Id)
                 .Select(g => g.First())
                 .ToList();
-            TempData["WarningMessage"] = $"Teacher: {teachers.Count}, Student: {students.Count}," +
-                $" Parent: {parents.Count}, Получатели с email: {recipients.Count}";
+            //TempData["WarningMessage"] = $"Teacher: {teachers.Count}, Student: {students.Count}," +
+            //    $" Parent: {parents.Count}, Получатели с email: {recipients.Count}";
 
-            string subject = "Предстоящо събитие в Читалище Искра";
+            string subject = $"Ново събитие: {model.Name}";
 
             string message = $@"
-        <h2>Имате ново събитие</h2>
-        <p><strong>Име:</strong> {model.Name}</p>
-        <p><strong>Дата:</strong> {model.Date}</p>
-        <p><strong>Начало:</strong> {model.StartTime}</p>
-        <p><strong>Край:</strong> {model.EndTime}</p>
-        <p><strong>Място:</strong> {model.Location}</p>
-    ";
+            <h2>📅 Предстоящо събитие</h2>
+            <p><strong>Име:</strong> {model.Name}</p>
+            <p><strong>Дата:</strong> {model.Date}</p>
+            <p><strong>Начало:</strong> {model.StartTime}</p>
+            <p><strong>Край:</strong> {model.EndTime}</p>
+            <p><strong>Място:</strong> {model.Location}</p>
+            <br/>
+            <p>Очакваме Ви!</p>
+            ";
 
-            try
+            foreach (var user in recipients)
             {
-                await emailSender.SendEmailAsync(
-                    "desislavagudova@gmail.com",
-                    "Тестов имейл",
-                    "<h2>Тест</h2><p>Това е тестов имейл.</p>"
-                );
+                try
+                {
+                    await emailSender.SendEmailAsync(user.Email!, subject, message);
+                }
+                catch
+                {
+                    
+                }
+            }
 
-                TempData["SuccessMessage"] = "Тестовият имейл е изпратен успешно.";
-            }
-            catch (Exception ex)
-            {
-                TempData["WarningMessage"] = $"Грешка при изпращане: {ex.Message}";
-            }
+            TempData["SuccessMessage"] = "Имейлите за предстоящото събитие са изпратени успешно.";
+
             return RedirectToAction(nameof(Index));
         }
 

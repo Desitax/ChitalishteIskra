@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Школа по спортни танци „Киара Н“";
+
+    var heroImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776090685/qio2hhpkp0iryirwchjx.jpg";
+    var contentImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776090550/dizkfpct7oduemsunlbq.jpg";
+}
+
+<div class="container py-5">
+
+    <!-- HERO -->
+    <div class="rounded-4 overflow-hidden mb-5 text-white d-flex align-items-center"
+         style="min-height: 360px;
+                background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.45)),
+                url('@heroImage') center/cover no-repeat;">
+
+        <div class="p-5">
+            <p class="text-uppercase mb-2" style="letter-spacing: 2px;">Народно читалище „Искра-1860”</p>
+            <h1 class="fw-bold mb-3">Школа по спортни танци „Киара Н“</h1>
+            <p class="mb-0 col-lg-8 fs-5">
+                Утвърдена танцова школа с множество награди и успешно развитие на млади таланти.
+            </p>
+        </div>
+    </div>
+
+    <!-- ЗА ШКОЛАТА (СНИМКА ВДЯСНО) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center gx-5">
+
+                <!-- ТЕКСТ -->
+                <div class="col-lg-7">
+                    <h2 class="mb-4">За школата</h2>
+                    <p>
+                        Школата по спортни танци е създадена през 2007 г. и бързо се утвърждава
+                        като водеща танцова школа в региона.
+                    </p>
+                    <p>
+                        В кратък период учениците създават силни танцови двойки,
+                        които по-късно се развиват в Клуб по спортни танци „Киара Н“.
+                    </p>
+                </div>
+
+                <!-- СНИМКА -->
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <img src="@contentImage"
+                         class="img-fluid rounded-4 shadow w-100"
+                         style="max-width: 520px; margin: 0 auto; display: block;"
+                         alt="Школа по спортни танци" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ПОСТИЖЕНИЯ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Постижения</h2>
+            <p>
+                Участниците в школата са носители на множество награди от национални състезания,
+                демонстрирайки своя талант, дисциплина и страст към танца.
+            </p>
+        </div>
+    </div>
+
+    <!-- ТРЕНЬОРИ -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Треньори</h2>
+            <p class="mb-0">
+                <strong>Николай Тенев</strong> и <strong>Антония Каярова</strong>
+            </p>
+        </div>
+    </div>
+
+</div>

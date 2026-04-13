@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Вокална група „Севтополис“";
+
+    var heroImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776087164/rpergc0gn6mhpf0zos8z.jpg";
+    var contentImage = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776087133/gkywhvp3kxtc8akhglei.jpg";
+}
+
+<div class="container py-5">
+
+    <!-- HERO -->
+    <div class="rounded-4 overflow-hidden mb-5 text-white d-flex align-items-center"
+         style="min-height: 360px;
+                background: linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.45)),
+                url('@heroImage') center/cover no-repeat;">
+
+        <div class="p-5">
+            <p class="text-uppercase mb-2" style="letter-spacing: 2px;">Народно читалище „Искра-1860”</p>
+            <h1 class="fw-bold mb-3">Вокална група „Севтополис“</h1>
+            <p class="mb-0 col-lg-8 fs-5">
+                Утвърдена музикална формация с богата история и активно участие в културния живот на Казанлък.
+            </p>
+        </div>
+    </div>
+
+    <!-- ЗА ГРУПАТА (СНИМКА ВЛЯВО) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row align-items-center">
+
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <img src="@contentImage"
+                         class="img-fluid rounded-4 shadow w-100"
+                         style="max-width: 480px; display: block; margin: 0 auto;"
+                         alt="Вокална група Севтополис" />
+                </div>
+
+
+                <!-- ТЕКСТ -->
+                <div class="col-lg-7">
+                    <h2 class="mb-4">За групата</h2>
+                    <p>
+                        Вокална група „Севтополис“ е една от утвърдените музикални формации към
+                        Народно читалище „Искра-1860“. Създадена е през 1987 г. с ръководител Румен Спиров.
+                    </p>
+                    <p>
+                        След период без активност съставът отново е възстановен в началото на 2000-те години,
+                        по инициатива на част от изпълнителите и Неделчо Димитров.
+                    </p>
+                    <p>
+                        През ноември 2003 г. формацията се разширява и неин художествен ръководител става
+                        Дечко Бакоев, под чиято дирекция групата продължава своята творческа дейност.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- РЕПЕРТОАР -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Репертоар</h2>
+            <p>
+                В репертоара на Вокална група „Севтополис“ са включени възрожденски песни,
+                планинарски песни, песни за България, обработки на народни песни и класически
+                градски мелодии, които представят богатството на нашата музикална традиция.
+            </p>
+            <p class="mb-0">
+                Групата е носител на множество награди от национални конкурси и фестивали и е
+                редовен участник в културните програми на Казанлък и региона.
+            </p>
+        </div>
+    </div>
+
+    <!-- ДЕЙНОСТ -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Дейност</h2>
+            <p>
+                Изпълненията на групата се представят на сцени по време на празнични концерти,
+                годишнини, национални тържества и различни музикални прояви.
+            </p>
+            <p class="mb-0">
+                Вокална група „Севтополис“ е част от по-широката музикална общност на Казанлък
+                и допринася за развитието и популяризирането на вокалното изкуство в града.
+            </p>
+        </div>
+    </div>
+
+    <!-- РЪКОВОДИТЕЛ -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-lg-5">
+            <h2 class="mb-4">Художествен ръководител</h2>
+            <p class="mb-0">
+                <strong>Дечко Бакоев</strong>
+            </p>
+        </div>
+    </div>
+
+</div>
