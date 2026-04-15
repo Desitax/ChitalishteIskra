@@ -10,5 +10,6 @@ namespace ChitalishteIskra.Core.Contracts
     public interface IImageService
     {
         Task<string?> UploadImageAsync(IFormFile image, string fileName);
+        Task<string?> UploadFileAsync(IFormFile file, string fileName);
     }
 }

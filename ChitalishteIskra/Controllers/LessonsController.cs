@@ -3,6 +3,7 @@ using ChitalishteIskra.Core.DTOs.Lessons;
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.Lessons;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class LessonsController:Controller
     {
         private readonly ILessonService lessonService;

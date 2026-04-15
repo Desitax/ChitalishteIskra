@@ -46,5 +46,32 @@ namespace ChitalishteIskra.Core.Services
 
             return uploadResult.SecureUrl?.ToString();
         }
+
+        public async Task<string?> UploadFileAsync(IFormFile file, string fileName)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            await using var stream = file.OpenReadStream();
+
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                PublicId = fileName,
+                Overwrite = true
+            };
+
+            var result = await cloudinary.UploadAsync(uploadParams);
+
+            if (result.StatusCode != System.Net.HttpStatusCode.OK &&
+                result.StatusCode != System.Net.HttpStatusCode.Created)
+            {
+                return null;
+            }
+
+            return result.SecureUrl?.ToString();
+        }
     }
 }

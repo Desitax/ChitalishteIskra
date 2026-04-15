@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Controllers
 {
+    [Authorize]
     public class GroupsController:Controller
     {
         private readonly IGroupService groupService;
@@ -22,7 +23,6 @@ namespace ChitalishteIskra.Controllers
             this.userManager = userManager;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -39,6 +39,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -55,6 +56,7 @@ namespace ChitalishteIskra.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(GroupCreateViewModel model)
         {
@@ -84,6 +86,8 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -114,6 +118,8 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(GroupEditViewModel model)
         {
@@ -143,6 +149,7 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {

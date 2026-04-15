@@ -4,24 +4,28 @@ using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.TeacherAvailabilities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ChitalishteIskra.Controllers
 {
     [Authorize]
-    public class TeacherAvailabilities:Controller
+    public class TeacherAvailabilitiesController:Controller
     {
-
         private readonly ITeacherAvailabilityService service;
+        private readonly UserManager<User> userManager;
 
-        public TeacherAvailabilities(ITeacherAvailabilityService service)
+        public TeacherAvailabilitiesController(
+            ITeacherAvailabilityService service,
+            UserManager<User> userManager)
         {
             this.service = service;
+            this.userManager = userManager;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -42,9 +46,19 @@ namespace ChitalishteIskra.Controllers
 
         [Authorize(Roles = "Teacher,Admin")]
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new TeacherAvailabilitiesCreateViewModel());
+            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+            ViewBag.Teachers = teachers.Select(t => new SelectListItem
+            {
+                Value = t.Id.ToString(),
+                Text = t.FirstName + " " + t.LastName
+            }).ToList();
+
+            var model = new TeacherAvailabilitiesCreateViewModel();
+
+            return View(model);
         }
 
 
@@ -57,11 +71,6 @@ namespace ChitalishteIskra.Controllers
                 ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
             }
 
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
             if (model.EndTime <= model.StartTime)
             {
                 ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
@@ -69,9 +78,22 @@ namespace ChitalishteIskra.Controllers
             }
 
             if (model.Date == DateOnly.FromDateTime(DateTime.Today) &&
-    model.StartTime < TimeOnly.FromDateTime(DateTime.Now))
+            model.StartTime < TimeOnly.FromDateTime(DateTime.Now))
             {
                 ModelState.AddModelError(nameof(model.StartTime), "Не може да избирате час, който вече е минал.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+                ViewBag.Teachers = teachers.Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.FirstName + " " + t.LastName
+                }).ToList();
+
+                return View(model);
             }
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -79,6 +101,17 @@ namespace ChitalishteIskra.Controllers
             if (string.IsNullOrWhiteSpace(currentUserId))
             {
                 return Unauthorized();
+            }
+
+            Guid teacherId;
+
+            if (User.IsInRole("Admin"))
+            {
+                teacherId = model.TeacherId;
+            }
+            else
+            {
+                teacherId = Guid.Parse(currentUserId);
             }
 
             var dto = new CreateTeacherAvailabilityDto

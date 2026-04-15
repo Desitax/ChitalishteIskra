@@ -1,7 +1,7 @@
 ﻿@model ChitalishteIskra.Models.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Регистрация";
 }
 
 <h1 class="text-center">@ViewData["Title"]</h1>
@@ -13,25 +13,25 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="text-center mb-3">
-                <label asp-for="UserName">Username</label>
+                <label asp-for="UserName">Потребителско име</label>
                 <input class="form-control" autocomplete="username" aria-required="true" asp-for="UserName" />
                 <span asp-validation-for="UserName" class="text-danger"></span>
             </div>
 
             <div class="text-center mb-3">
-                <label asp-for="Email">Email</label>
+                <label asp-for="Email">Имейл</label>
                 <input class="form-control" autocomplete="username" aria-required="true" asp-for="Email" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="text-center mb-3">
-                <label asp-for="Password">Password</label>
+                <label asp-for="Password">Парола</label>
                 <input class="form-control" type="password" autocomplete="new-password" aria-required="true" asp-for="Password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
             <div class="text-center mb-3">
-                <label asp-for="ConfirmPassword">Confirm Password</label>
+                <label asp-for="ConfirmPassword">Потвърди парола</label>
                 <input class="form-control" type="password" autocomplete="new-password" aria-required="true" asp-for="ConfirmPassword" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
@@ -41,19 +41,19 @@
             <div id="childInfoSection">
                 <h4 class="text-center">Child Info</h4>
                 <div class="mb-3">
-                    <label asp-for="ChildInfo.FirstName">First Name</label>
+                    <label asp-for="ChildInfo.FirstName">Име</label>
                     <input class="form-control" asp-for="ChildInfo.FirstName" />
                     <span asp-validation-for="ChildInfo.FirstName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="ChildInfo.LastName">Last Name</label>
+                    <label asp-for="ChildInfo.LastName">Фамилия</label>
                     <input class="form-control" asp-for="ChildInfo.LastName" />
                     <span asp-validation-for="ChildInfo.LastName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="ChildInfo.Age">Age</label>
+                    <label asp-for="ChildInfo.Age">Години</label>
                     <input class="form-control" asp-for="ChildInfo.Age" type="number" />
                     <span asp-validation-for="ChildInfo.Age" class="text-danger"></span>
                 </div>
@@ -63,33 +63,33 @@
                 <hr />
                 <h4 class="text-center">Parent Info</h4>
                 <div class="mb-3">
-                    <label asp-for="ParentInfo.FirstName">Parent First Name</label>
+                    <label asp-for="ParentInfo.FirstName">Име на родител</label>
                     <input class="form-control" asp-for="ParentInfo.FirstName" />
                     <span asp-validation-for="ParentInfo.FirstName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="ParentInfo.LastName">Parent Last Name</label>
+                    <label asp-for="ParentInfo.LastName">Фамилия на родител</label>
                     <input class="form-control" asp-for="ParentInfo.LastName" />
                     <span asp-validation-for="ParentInfo.LastName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="ParentInfo.Age">Parent Age</label>
+                    <label asp-for="ParentInfo.Age">Години на родител</label>
                     <input class="form-control" asp-for="ParentInfo.Age" type="number" />
                     <span asp-validation-for="ParentInfo.Age" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="text-center mb-4">
-                <button type="button" class="btn btn-outline-primary me-2" id="singleChildBtn">Register Single Child</button>
-                <button type="button" class="btn btn-outline-secondary" id="childWithParentBtn">Register Child with Parent</button>
+                <button type="button" class="btn btn-outline-primary me-2" id="singleChildBtn">Регистриране на ученик</button>
+                <button type="button" class="btn btn-outline-secondary" id="childWithParentBtn">Регистриране на ученик с родител</button>
             </div>
 
             <div class="text-center mt-3">
-                <button id="registerSubmit" type="submit" class="btn btn-primary">Register</button>
+                <button id="registerSubmit" type="submit" class="btn btn-primary">Регистрирай се</button>
             </div>
-        </form>
+        </form>                             
     </div>
 </div>
 

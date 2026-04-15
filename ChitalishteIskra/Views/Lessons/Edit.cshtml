@@ -1,21 +1,21 @@
 ﻿@using ChitalishteIskra.Models.Lessons
 @model LessonEditViewModel
 
-<h2 class="mb-3">Edit lesson</h2>
+<h2 class="mb-3">Поправи урок</h2>
 
 <form asp-action="Edit" method="post">
     <div class="mb-3">
-        <label class="form-label">Name</label>
+        <label class="form-label">Име</label>
         <input class="form-control" asp-for="Name" />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Type</label>
+        <label class="form-label">Тип</label>
         <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control" required>
-            <option selected disabled>Select type of lesson</option>
+            <option selected disabled>Избери тип урок</option>
         </select>
     </div>
 
 
-    <button class="btn btn-primary btn-lg" type="submit">Save</button>
+    <button class="btn btn-primary btn-lg" type="submit">Запази</button>
 </form>

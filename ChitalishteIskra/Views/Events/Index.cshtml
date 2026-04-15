@@ -15,22 +15,22 @@
     </div>
 }
 
-<h2 class="mb-3">Events</h2>
+<h2 class="mb-3">Събития</h2>
 
 @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
 {
-    <a asp-action="Create" class="btn btn-primary mb-3">Направи събитие</a>
+    <a asp-action="Create" class="btn btn-primary mb-3">Добави събитие</a>
 }
 
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Start time</th>
-            <th>End time</th>
-            <th>Location</th>
-            <th>Actions</th>
+            <th>Име</th>
+            <th>Дата</th>
+            <th>Начало</th>
+            <th>Край</th>
+            <th>Местоположение</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -48,11 +48,11 @@
 
                 {
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Поправи</a>
 
                         <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
                         </form>
                     </td>
                 }

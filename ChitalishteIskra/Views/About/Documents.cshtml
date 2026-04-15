@@ -6,31 +6,36 @@
 
     <ul>
         <li>
-            <a href="docs/otchet-2025.pdf" target="_blank">
+            <a href="https://res.cloudinary.com/dxloy3tkq/raw/upload/v1776252888/отчет_2025%282%29-21401ccaec3e4cbcae573ff3dc0625c9.docx"
+               onclick="return confirmDownload(this.href)">
                 Отчет за дейността на НЧ "Искра-1860" за 2025 г.
             </a>
         </li>
 
         <li>
-            <a href="docs/otchet-2024.pdf" target="_blank">
+            <a href="https://res.cloudinary.com/dxloy3tkq/raw/upload/v1776253388/ОТЧЕТЕН ДОКЛАД ЗА ДЕЙНОСТТА НА НЧ-684d1040829c44579b0e168b3238b385.docx"
+               onclick="return confirmDownload(this.href)">
                 Отчет за дейността на НЧ "Искра-1860" за 2024 г.
             </a>
         </li>
 
         <li>
-            <a href="docs/otchet-2023.pdf" target="_blank">
-                Отчет за дейността за НЧ "Искра-1860" за 2023 г.
+            <a href="https://res.cloudinary.com/dxloy3tkq/raw/upload/v1776253433/отчет_дейност_23-d4d01c4663bf401e917c76f36ba9ef3b.pdf"
+               onclick="return confirmDownload(this.href)">
+                Отчет за дейността на НЧ "Искра-1860" за 2023 г.
             </a>
         </li>
 
         <li>
-            <a href="docs/otchet-2022.pdf" target="_blank">
-                Отчет за дейността на НЧ „Искра-1860“ за 2022 г.
+            <a href="https://res.cloudinary.com/dxloy3tkq/raw/upload/v1776253465/22-ОТЧЕТ-ДЕЙНОСТ-НЧ-b75eee6916c845a8a9f2c0331dc8fdc4.docx"
+               onclick="return confirmDownload(this.href)">
+                Отчет за дейността на НЧ "Искра-1860" за 2022 г.
             </a>
         </li>
 
         <li>
-            <a href="docs/deklaracii-nastoyatelstvo.pdf" target="_blank">
+            <a href="https://res.cloudinary.com/dxloy3tkq/raw/upload/v1776253500/deklaracii-b92a19ff58d84b779460f25d39a71d99.pdf"
+               onclick="return confirmDownload(this.href)">
                 Декларации на Настоятелството на НЧ "Искра-1860" по чл.19а от ЗНЧ
             </a>
         </li>
@@ -38,3 +43,15 @@
     </ul>
 
 </div>
+
+
+
+<script>
+    function confirmDownload(fileUrl) {
+        const result = confirm("Искате ли да изтеглите документа?");
+        if (result) {
+            window.open(fileUrl, '_blank');
+        }
+        return false;
+    }
+</script>

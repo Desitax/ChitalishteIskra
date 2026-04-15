@@ -43,41 +43,11 @@
                             <a class="nav-link" asp-controller="Home" asp-action="Index">Начало</a>
                         </li>
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Image" asp-action="Upload">Качи снимка</a>
-                            </li>
-                        }
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="BookLessons" asp-action="Index">
-                                Запази час онлайн
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Events" asp-action="Index">Събития</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Lessons" asp-action="Index">Lessons</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Groups" asp-action="Index">Възрастови групи</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="TeacherAvailabilities" asp-action="Index">Свободни часове</a>
-                        </li>
-
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Читалището
                             </a>
-
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="About" asp-action="History">История</a></li>
                                 <li><a class="dropdown-item" asp-controller="About" asp-action="Statutes">Устав</a></li>
@@ -88,12 +58,10 @@
                             </ul>
                         </li>
 
-
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Групи и школи
                             </a>
-
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="ANPT">АНПТ</a></li>
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="Babsbg">Бабсбг</a></li>
@@ -109,6 +77,71 @@
                             </ul>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Events" asp-action="Index">Събития</a>
+                        </li>   
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Функционалности
+                                </a>
+                                <ul class="dropdown-menu">
+
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Users" asp-action="PendingTeachers">
+                                                Регистрация на учител
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Image" asp-action="Upload">
+                                                Качи снимка
+                                            </a>
+
+                                            <a class="dropdown-item" asp-controller="Image" asp-action="UploadFile">
+                                                Качи документ
+                                                </a>
+                                        </li>
+                                    }
+
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Parent") || User.IsInRole("Student"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
+                                                Запази час онлайн
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Lessons" asp-action="Index">
+                                                Уроци
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Groups" asp-action="Index">
+                                            Възрастови групи
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="TeacherAvailabilities" asp-action="Index">
+                                            Свободни часове
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </li>
+                        }
 
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Stage" asp-action="Stage">Сцена</a>

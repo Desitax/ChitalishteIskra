@@ -9,7 +9,7 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
-        <label asp-for="Date" class="form-label"></label>
+        <label asp-for="Date" class="form-label">Дата</label>
         <input asp-for="Date"
                type="date"
                class="form-control"
@@ -18,13 +18,13 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="StartTime" class="form-label"></label>
+        <label asp-for="StartTime" class="form-label">Начало</label>
         <input asp-for="StartTime" type="time" class="form-control" />
         <span asp-validation-for="StartTime" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="EndTime" class="form-label"></label>
+        <label asp-for="EndTime" class="form-label">Край</label>
         <input asp-for="EndTime" type="time" class="form-control" />
         <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>

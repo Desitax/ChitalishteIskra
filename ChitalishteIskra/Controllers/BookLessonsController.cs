@@ -27,7 +27,7 @@ namespace ChitalishteIskra.Controllers
             this.bookLessonService = _bookLessonService;
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin,Parent,Student")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -46,7 +46,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Student,Parent")]
+        [Authorize(Roles = "Admin,Student,Parent")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -70,7 +70,7 @@ namespace ChitalishteIskra.Controllers
         }
 
 
-        [Authorize(Roles = "Student,Parent")]
+        [Authorize(Roles = "Admin,Student,Parent")]
         [HttpPost]
         public async Task<IActionResult> Create(BookLessonCreateViewModel model)
         {

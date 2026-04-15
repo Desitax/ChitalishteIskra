@@ -1,42 +1,42 @@
 ﻿    @using ChitalishteIskra.Models.BookLessons
 @model BookLessonEditViewModel
 
-<h2 class="mb-3">Edit booking</h2>
+<h2 class="mb-3">Поправи часа</h2>
 
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
-        <label class="form-label">Date</label>
+        <label class="form-label">Дата</label>
         <input class="form-control" type="date" asp-for="Date"
                min="@DateTime.Today.ToString("yyyy-MM-dd")" />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Start time</label>
+        <label class="form-label">Начало</label>
         <input class="form-control" type="time" asp-for="StartTime" />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">End time</label>
+        <label class="form-label">Край</label>
         <input class="form-control" type="time" asp-for="EndTime" />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Teacher</label>
+        <label class="form-label">Учител</label>
         <select asp-for="TeacherId" asp-items="ViewBag.Teachers" class="form-control" required>
-            <option selected disabled value="">Select Teacher</option>
+            <option selected disabled value="">Избери учител</option>
         </select>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Lesson</label>
+        <label class="form-label">Урок</label>
         <select asp-for="LessonId" asp-items="ViewBag.Lessons" class="form-control" required>
-            <option selected disabled value="">Select Lesson</option>
+            <option selected disabled value="">Избери урок</option>
         </select>
     </div>
 
-    <button class="btn btn-primary btn-lg" type="submit">Save</button>
+    <button class="btn btn-primary btn-lg" type="submit">Запази</button>
 </form>
 
 

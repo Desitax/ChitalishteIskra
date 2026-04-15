@@ -1,14 +1,14 @@
 ﻿@using ChitalishteIskra.Models.Lessons
 @model IEnumerable<LessonIndexViewModel>
 
-<h2 class="mb-3">Lessons</h2>
+<h2 class="mb-3">Уроци</h2>
 
-<a asp-action="Create" class="btn btn-primary mb-3">Add lesson</a>
+<a asp-action="Create" class="btn btn-primary mb-3">Добави урок</a>
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Type of lesson</th>
+            <th>Име</th>
+            <th>Тип урок</th>
         </tr>
     </thead>
     <tbody>
@@ -18,9 +18,9 @@
                 <td>@lesson.Name</td>
                 <td>@lesson.TypeName</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm" method="Post" style="display:inline">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm" method="Post" style="display:inline">Поправи</a>
                     <form asp-action="Delete" asp-route-id="@lesson.Id" style="display:inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
                     </form>
                 </td>
             </tr>

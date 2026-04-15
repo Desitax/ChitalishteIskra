@@ -20,9 +20,5 @@ namespace ChitalishteIskra.Models.TeacherAvailabilities
         [Required]
         public bool IsAvailable { get; set; } = true;
 
-        [Required]
-        public IFormFile? Image { get; set; }
-
-        //public IEnumerable<SelectListItem> Teachers { get; set; } = new List<SelectListItem>();
     }
 }

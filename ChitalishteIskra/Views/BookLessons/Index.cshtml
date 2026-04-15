@@ -1,7 +1,7 @@
 ﻿@using ChitalishteIskra.Models.BookLessons
 @model IEnumerable<BookLessonIndexViewModel>
 
-<h2 class="mb-3">Bookings</h2>
+<h2 class="mb-3">Запази час</h2>
 
 @if (User.IsInRole("Student") || User.IsInRole("Parent"))
 
@@ -16,12 +16,12 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Start time</th>
-            <th>End time</th>
-            <th>Teacher</th>
-            <th>Lesson</th>
-            <th>Actions</th>
+            <th>Дата</th>
+            <th>Начало</th>
+            <th>Край</th>
+            <th>Учител</th>
+            <th>Урок</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -35,10 +35,10 @@
                 <td>@booking.TeacherName</td>
                 <td>@booking.LessonName</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@booking.Id" method="post" class="btn btn-warning btn-sm" style="display:inline">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@booking.Id" method="post" class="btn btn-warning btn-sm" style="display:inline">Поправи</a>
 
                     <form asp-action="Delete" asp-route-id="@booking.Id" method="post" style="display:inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
                     </form>
                 </td>
             </tr>

@@ -269,10 +269,12 @@ namespace ChitalishteIskra.Controllers
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> PendingTeachers()
-        {
+        { 
             var users = await userManager.Users
                 .Where(u => u.IsTeacherRequest && !u.IsApprovedTeacher)
                 .ToListAsync();
+
+            //var users = await userManager.Users.ToListAsync();
 
             return View(users);
         }
