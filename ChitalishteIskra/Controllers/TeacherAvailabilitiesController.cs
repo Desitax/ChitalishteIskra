@@ -108,7 +108,8 @@ namespace ChitalishteIskra.Controllers
                 DayOfWeek = model.DayOfWeek,
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
-                TeacherId = teacherId
+                TeacherId = teacherId,
+                IsAvailable = model.IsAvailable
             };
 
             await service.CreateAsync(dto);
@@ -127,7 +128,8 @@ namespace ChitalishteIskra.Controllers
             {
                 DayOfWeek = data.DayOfWeek,
                 StartTime = data.StartTime,
-                EndTime = data.EndTime
+                EndTime = data.EndTime,
+                IsAvailable = data.IsAvailable
             };
 
             ViewBag.Id = id;
@@ -155,7 +157,8 @@ namespace ChitalishteIskra.Controllers
             {
                 DayOfWeek = model.DayOfWeek,
                 StartTime = model.StartTime,
-                EndTime = model.EndTime
+                EndTime = model.EndTime,
+                IsAvailable = model.IsAvailable
             };
 
             await service.UpdateAsync(id, dto);

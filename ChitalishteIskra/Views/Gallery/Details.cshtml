@@ -1,0 +1,56 @@
+@model ChitalishteIskra.Models.Gallery.GalleryDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<style>
+    .gallery-details {
+        padding: 2.5rem 0 4rem 0;
+    }
+
+    .gallery-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #8b0000;
+        margin-bottom: 2rem;
+    }
+
+    .photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .photo-item img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 16px;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+        .photo-item img:hover {
+            transform: scale(1.05);
+        }
+</style>
+
+<section class="gallery-details">
+    <div class="container">
+
+        <h1 class="gallery-title">@Model.Title</h1>
+
+        <div class="photos-grid">
+            @foreach (var image in Model.ImageUrls)
+            {
+                <div class="photo-item">
+                    <a href="@image" class="glightbox">
+                        <img src="@image" alt="Снимка" />
+                    </a>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>

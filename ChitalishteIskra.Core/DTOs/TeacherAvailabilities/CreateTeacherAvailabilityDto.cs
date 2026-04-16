@@ -15,5 +15,7 @@ namespace ChitalishteIskra.Core.DTOs.TeacherAvailabilities
         public TimeOnly EndTime { get; set; }
 
         public Guid TeacherId { get; set; }
+
+        public bool IsAvailable { get; set; }
     }
 }

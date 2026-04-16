@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChitalishteIskra.Data.Migrations
 {
     [DbContext(typeof(ChitalishteIskraDbContext))]
-    [Migration("20260416103836_Initial")]
+    [Migration("20260416182106_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

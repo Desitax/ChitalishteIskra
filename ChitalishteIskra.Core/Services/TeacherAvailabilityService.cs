@@ -45,7 +45,7 @@ namespace ChitalishteIskra.Core.Services
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
                 TeacherId = model.TeacherId,
-                IsAvailable = true
+                IsAvailable = model.IsAvailable
             };
 
             await context.TeacherAvailabilities.AddAsync(availability);
@@ -86,6 +86,7 @@ namespace ChitalishteIskra.Core.Services
             entity.DayOfWeek = model.DayOfWeek;
             entity.StartTime = model.StartTime;
             entity.EndTime = model.EndTime;
+            entity.IsAvailable = model.IsAvailable;
 
             await context.SaveChangesAsync();
         }

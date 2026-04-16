@@ -10,9 +10,10 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Дата</label>
-        <input class="form-control" type="date" asp-for="DayOfWeek"
-               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <label asp-for="DayOfWeek" class="form-label">Ден от седмицата</label>
+        <select asp-for="DayOfWeek" class="form-control"
+                asp-items="Html.GetEnumSelectList<DayOfWeek>()"></select>
+        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
     </div>
 
     <div class="mb-3">

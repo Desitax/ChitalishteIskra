@@ -25,7 +25,6 @@ h1, h2, h3 {
     font-family: "Playfair Display", serif;
 }
 
-/* Navbar look */
 header,
 .navbar,
 .navbar .container-fluid {
@@ -36,7 +35,6 @@ header,
     background: linear-gradient(to right, var(--primary), var(--primary-dark)) !important;
 }
 
-/* Page sections */
 .section {
     padding: 72px 0;
 }
@@ -47,7 +45,6 @@ header,
     margin-bottom: 28px;
 }
 
-/* Nice cards */
 .ui-card {
     background: var(--card);
     border-radius: 16px;
@@ -60,7 +57,6 @@ header,
         transition: .2s ease;
     }
 
-/* Buttons */
 .btn-primary {
     background: var(--primary);
     border-color: var(--primary);
@@ -71,7 +67,6 @@ header,
         border-color: var(--primary-dark);
     }
 
-/* Utility */
 .text-muted2 {
     color: var(--muted) !important;
 }
@@ -183,3 +178,129 @@ header,
         padding: 2.5rem !important;
     }
 }
+
+/* GALLERY INDEX */
+
+.gallery-page {
+    padding: 2.5rem 0 4rem 0;
+}
+
+.gallery-header {
+    background: linear-gradient(135deg, #7b001c, #c13b00);
+    color: #fff;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(123, 0, 28, 0.18);
+    margin-bottom: 2.5rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.75rem;
+}
+
+.album-card {
+    display: block;
+    text-decoration: none;
+    background: #fff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+    transition: transform .25s ease, box-shadow .25s ease;
+    height: 100%;
+    color: inherit;
+}
+
+    .album-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 22px 40px rgba(0, 0, 0, 0.14);
+        color: inherit;
+    }
+
+.album-card-image-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 280px;
+}
+
+.album-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease;
+}
+
+.album-card:hover .album-card-image {
+    transform: scale(1.08);
+}
+
+.album-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,.12));
+    display: flex;
+    align-items: end;
+    padding: 1rem;
+}
+
+.album-card-badge {
+    background: rgba(255,255,255,.92);
+    color: #8b0000;
+    padding: .4rem .8rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: .9rem;
+}
+
+.album-card-body {
+    padding: 1.25rem 1.25rem 1.5rem 1.25rem;
+}
+
+.album-card-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #8b0000;
+    margin-bottom: .75rem;
+}
+
+.album-card-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #8b0000;
+}
+
+/* GALLERY DETAILS */
+
+.gallery-details {
+    padding: 2.5rem 0 4rem 0;
+}
+
+.gallery-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #8b0000;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.photo-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 16px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    display: block;
+}
+
+    .photo-item img:hover {
+        transform: scale(1.05);
+    }
