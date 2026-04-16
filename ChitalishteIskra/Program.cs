@@ -56,6 +56,7 @@ builder.Services.AddScoped<IBookLessonService, BookLessonService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ITeacherAvailabilityService, TeacherAvailabilityService>();
+builder.Services.AddScoped<ITeacherLessonService, TeacherLessonService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddTransient<IEmailSender, EmailSender>();

@@ -79,7 +79,7 @@
 
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Events" asp-action="Index">Събития</a>
-                        </li>   
+                        </li>
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
@@ -105,15 +105,24 @@
 
                                             <a class="dropdown-item" asp-controller="Image" asp-action="UploadFile">
                                                 Качи документ
-                                                </a>
+                                            </a>
                                         </li>
                                     }
 
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Parent") || User.IsInRole("Student"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Parent") || User.IsInRole("Student") || User.IsInRole("Teacher"))
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
                                                 Запази час онлайн
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (User.IsInRole("Student"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="GroupInvitations">
+                                                Моите групови покани
                                             </a>
                                         </li>
                                     }

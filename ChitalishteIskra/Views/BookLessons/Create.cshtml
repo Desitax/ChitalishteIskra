@@ -1,23 +1,59 @@
 ﻿@using ChitalishteIskra.Models.BookLessons
 @model BookLessonCreateViewModel
 
-<h2 class="mb-3">Запази час</h2>
+<h2 class="mb-3">Запази индивидуален урок</h2>
 
 <form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
     <div class="mb-3">
-        <label class="form-label">Урок</label>
-        <select asp-for="LessonId" asp-items="Model.Lessons" class="form-control">
-            <option selected disabled value="">Избери урок</option>
+        <label asp-for="TeacherId" class="form-label">Учител</label>
+        <select asp-for="TeacherId" asp-items="Model.Teachers" class="form-control" id="teacherSelect">
+            <option value="">Избери учител</option>
+        </select>
+        <span asp-validation-for="TeacherId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label">Дата</label>
+        <input asp-for="Date" type="date" class="form-control" id="dateInput" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LessonId" class="form-label">Предмет</label>
+        <select asp-for="LessonId" asp-items="Model.Lessons" class="form-control" id="lessonSelect">
+            <option value="">Избери предмет</option>
         </select>
         <span asp-validation-for="LessonId" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Свободен час</label>
-        <select asp-for="TeacherAvailabilityId" asp-items="Model.AvailableSlots" class="form-control">
-            <option selected disabled value="">Избери свободен час</option>
+        <label asp-for="TeacherAvailabilityId" class="form-label">Свободен час</label>
+        <select asp-for="TeacherAvailabilityId" asp-items="Model.AvailableSlots" class="form-control" id="slotSelect">
+            <option value="">Избери свободен час</option>
         </select>
         <span asp-validation-for="TeacherAvailabilityId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <h5>Възрастови групи на учителя</h5>
+        <ul id="groupsList">
+            @foreach (var group in Model.TeacherGroups)
+            {
+                <li>@group</li>
+            }
+        </ul>
+    </div>
+
+    <div class="mb-3">
+        <h5>Работно време за избрания ден</h5>
+        <ul id="workingHoursList">
+            @foreach (var hour in Model.WorkingHours)
+            {
+                <li>@hour</li>
+            }
+        </ul>
     </div>
 
     <button class="btn btn-primary" type="submit">Запази</button>
@@ -25,7 +61,57 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        async function loadTeacherBookingData() {
+            const teacherId = document.getElementById('teacherSelect').value;
+            const date = document.getElementById('dateInput').value;
+
+            const lessonSelect = document.getElementById('lessonSelect');
+            const slotSelect = document.getElementById('slotSelect');
+            const groupsList = document.getElementById('groupsList');
+            const workingHoursList = document.getElementById('workingHoursList');
+
+            lessonSelect.innerHTML = '<option value="">Избери предмет</option>';
+            slotSelect.innerHTML = '<option value="">Избери свободен час</option>';
+            groupsList.innerHTML = '';
+            workingHoursList.innerHTML = '';
+
+            if (!teacherId || !date) {
+                return;
+            }
+
+            const response = await fetch(`/BookLessons/GetTeacherBookingData?teacherId=${teacherId}&date=${date}`);
+            const data = await response.json();
+
+            data.lessons.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.text = item.text;
+                lessonSelect.appendChild(option);
+            });
+
+            data.availableSlots.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.value;
+                option.text = item.text;
+                slotSelect.appendChild(option);
+            });
+
+            data.groups.forEach(group => {
+                const li = document.createElement('li');
+                li.textContent = group;
+                groupsList.appendChild(li);
+            });
+
+            data.workingHours.forEach(hour => {
+                const li = document.createElement('li');
+                li.textContent = hour;
+                workingHoursList.appendChild(li);
+            });
+        }
+
+        document.getElementById('teacherSelect').addEventListener('change', loadTeacherBookingData);
+        document.getElementById('dateInput').addEventListener('change', loadTeacherBookingData);
+    </script>
 }
-
-
-

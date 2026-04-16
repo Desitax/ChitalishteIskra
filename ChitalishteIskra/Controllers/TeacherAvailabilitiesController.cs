@@ -13,7 +13,7 @@ using System.Security.Claims;
 namespace ChitalishteIskra.Controllers
 {
     [Authorize]
-    public class TeacherAvailabilitiesController:Controller
+    public class TeacherAvailabilitiesController : Controller
     {
         private readonly ITeacherAvailabilityService service;
         private readonly UserManager<User> userManager;
@@ -35,7 +35,7 @@ namespace ChitalishteIskra.Controllers
             {
                 Id = x.Id,
                 TeacherName = x.TeacherName,
-                Date = x.Date,
+                DayOfWeek = x.DayOfWeek,
                 StartTime = x.StartTime,
                 EndTime = x.EndTime,
                 IsAvailable = x.IsAvailable
@@ -66,21 +66,10 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(TeacherAvailabilitiesCreateViewModel model)
         {
-            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
-            {
-                ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
-            }
-
             if (model.EndTime <= model.StartTime)
             {
                 ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
                 return View(model);
-            }
-
-            if (model.Date == DateOnly.FromDateTime(DateTime.Today) &&
-            model.StartTime < TimeOnly.FromDateTime(DateTime.Now))
-            {
-                ModelState.AddModelError(nameof(model.StartTime), "Не може да избирате час, който вече е минал.");
             }
 
             if (!ModelState.IsValid)
@@ -116,10 +105,10 @@ namespace ChitalishteIskra.Controllers
 
             var dto = new CreateTeacherAvailabilityDto
             {
-                Date = model.Date,
+                DayOfWeek = model.DayOfWeek,
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
-                TeacherId = Guid.Parse(currentUserId)
+                TeacherId = teacherId
             };
 
             await service.CreateAsync(dto);
@@ -136,7 +125,7 @@ namespace ChitalishteIskra.Controllers
 
             var model = new TeacherAvailabilitiesCreateViewModel
             {
-                Date = data.Date,
+                DayOfWeek = data.DayOfWeek,
                 StartTime = data.StartTime,
                 EndTime = data.EndTime
             };
@@ -150,10 +139,6 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, TeacherAvailabilitiesCreateViewModel model)
         {
-            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
-            {
-                ModelState.AddModelError(nameof(model.Date), "Не може да избирате минала дата.");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -166,15 +151,9 @@ namespace ChitalishteIskra.Controllers
                 return View(model);
             }
 
-            if (model.Date == DateOnly.FromDateTime(DateTime.Today) &&
-    model.StartTime < TimeOnly.FromDateTime(DateTime.Now))
-            {
-                ModelState.AddModelError(nameof(model.StartTime), "Не може да избирате час, който вече е минал.");
-            }
-
             var dto = new CreateTeacherAvailabilityDto
             {
-                Date = model.Date,
+                DayOfWeek = model.DayOfWeek,
                 StartTime = model.StartTime,
                 EndTime = model.EndTime
             };

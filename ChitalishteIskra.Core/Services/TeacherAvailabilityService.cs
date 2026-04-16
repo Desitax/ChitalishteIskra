@@ -27,7 +27,7 @@ namespace ChitalishteIskra.Core.Services
                 .Select(t => new TeacherAvailabilityDto
                 {
                     Id = t.Id,
-                    Date = t.Date,
+                    DayOfWeek = t.DayOfWeek,
                     StartTime = t.StartTime,
                     EndTime = t.EndTime,
                     IsAvailable = t.IsAvailable,
@@ -41,7 +41,7 @@ namespace ChitalishteIskra.Core.Services
             var availability = new TeacherAvailability
             {
                 Id = Guid.NewGuid(),
-                Date = model.Date,
+                DayOfWeek = model.DayOfWeek,
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
                 TeacherId = model.TeacherId,
@@ -66,7 +66,7 @@ namespace ChitalishteIskra.Core.Services
             return new TeacherAvailabilityDto
             {
                 Id = entity.Id,
-                Date = entity.Date,
+                DayOfWeek = entity.DayOfWeek,
                 StartTime = entity.StartTime,
                 EndTime = entity.EndTime,
                 IsAvailable = entity.IsAvailable,
@@ -83,7 +83,7 @@ namespace ChitalishteIskra.Core.Services
                 throw new ArgumentException("Not found");
             }
 
-            entity.Date = model.Date;
+            entity.DayOfWeek = model.DayOfWeek;
             entity.StartTime = model.StartTime;
             entity.EndTime = model.EndTime;
 

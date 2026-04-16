@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace ChitalishteIskra.Models.TeacherLessons
+namespace ChitalishteIskra.Models.TeacherLesson
 {
     public class TeacherLessonCreateViewModel
     {

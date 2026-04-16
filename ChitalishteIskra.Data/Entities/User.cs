@@ -32,6 +32,8 @@ namespace ChitalishteIskra.Data.Entities
         public ICollection<TeacherEvent> TeacherEvents { get; set; } = new List<TeacherEvent>();
 
         public ICollection<GroupStudent> GroupStudents { get; set; } = new List<GroupStudent>();
+
+        public ICollection<TeacherLesson> TeacherLessons { get; set; } = new List<TeacherLesson>();
     }    
   
 }

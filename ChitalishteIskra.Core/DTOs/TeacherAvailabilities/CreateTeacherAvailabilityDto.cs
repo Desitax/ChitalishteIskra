@@ -8,7 +8,7 @@ namespace ChitalishteIskra.Core.DTOs.TeacherAvailabilities
 {
     public class CreateTeacherAvailabilityDto
     {
-        public DateOnly Date { get; set; }
+        public DayOfWeek DayOfWeek { get; set; }
 
         public TimeOnly StartTime { get; set; }
 

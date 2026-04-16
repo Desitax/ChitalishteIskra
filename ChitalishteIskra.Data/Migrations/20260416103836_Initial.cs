@@ -215,7 +215,7 @@ namespace ChitalishteIskra.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TeacherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false)
@@ -252,6 +252,31 @@ namespace ChitalishteIskra.Data.Migrations
                         name: "FK_TeacherEvents_Events_EventId",
                         column: x => x.EventId,
                         principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TeacherLessons",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeacherLessons", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeacherLessons_AspNetUsers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TeacherLessons_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -323,6 +348,33 @@ namespace ChitalishteIskra.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "GroupLessonResponses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BookLessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupLessonResponses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GroupLessonResponses_AspNetUsers_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupLessonResponses_BookLessons_BookLessonId",
+                        column: x => x.BookLessonId,
+                        principalTable: "BookLessons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -384,6 +436,16 @@ namespace ChitalishteIskra.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_GroupLessonResponses_BookLessonId",
+                table: "GroupLessonResponses",
+                column: "BookLessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupLessonResponses_StudentId",
+                table: "GroupLessonResponses",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Groups_TeacherId",
                 table: "Groups",
                 column: "TeacherId");
@@ -400,9 +462,9 @@ namespace ChitalishteIskra.Data.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TeacherAvailabilities_TeacherId_Date_StartTime_EndTime",
+                name: "IX_TeacherAvailabilities_TeacherId_DayOfWeek_StartTime_EndTime",
                 table: "TeacherAvailabilities",
-                columns: new[] { "TeacherId", "Date", "StartTime", "EndTime" },
+                columns: new[] { "TeacherId", "DayOfWeek", "StartTime", "EndTime" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -415,6 +477,16 @@ namespace ChitalishteIskra.Data.Migrations
                 table: "TeacherEvents",
                 columns: new[] { "TeacherId", "EventId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeacherLessons_LessonId",
+                table: "TeacherLessons",
+                column: "LessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeacherLessons_TeacherId",
+                table: "TeacherLessons",
+                column: "TeacherId");
         }
 
         /// <inheritdoc />
@@ -436,7 +508,7 @@ namespace ChitalishteIskra.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "BookLessons");
+                name: "GroupLessonResponses");
 
             migrationBuilder.DropTable(
                 name: "GroupStudents");
@@ -448,16 +520,22 @@ namespace ChitalishteIskra.Data.Migrations
                 name: "TeacherEvents");
 
             migrationBuilder.DropTable(
+                name: "TeacherLessons");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Lessons");
+                name: "BookLessons");
+
+            migrationBuilder.DropTable(
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "Groups");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

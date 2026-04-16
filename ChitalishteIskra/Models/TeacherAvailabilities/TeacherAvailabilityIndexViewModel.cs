@@ -7,7 +7,7 @@ namespace ChitalishteIskra.Models.TeacherAvailabilities
         public Guid Id { get; set; }
         public string TeacherName { get; set; } = null!;
 
-        public DateOnly Date { get; set; }
+        public DayOfWeek DayOfWeek { get; set; }
 
         public TimeOnly StartTime { get; set; }
 

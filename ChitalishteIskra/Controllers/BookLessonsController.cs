@@ -19,15 +19,18 @@ namespace ChitalishteIskra.Controllers
         private readonly IBookLessonService bookLessonService;
         public readonly ChitalishteIskraDbContext context;
         private readonly UserManager<User> userManager;
-        public BookLessonsController(ChitalishteIskraDbContext _context, UserManager<User> _userManager,
-            IBookLessonService _bookLessonService)
+
+        public BookLessonsController(
+            ChitalishteIskraDbContext context,
+            UserManager<User> userManager,
+            IBookLessonService bookLessonService)
         {
-            this.context = _context;
-            this.userManager = _userManager;
-            this.bookLessonService = _bookLessonService;
+            this.context = context;
+            this.userManager = userManager;
+            this.bookLessonService = bookLessonService;
         }
 
-        [Authorize(Roles = "Admin,Parent,Student")]
+        [Authorize(Roles = "Admin,Parent,Student,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -54,12 +57,8 @@ namespace ChitalishteIskra.Controllers
 
             var model = new BookLessonCreateViewModel
             {
-                Lessons = data.Lessons.Select(x => new SelectListItem
-                {
-                    Value = x.Value,
-                    Text = x.Text
-                }),
-                AvailableSlots = data.AvailableSlots.Select(x => new SelectListItem
+                Date = DateOnly.FromDateTime(DateTime.Today),
+                Teachers = data.Teachers.Select(x => new SelectListItem
                 {
                     Value = x.Value,
                     Text = x.Text
@@ -69,34 +68,23 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-
         [Authorize(Roles = "Admin,Student,Parent")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookLessonCreateViewModel model)
         {
-
+            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(model.Date), "Не може да избереш минала дата.");
+            }
 
             if (!ModelState.IsValid)
             {
-                var pageData = await bookLessonService.GetCreatePageDataAsync();
-
-                model.Lessons = pageData.Lessons.Select(x => new SelectListItem
-                {
-                    Value = x.Value,
-                    Text = x.Text
-                });
-
-                model.AvailableSlots = pageData.AvailableSlots.Select(x => new SelectListItem
-                {
-                    Value = x.Value,
-                    Text = x.Text
-                });
-
+                await PopulateCreateViewModelAsync(model);
                 return View(model);
             }
 
             string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (string.IsNullOrWhiteSpace(currentUserIdString))
             {
                 return Unauthorized();
@@ -108,35 +96,155 @@ namespace ChitalishteIskra.Controllers
             {
                 var dto = new CreateBookLessonDto
                 {
+                    TeacherId = model.TeacherId,
                     LessonId = model.LessonId,
                     TeacherAvailabilityId = model.TeacherAvailabilityId,
-                    StudentId = currentUserId
+                    StudentId = currentUserId,
+                    Date = model.Date
                 };
 
                 await bookLessonService.CreateAsync(dto);
-
+                TempData["SuccessMessage"] = "Индивидуалният урок беше записан успешно.";
                 return RedirectToAction(nameof(Index));
             }
             catch (ArgumentException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-
-                var pageData = await bookLessonService.GetCreatePageDataAsync();
-
-                model.Lessons = pageData.Lessons.Select(x => new SelectListItem
-                {
-                    Value = x.Value,
-                    Text = x.Text
-                });
-
-                model.AvailableSlots = pageData.AvailableSlots.Select(x => new SelectListItem
-                {
-                    Value = x.Value,
-                    Text = x.Text
-                });
-
+                await PopulateCreateViewModelAsync(model);
                 return View(model);
             }
+        }
+
+        [Authorize(Roles = "Teacher")]
+        [HttpGet]
+        public async Task<IActionResult> CreateGroup()
+        {
+            Guid? teacherId = await ResolveTeacherIdForGroupActionsAsync();
+            if (teacherId == null)
+            {
+                return Unauthorized();
+            }
+
+            var model = new BookLessonCreateGroupViewModel
+            {
+                Date = DateOnly.FromDateTime(DateTime.Today)
+            };
+
+            await PopulateCreateGroupViewModelAsync(model, teacherId.Value);
+            return View(model);
+        }
+
+        [Authorize(Roles = "Teacher")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateGroup(BookLessonCreateGroupViewModel model)
+        {
+            Guid? teacherId = await ResolveTeacherIdForGroupActionsAsync();
+            if (teacherId == null)
+            {
+                return Unauthorized();
+            }
+
+            if (model.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                ModelState.AddModelError(nameof(model.Date), "Не може да избереш минала дата.");
+            }
+
+            if (model.EndTime <= model.StartTime)
+            {
+                ModelState.AddModelError(nameof(model.EndTime), "Крайният час трябва да е след началния.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await PopulateCreateGroupViewModelAsync(model, teacherId.Value);
+                return View(model);
+            }
+
+            try
+            {
+                var dto = new CreateGroupLessonDto
+                {
+                    TeacherId = teacherId.Value,
+                    LessonId = model.LessonId,
+                    GroupId = model.GroupId,
+                    Date = model.Date,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime
+                };
+
+                await bookLessonService.CreateGroupAsync(dto);
+                TempData["SuccessMessage"] = "Груповият урок беше създаден успешно.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                await PopulateCreateGroupViewModelAsync(model, teacherId.Value);
+                return View(model);
+            }
+        }
+
+        [Authorize(Roles = "Student")]
+        [HttpGet]
+        public async Task<IActionResult> GroupInvitations()
+        {
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            var model = await bookLessonService.GetStudentGroupLessonsAsync(Guid.Parse(currentUserId));
+            return View(model);
+        }
+
+        [Authorize(Roles = "Student")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AcceptGroupLesson(Guid bookLessonId)
+        {
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await bookLessonService.RespondToGroupLessonAsync(bookLessonId, Guid.Parse(currentUserId), true);
+                TempData["SuccessMessage"] = "Поканата беше приета.";
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(GroupInvitations));
+        }
+
+        [Authorize(Roles = "Student")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeclineGroupLesson(Guid bookLessonId)
+        {
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await bookLessonService.RespondToGroupLessonAsync(bookLessonId, Guid.Parse(currentUserId), false);
+                TempData["SuccessMessage"] = "Поканата беше отказана.";
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(GroupInvitations));
         }
 
         [HttpGet]
@@ -162,13 +270,11 @@ namespace ChitalishteIskra.Controllers
                 EndTime = booking.EndTime,
                 TeacherId = booking.TeacherId,
                 LessonId = booking.LessonId,
-
                 Teachers = context.Users.Select(u => new SelectListItem
                 {
                     Value = u.Id.ToString(),
                     Text = u.FirstName + " " + u.LastName
                 }),
-
                 Lessons = context.Lessons.Select(l => new SelectListItem
                 {
                     Value = l.Id.ToString(),
@@ -178,117 +284,6 @@ namespace ChitalishteIskra.Controllers
 
             return View(model);
         }
-
-
-
-        [Authorize(Roles = "Admin,Teacher")]
-        [HttpGet]
-        public async Task<IActionResult> CreateGroup()
-        {
-            var model = new BookLessonCreateGroupViewModel
-            {
-                Lessons = await context.Lessons
-                    .Where(l => l.TypeName == LessonTypeName.Group)
-                    .Select(l => new SelectListItem
-                    {
-                        Value = l.Id.ToString(),
-                        Text = l.Name
-                    })
-                    .ToListAsync(),
-
-                Groups = await context.Groups
-                    .Select(g => new SelectListItem
-                    {
-                        Value = g.Id.ToString(),
-                        Text = g.Name
-                    })
-                    .ToListAsync()
-            };
-
-            return View(model);
-        }
-
-        [Authorize(Roles = "Admin,Teacher")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateGroup(BookLessonCreateGroupViewModel model)
-        {
-            if (model.EndTime <= model.StartTime)
-            {
-                ModelState.AddModelError(string.Empty, "Крайният час трябва да е след началния.");
-            }
-
-            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.Id == model.LessonId);
-            if (lesson == null || lesson.TypeName != LessonTypeName.Group)
-            {
-                ModelState.AddModelError(string.Empty, "Избраният урок не е групов.");
-            }
-
-            var groupExists = await context.Groups.AnyAsync(g => g.Id == model.GroupId);
-            if (!groupExists)
-            {
-                ModelState.AddModelError(string.Empty, "Избраната група не съществува.");
-            }
-
-            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrWhiteSpace(currentUserId))
-            {
-                return Unauthorized();
-            }
-
-            Guid teacherId = Guid.Parse(currentUserId);
-
-            bool hasConflict = await context.BookLessons.AnyAsync(bl =>
-                bl.TeacherId == teacherId &&
-                bl.Date == model.Date &&
-                bl.StartTime == model.StartTime &&
-                bl.EndTime == model.EndTime);
-
-            if (hasConflict)
-            {
-                ModelState.AddModelError(string.Empty, "Вече има урок за този час.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                model.Lessons = await context.Lessons
-                    .Where(l => l.TypeName == LessonTypeName.Group)
-                    .Select(l => new SelectListItem
-                    {
-                        Value = l.Id.ToString(),
-                        Text = l.Name
-                    })
-                    .ToListAsync();
-
-                model.Groups = await context.Groups
-                    .Select(g => new SelectListItem
-                    {
-                        Value = g.Id.ToString(),
-                        Text = g.Name
-                    })
-                    .ToListAsync();
-
-                return View(model);
-            }
-
-            var booking = new BookLesson
-            {
-                Id = Guid.NewGuid(),
-                Date = model.Date,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
-                TeacherId = teacherId,
-                LessonId = model.LessonId,
-                GroupId = model.GroupId,
-                StudentId = null
-            };
-
-            await context.BookLessons.AddAsync(booking);
-            await context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-        }
-
 
         [HttpPost]
         public async Task<IActionResult> Edit(BookLessonEditViewModel model)
@@ -327,7 +322,6 @@ namespace ChitalishteIskra.Controllers
             }
 
             var booking = await context.BookLessons.FindAsync(model.Id);
-
             if (booking == null)
             {
                 return NotFound();
@@ -352,12 +346,83 @@ namespace ChitalishteIskra.Controllers
                 context.BookLessons.Remove(booking);
                 await context.SaveChangesAsync();
             }
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        private string GetCurrentClientId()
+        [Authorize(Roles = "Admin,Student,Parent")]
+        [HttpGet]
+        public async Task<IActionResult> GetTeacherBookingData(Guid teacherId, DateOnly date)
         {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            var data = await bookLessonService.GetTeacherBookingDataAsync(teacherId, date);
+
+            return Json(new
+            {
+                lessons = data.Lessons.Select(x => new { value = x.Value, text = x.Text }),
+                groups = data.Groups.Select(x => x.Text),
+                workingHours = data.WorkingHours,
+                availableSlots = data.AvailableSlots.Select(x => new { value = x.Value, text = x.Text })
+            });
+        }
+
+        private async Task PopulateCreateViewModelAsync(BookLessonCreateViewModel model)
+        {
+            var pageData = await bookLessonService.GetCreatePageDataAsync();
+            model.Teachers = pageData.Teachers.Select(x => new SelectListItem
+            {
+                Value = x.Value,
+                Text = x.Text
+            });
+
+            if (model.TeacherId != Guid.Empty)
+            {
+                var teacherData = await bookLessonService.GetTeacherBookingDataAsync(model.TeacherId, model.Date);
+                model.Lessons = teacherData.Lessons.Select(x => new SelectListItem
+                {
+                    Value = x.Value,
+                    Text = x.Text
+                });
+                model.AvailableSlots = teacherData.AvailableSlots.Select(x => new SelectListItem
+                {
+                    Value = x.Value,
+                    Text = x.Text
+                });
+                model.TeacherGroups = teacherData.Groups.Select(g => g.Text);
+                model.WorkingHours = teacherData.WorkingHours;
+            }
+        }
+
+        private async Task PopulateCreateGroupViewModelAsync(BookLessonCreateGroupViewModel model, Guid teacherId)
+        {
+            model.Lessons = await context.TeacherLessons
+                .Where(tl => tl.TeacherId == teacherId && tl.Lesson.TypeName == LessonTypeName.Group)
+                .Select(tl => new { tl.LessonId, tl.Lesson.Name })
+                .Distinct()
+                .Select(tl => new SelectListItem
+                {
+                    Value = tl.LessonId.ToString(),
+                    Text = tl.Name
+                })
+                .ToListAsync();
+
+            model.Groups = await context.Groups
+                .Where(g => g.TeacherId == teacherId)
+                .Select(g => new SelectListItem
+                {
+                    Value = g.Id.ToString(),
+                    Text = g.Name
+                })
+                .ToListAsync();
+        }
+
+        private Task<Guid?> ResolveTeacherIdForGroupActionsAsync()
+        {
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserId))
+            {
+                return Task.FromResult<Guid?>(null);
+            }
+
+            return Task.FromResult<Guid?>(Guid.Parse(currentUserId));
         }
     }
 }

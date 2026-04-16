@@ -38,9 +38,5 @@ namespace ChitalishteIskra.Data.Entities
         public Guid? GroupId { get; set; }
         public Group? Group { get; set; }
 
-        //[ForeignKey(nameof(User))]
-        //public Guid UserId { get; set; }
-        //public User User { get; set; } = null!;
-
 	}
 }

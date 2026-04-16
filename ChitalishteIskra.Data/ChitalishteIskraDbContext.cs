@@ -26,14 +26,8 @@ namespace ChitalishteIskra.Data
         public DbSet<Lesson> Lessons { get; set; } = null!;
         public DbSet<Event> Events { get; set; } = null!;
         public DbSet<BookLesson> BookLessons { get; set; } = null!;
-
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    base.OnModelCreating(builder);
-
-        //    builder.ApplyConfigurationsFromAssembly(typeof(ChitalishteIskraDbContext).Assembly);
-        //}
-
+        public DbSet<TeacherLesson> TeacherLessons { get; set; } = null!;
+        public DbSet<GroupLessonResponse> GroupLessonResponses { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -101,7 +95,7 @@ namespace ChitalishteIskra.Data
                 .IsUnique();
 
             builder.Entity<TeacherAvailability>()
-                .HasIndex(x => new { x.TeacherId, x.Date, x.StartTime, x.EndTime })
+                .HasIndex(x => new { x.TeacherId, x.DayOfWeek, x.StartTime, x.EndTime })
                 .IsUnique();
 
             builder.Entity<BookLesson>()

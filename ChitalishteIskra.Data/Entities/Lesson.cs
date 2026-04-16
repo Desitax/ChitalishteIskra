@@ -15,13 +15,9 @@ namespace ChitalishteIskra.Data.Entities
         [Required]
         public string Name { get; set; } = null!;
 
-		//[ForeignKey(nameof(Type))]
-		//public Guid? TypeId { get; set; }
-		//public LessonType? Type { get; set; }
-
         public LessonTypeName TypeName { get; set; }
         public ICollection<BookLesson> BookLessons { get; set; }=new List<BookLesson>();
-
+        public ICollection<TeacherLesson> TeacherLessons { get; set; } = new List<TeacherLesson>();
         public enum LessonTypeName
         {
             Individual,

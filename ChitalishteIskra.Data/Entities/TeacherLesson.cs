@@ -7,24 +7,14 @@ using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data.Entities
 {
-    public class TeacherAvailability
+    public class TeacherLesson
     {
-        [Key]
+        [Key] 
         public Guid Id { get; set; }
-
-        [Required]
         public Guid TeacherId { get; set; }
         public User Teacher { get; set; } = null!;
 
-        [Required]
-        public DayOfWeek DayOfWeek { get; set; }
-
-        [Required]
-        public TimeOnly StartTime { get; set; }
-
-        [Required]
-        public TimeOnly EndTime { get; set; }
-
-        public bool IsAvailable { get; set; } = true;
+        public Guid LessonId { get; set; }
+        public Lesson Lesson { get; set; } = null!;
     }
 }

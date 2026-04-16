@@ -1,0 +1,70 @@
+@using ChitalishteIskra.Core.DTOs.BookLessons
+@model IEnumerable<GroupLessonInvitationDto>
+
+<h2 class="mb-3">Моите групови покани</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Нямаш покани за групови уроци.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Начало</th>
+                <th>Край</th>
+                <th>Предмет</th>
+                <th>Група</th>
+                <th>Учител</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Date</td>
+                    <td>@item.StartTime</td>
+                    <td>@item.EndTime</td>
+                    <td>@item.LessonName</td>
+                    <td>@item.GroupName</td>
+                    <td>@item.TeacherName</td>
+                    <td>@item.Status</td>
+                    <td>
+                        @if (item.Status == "Чака отговор")
+                        {
+                            <form asp-action="AcceptGroupLesson" method="post" style="display:inline; margin-right:5px;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookLessonId" value="@item.BookLessonId" />
+                                <button type="submit" class="btn btn-success btn-sm">Приеми</button>
+                            </form>
+
+                            <form asp-action="DeclineGroupLesson" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookLessonId" value="@item.BookLessonId" />
+                                <button type="submit" class="btn btn-danger btn-sm">Откажи</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Няма налични действия</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

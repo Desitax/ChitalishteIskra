@@ -1,0 +1,27 @@
+﻿@model IEnumerable<ChitalishteIskra.Core.DTOs.TeacherLessons.TeacherLessonIndexDto>
+
+<h2>Учители и предмети</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Назначи предмет</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Учител</th>
+            <th>Предмет</th>
+            <th>Тип</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TeacherName</td>
+                <td>@item.LessonName</td>
+                <td>@item.LessonType</td>
+            </tr>
+        }
+    </tbody>
+</table>

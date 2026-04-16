@@ -13,6 +13,12 @@ namespace ChitalishteIskra.Core.Contracts
 
         Task<BookLessonCreatePageDto> GetCreatePageDataAsync();
 
+        Task<BookLessonTeacherInfoDto> GetTeacherBookingDataAsync(Guid teacherId, DateOnly date);
+
         Task CreateAsync(CreateBookLessonDto model);
+        Task CreateGroupAsync(CreateGroupLessonDto model);
+
+        Task<IEnumerable<GroupLessonInvitationDto>> GetStudentGroupLessonsAsync(Guid studentId);
+        Task RespondToGroupLessonAsync(Guid bookLessonId, Guid studentId, bool isAccepted);
     }
 }

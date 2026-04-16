@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ChitalishteIskra.Data.Entities.GroupLessonResponse;
 using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Core.Services
@@ -34,7 +35,7 @@ namespace ChitalishteIskra.Core.Services
             return await context.BookLessons
                 .Include(b => b.Teacher)
                 .Include(b => b.Lesson)
-                .Where(x => teachersIds.Contains(x.Teacher.Id))
+                .Where(x => teachersIds.Contains(x.TeacherId))
                 .Select(b => new BookLessonIndexDto
                 {
                     Id = b.Id,
@@ -49,69 +50,283 @@ namespace ChitalishteIskra.Core.Services
 
         public async Task<BookLessonCreatePageDto> GetCreatePageDataAsync()
         {
-            var lessons = await context.Lessons
-                .Where(l => l.TypeName == LessonTypeName.Individual)
-                .Select(l => new BookLessonOptionDto
-                {
-                    Value = l.Id.ToString(),
-                    Text = l.Name
-                })
-                .ToListAsync();
-
-            var availableSlots = await context.TeacherAvailabilities
-                .Where(x => x.IsAvailable)
-                .Include(x => x.Teacher)
-                .OrderBy(x => x.Date)
-                .ThenBy(x => x.StartTime)
-                .Select(x => new BookLessonOptionDto
-                {
-                    Value = x.Id.ToString(),
-                    Text = x.Teacher.FirstName + " " + x.Teacher.LastName
-                           + " - " + x.Date.ToString()
-                           + " - " + x.StartTime.ToString()
-                           + " - " + x.EndTime.ToString()
-                })
-                .ToListAsync();
+            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
 
             return new BookLessonCreatePageDto
             {
+                Teachers = teachers
+                    .Where(t => t.IsApprovedTeacher)
+                    .Select(t => new BookLessonOptionDto
+                    {
+                        Value = t.Id.ToString(),
+                        Text = t.FirstName + " " + t.LastName
+                    })
+                    .ToList()
+            };
+        }
+
+        public async Task<BookLessonTeacherInfoDto> GetTeacherBookingDataAsync(Guid teacherId, DateOnly date)
+        {
+            var dayOfWeek = date.ToDateTime(TimeOnly.MinValue).DayOfWeek;
+
+            var lessons = await context.TeacherLessons
+                .Where(tl => tl.TeacherId == teacherId && tl.Lesson.TypeName == LessonTypeName.Individual)
+                .Select(tl => new { tl.LessonId, tl.Lesson.Name })
+                .Distinct()
+                .Select(tl => new BookLessonOptionDto
+                {
+                    Value = tl.LessonId.ToString(),
+                    Text = tl.Name
+                })
+                .ToListAsync();
+
+            var groups = await context.Groups
+                .Where(g => g.TeacherId == teacherId)
+                .Select(g => new BookLessonOptionDto
+                {
+                    Value = g.Id.ToString(),
+                    Text = g.Name
+                })
+                .ToListAsync();
+
+            var workingHoursEntities = await context.TeacherAvailabilities
+                .Where(ta => ta.TeacherId == teacherId
+                             && ta.DayOfWeek == dayOfWeek
+                             && ta.IsAvailable)
+                .OrderBy(ta => ta.StartTime)
+                .ToListAsync();
+
+            var bookedSlots = await context.BookLessons
+                .Where(bl => bl.TeacherId == teacherId && bl.Date == date)
+                .Select(bl => new { bl.StartTime, bl.EndTime })
+                .ToListAsync();
+
+            var availableSlots = workingHoursEntities
+                .Where(wh => !bookedSlots.Any(bs =>
+                    bs.StartTime == wh.StartTime && bs.EndTime == wh.EndTime))
+                .Select(wh => new BookLessonOptionDto
+                {
+                    Value = wh.Id.ToString(),
+                    Text = $"{wh.StartTime:HH\\:mm} - {wh.EndTime:HH\\:mm}"
+                })
+                .ToList();
+
+            var workingHours = workingHoursEntities
+                .Select(wh => $"{wh.DayOfWeek} : {wh.StartTime:HH\\:mm} - {wh.EndTime:HH\\:mm}")
+                .ToList();
+
+            return new BookLessonTeacherInfoDto
+            {
                 Lessons = lessons,
+                Groups = groups,
+                WorkingHours = workingHours,
                 AvailableSlots = availableSlots
             };
         }
 
         public async Task CreateAsync(CreateBookLessonDto model)
         {
+            var lesson = await context.Lessons
+                .FirstOrDefaultAsync(l => l.Id == model.LessonId);
+
+            if (lesson == null || lesson.TypeName != LessonTypeName.Individual)
+            {
+                throw new ArgumentException("Избраният урок не е индивидуален.");
+            }
+
+            bool teacherCanTeachLesson = await context.TeacherLessons
+                .AnyAsync(tl => tl.TeacherId == model.TeacherId && tl.LessonId == model.LessonId);
+
+            if (!teacherCanTeachLesson)
+            {
+                throw new ArgumentException("Този учител не преподава избрания предмет.");
+            }
+
             var slot = await context.TeacherAvailabilities
-                .FirstOrDefaultAsync(x => x.Id == model.TeacherAvailabilityId && x.IsAvailable);
+                .FirstOrDefaultAsync(x =>
+                    x.Id == model.TeacherAvailabilityId &&
+                    x.TeacherId == model.TeacherId &&
+                    x.IsAvailable);
 
             if (slot == null)
             {
                 throw new ArgumentException("Избраният час вече не е свободен.");
             }
 
-            var lesson = await context.Lessons
-                .FirstOrDefaultAsync(l => l.Id == model.LessonId);
-
-            if (lesson == null || lesson.TypeName != LessonTypeName.Individual)
+            var requestedDay = model.Date.ToDateTime(TimeOnly.MinValue).DayOfWeek;
+            if (slot.DayOfWeek != requestedDay)
             {
-                throw new ArgumentException("Невалиден урок.");
+                throw new ArgumentException("Избраният час не съответства на избраната дата.");
+            }
+
+            bool alreadyBooked = await context.BookLessons.AnyAsync(bl =>
+                bl.TeacherId == model.TeacherId &&
+                bl.Date == model.Date &&
+                bl.StartTime == slot.StartTime &&
+                bl.EndTime == slot.EndTime);
+
+            if (alreadyBooked)
+            {
+                throw new ArgumentException("Този час вече е зает.");
             }
 
             var booking = new BookLesson
             {
                 Id = Guid.NewGuid(),
-                Date = slot.Date,
+                TeacherId = model.TeacherId,
+                LessonId = model.LessonId,
+                StudentId = model.StudentId,
+                Date = model.Date,
                 StartTime = slot.StartTime,
                 EndTime = slot.EndTime,
-                TeacherId = slot.TeacherId,
-                LessonId = model.LessonId,
-                StudentId = model.StudentId
+                GroupId = null
             };
 
-            slot.IsAvailable = false;
+            await context.BookLessons.AddAsync(booking);
+            await context.SaveChangesAsync();
+        }
+        public async Task CreateGroupAsync(CreateGroupLessonDto model)
+        {
+            var lesson = await context.Lessons
+                .FirstOrDefaultAsync(l => l.Id == model.LessonId);
+
+            if (lesson == null || lesson.TypeName != LessonTypeName.Group)
+            {
+                throw new ArgumentException("Избраният урок не е групов.");
+            }
+
+            bool teacherCanTeachLesson = await context.TeacherLessons
+                .AnyAsync(tl => tl.TeacherId == model.TeacherId && tl.LessonId == model.LessonId);
+
+            if (!teacherCanTeachLesson)
+            {
+                throw new ArgumentException("Този учител не преподава избрания групов предмет.");
+            }
+
+            var group = await context.Groups
+                .FirstOrDefaultAsync(g => g.Id == model.GroupId && g.TeacherId == model.TeacherId);
+
+            if (group == null)
+            {
+                throw new ArgumentException("Избраната група не принадлежи на този учител.");
+            }
+
+            var dayOfWeek = model.Date.ToDateTime(TimeOnly.MinValue).DayOfWeek;
+
+            bool teacherIsWorking = await context.TeacherAvailabilities.AnyAsync(ta =>
+                ta.TeacherId == model.TeacherId &&
+                ta.DayOfWeek == dayOfWeek &&
+                ta.IsAvailable &&
+                ta.StartTime <= model.StartTime &&
+                ta.EndTime >= model.EndTime);
+
+            if (!teacherIsWorking)
+            {
+                throw new ArgumentException("Урокът е извън работното време на учителя.");
+            }
+
+            bool hasConflict = await context.BookLessons.AnyAsync(bl =>
+                bl.TeacherId == model.TeacherId &&
+                bl.Date == model.Date &&
+                model.StartTime < bl.EndTime &&
+                model.EndTime > bl.StartTime);
+
+            if (hasConflict)
+            {
+                throw new ArgumentException("Учителят вече има урок в този часови диапазон.");
+            }
+
+            var booking = new BookLesson
+            {
+                Id = Guid.NewGuid(),
+                TeacherId = model.TeacherId,
+                LessonId = model.LessonId,
+                GroupId = model.GroupId,
+                StudentId = null,
+                Date = model.Date,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime
+            };
 
             await context.BookLessons.AddAsync(booking);
+
+            // ТУК е кодът, за който питаш
+            var students = await context.GroupStudents
+                .Where(gs => gs.GroupId == model.GroupId)
+                .Select(gs => gs.StudentId)
+                .ToListAsync();
+
+            if (!students.Any())
+            {
+                throw new ArgumentException("В избраната група няма записани деца.");
+            }
+
+            foreach (var studentId in students)
+            {
+                var response = new GroupLessonResponse
+                {
+                    Id = Guid.NewGuid(),
+                    BookLessonId = booking.Id,
+                    StudentId = studentId,
+                    Status = GroupLessonResponseStatus.Pending
+                };
+
+                await context.GroupLessonResponses.AddAsync(response);
+            }
+
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<GroupLessonInvitationDto>> GetStudentGroupLessonsAsync(Guid studentId)
+        {
+            return await context.GroupLessonResponses
+                .Where(x => x.StudentId == studentId)
+                .Include(x => x.BookLesson)
+                    .ThenInclude(bl => bl.Lesson)
+                .Include(x => x.BookLesson)
+                    .ThenInclude(bl => bl.Teacher)
+                .Include(x => x.BookLesson)
+                    .ThenInclude(bl => bl.Group)
+                .OrderBy(x => x.BookLesson.Date)
+                .ThenBy(x => x.BookLesson.StartTime)
+                .Select(x => new GroupLessonInvitationDto
+                {
+                    BookLessonId = x.BookLessonId,
+                    LessonName = x.BookLesson.Lesson.Name,
+                    GroupName = x.BookLesson.Group != null ? x.BookLesson.Group.Name : string.Empty,
+                    TeacherName = x.BookLesson.Teacher.FirstName + " " + x.BookLesson.Teacher.LastName,
+                    Date = x.BookLesson.Date,
+                    StartTime = x.BookLesson.StartTime,
+                    EndTime = x.BookLesson.EndTime,
+                    Status = x.Status == GroupLessonResponseStatus.Pending
+                        ? "Чака отговор"
+                        : x.Status == GroupLessonResponseStatus.Accepted
+                            ? "Приет"
+                            : "Отказан"
+                })
+                .ToListAsync();
+        }
+
+        public async Task RespondToGroupLessonAsync(Guid bookLessonId, Guid studentId, bool isAccepted)
+        {
+            var response = await context.GroupLessonResponses
+                .Include(x => x.BookLesson)
+                .FirstOrDefaultAsync(x => x.BookLessonId == bookLessonId && x.StudentId == studentId);
+
+            if (response == null)
+            {
+                throw new ArgumentException("Няма намерена покана за този групов урок.");
+            }
+
+            if (response.BookLesson.Date < DateOnly.FromDateTime(DateTime.Today))
+            {
+                throw new ArgumentException("Не може да отговаряш на минал урок.");
+            }
+
+            response.Status = isAccepted
+                ? GroupLessonResponseStatus.Accepted
+                : GroupLessonResponseStatus.Declined;
+
             await context.SaveChangesAsync();
         }
     }
