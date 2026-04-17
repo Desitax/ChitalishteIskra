@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Core.Services
 {
-    public class TeacherLessonService: ITeacherLessonService
+    public class TeacherLessonService : ITeacherLessonService
     {
         private readonly ChitalishteIskraDbContext context;
         private readonly UserManager<User> userManager;
@@ -43,8 +43,9 @@ namespace ChitalishteIskra.Core.Services
         public async Task<TeacherLessonCreatePageDto> GetCreatePageDataAsync()
         {
             var teachers = await userManager.GetUsersInRoleAsync("Teacher");
-
-            var lessons = await context.Lessons.ToListAsync();
+            var lessons = await context.Lessons
+                .Where(l => !l.IsDeleted)
+                .ToListAsync();
 
             return new TeacherLessonCreatePageDto
             {

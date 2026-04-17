@@ -5,18 +5,19 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data
 
 {
-    public class ChitalishteIskraDbContext: IdentityDbContext<User, IdentityRole<Guid>, Guid>
-	{
-		public ChitalishteIskraDbContext(DbContextOptions<ChitalishteIskraDbContext> options)
-		: base(options)
-		{
-		}
+    public class ChitalishteIskraDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    {
+        public ChitalishteIskraDbContext(DbContextOptions<ChitalishteIskraDbContext> options)
+        : base(options)
+        {
+        }
 
 
         public DbSet<TeacherAvailability> TeacherAvailabilities { get; set; } = null!;
@@ -31,6 +32,7 @@ namespace ChitalishteIskra.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             builder.Entity<BookLesson>()
                 .HasOne(bl => bl.Teacher)
@@ -131,6 +133,18 @@ namespace ChitalishteIskra.Data
                 .Property(u => u.LastName)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            builder.Entity<TeacherLesson>()
+              .HasOne(tl => tl.Teacher)
+              .WithMany(t => t.TeacherLessons)
+              .HasForeignKey(tl => tl.TeacherId)
+              .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<TeacherLesson>()
+                .HasOne(tl => tl.Lesson)
+                .WithMany(l => l.TeacherLessons)
+                .HasForeignKey(tl => tl.LessonId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
     }

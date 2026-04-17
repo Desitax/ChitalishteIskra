@@ -1,18 +1,15 @@
 ﻿using ChitalishteIskra.Core.Contracts;
 using ChitalishteIskra.Core.DTOs.Lessons;
-using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.Lessons;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class LessonsController:Controller
+    public class LessonsController : Controller
     {
         private readonly ILessonService lessonService;
 
@@ -39,43 +36,38 @@ namespace ChitalishteIskra.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
-                .Cast<Lesson.LessonTypeName>()
-                .Select(d => new SelectListItem
-                {
-                    Text = d.ToString(),
-                    Value = d.ToString()
-                })
-                .ToList();
-
+            PopulateLessonTypes();
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LessonCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
-                    .Cast<Lesson.LessonTypeName>()
-                    .Select(d => new SelectListItem
-                    {
-                        Text = d.ToString(),
-                        Value = d.ToString()
-                    })
-                    .ToList();
-
+                PopulateLessonTypes();
                 return View(model);
             }
 
-            var dto = new CreateLessonDto
+            try
             {
-                Name = model.Name,
-                TypeName = model.TypeName
-            };
+                var dto = new CreateLessonDto
+                {
+                    Name = model.Name,
+                    TypeName = model.TypeName
+                };
 
-            await lessonService.CreateAsync(dto);
-            return RedirectToAction(nameof(Index));
+                await lessonService.CreateAsync(dto);
+                TempData["SuccessMessage"] = "Предметът беше добавен успешно.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                PopulateLessonTypes();
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -88,14 +80,7 @@ namespace ChitalishteIskra.Controllers
                 return NotFound();
             }
 
-            ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
-                .Cast<Lesson.LessonTypeName>()
-                .Select(d => new SelectListItem
-                {
-                    Text = d.ToString(),
-                    Value = d.ToString()
-                })
-                .ToList();
+            PopulateLessonTypes();
 
             var model = new LessonEditViewModel
             {
@@ -108,37 +93,62 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(LessonEditViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
-                    .Cast<Lesson.LessonTypeName>()
-                    .Select(d => new SelectListItem
-                    {
-                        Text = d.ToString(),
-                        Value = d.ToString()
-                    })
-                    .ToList();
-
+                PopulateLessonTypes();
                 return View(model);
             }
 
-            var dto = new CreateLessonDto
+            try
             {
-                Name = model.Name,
-                TypeName = model.TypeName
-            };
+                var dto = new CreateLessonDto
+                {
+                    Name = model.Name,
+                    TypeName = model.TypeName
+                };
 
-            await lessonService.UpdateAsync(model.Id, dto);
-            return RedirectToAction(nameof(Index));
+                await lessonService.UpdateAsync(model.Id, dto);
+                TempData["SuccessMessage"] = "Предметът беше редактиран успешно.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                PopulateLessonTypes();
+                return View(model);
+            }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await lessonService.DeleteAsync(id);
+            try
+            {
+                await lessonService.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Предметът беше изтрит успешно.";
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToAction(nameof(Index));
+        }
+
+        private void PopulateLessonTypes()
+        {
+            ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
+                .Cast<Lesson.LessonTypeName>()
+                .Select(x => new SelectListItem
+                {
+                    Value = x.ToString(),
+                    Text = x.ToString()
+                })
+                .ToList();
         }
     }
 }

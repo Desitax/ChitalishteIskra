@@ -4,21 +4,18 @@ using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data.Seed;
 using ChitalishteIskra.Data.Utilities;
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Connection string
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ChitalishteIskraDbContext>(options =>
     options.UseSqlServer(connectionString));
-
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -28,25 +25,21 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 
     options.Password.RequireDigit = false;
     options.Password.RequireUppercase = false;
-    options.Password.RequiredLength = 5;
+    options.Password.RequireLowercase = false;
     options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 5;
 })
 .AddEntityFrameworkStores<ChitalishteIskraDbContext>()
 .AddDefaultTokenProviders();
 
-//var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
-//builder.Services.AddSingleton<Cloudinary>((sp) =>
-//{
-//    return new Cloudinary(new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret));
-//});
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
 
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddScoped<IImageService, ImageService>();
-
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-//builder.Services.AddAuthorization();
-
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -58,20 +51,20 @@ builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<ITeacherAvailabilityService, TeacherAvailabilityService>();
 builder.Services.AddScoped<ITeacherLessonService, TeacherLessonService>();
 
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var services = scope.ServiceProvider;
+
+    var dbContext = services.GetRequiredService<ChitalishteIskraDbContext>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
+
+    await dbContext.Database.MigrateAsync();
+
     await IdentitySeeder.SeedRolesAsync(roleManager);
-    await IdentitySeeder.SeedAdminAsync(userManager);
-    await IdentitySeeder.SeedTeacherAsync(userManager);
-    await IdentitySeeder.SeedStudentAsync(userManager);
-    await IdentitySeeder.SeedParentAsync(userManager);
+    await IdentitySeeder.AssignUsersToRolesAsync(userManager);
 }
 
 // Configure the HTTP request pipeline.
@@ -82,7 +75,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -94,11 +86,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseStaticFiles();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.MapRazorPages();
 
 app.Run();

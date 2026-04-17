@@ -1,15 +1,10 @@
 ﻿using ChitalishteIskra.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data.Configurations
 {
-    public class TeacherLessonConfiguration: IEntityTypeConfiguration<TeacherLesson>
+    public class TeacherLessonConfiguration : IEntityTypeConfiguration<TeacherLesson>
     {
         public void Configure(EntityTypeBuilder<TeacherLesson> builder)
         {
@@ -30,6 +25,21 @@ namespace ChitalishteIskra.Data.Configurations
             builder
                 .HasIndex(tl => new { tl.TeacherId, tl.LessonId })
                 .IsUnique();
+
+            builder.HasData(
+                new TeacherLesson
+                {
+                    Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                    TeacherId = Guid.Parse("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                    LessonId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+                },
+                new TeacherLesson
+                {
+                    Id = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                    TeacherId = Guid.Parse("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                    LessonId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                }
+            );
         }
     }
 }

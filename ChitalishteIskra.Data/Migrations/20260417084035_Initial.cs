@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace ChitalishteIskra.Data.Migrations
 {
     /// <inheritdoc />
@@ -77,7 +79,8 @@ namespace ChitalishteIskra.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    TypeName = table.Column<int>(type: "int", nullable: false)
+                    TypeName = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,7 +209,7 @@ namespace ChitalishteIskra.Data.Migrations
                         column: x => x.TeacherId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -271,14 +274,12 @@ namespace ChitalishteIskra.Data.Migrations
                         name: "FK_TeacherLessons_AspNetUsers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TeacherLessons_Lessons_LessonId",
                         column: x => x.LessonId,
                         principalTable: "Lessons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -373,6 +374,44 @@ namespace ChitalishteIskra.Data.Migrations
                         principalTable: "BookLessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "Age", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsApprovedTeacher", "IsTeacherRequest", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, 30, "2c85bcf6-9cdb-4bc5-9c98-16c01f20335b", "admin@admin.com", true, "Admin", false, false, "Adminov", false, null, "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEKVJXJC+1tCUOI1w0um/UJaDlWfGsUBGwNoRPxflDnvNll5RDIejaF9JQRNojcuwHQ==", null, false, "401f68d6-ab15-4702-bf83-c3e8ef574ead", false, "admin" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, 18, "4543cc3a-c891-4eb5-ad26-941ca722460b", "student@student.com", true, "Petko", false, false, "Petkov", false, null, "STUDENT@STUDENT.COM", "STUDENT", "AQAAAAIAAYagAAAAEEDAZMQ3bu6RRLu6NRfi8igRh6WVuR2F39ev2tEUuhNzxsXXn7c/miYdv6mWqOAK/Q==", null, false, "4329d158-500e-4c00-ae0e-e398cab5c569", false, "student" },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 0, 40, "5d8d7ea5-b77f-4443-b088-aa8ace96908e", "parent@parent.com", true, "Maria", false, false, "Petrova", false, null, "PARENT@PARENT.COM", "PARENT", "AQAAAAIAAYagAAAAEN8sr0msGWI3RnTeTQsZhhxRmRiBsI2e6VEWf2UXHb6Jx7QjvR9ChUozcPqx20HDEg==", null, false, "4bc4b618-fad3-4ef2-904b-eb677d22cc40", false, "parent" },
+                    { new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 0, 35, "da77bc9e-eb48-4104-8537-b5576cbe7233", "teacher@teacher.com", true, "Ivan", true, false, "Ivanov", false, null, "TEACHER@TEACHER.COM", "TEACHER", "AQAAAAIAAYagAAAAEPNCr1xzWfjZRljOybw2Z8y45Ocqb+qZOjOe5QfFP9pnxmaP0Q0DqeC71WpUTgA8aA==", null, false, "c7c7b52a-117f-4c31-b79f-d2191968b7f9", false, "teacher" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Lessons",
+                columns: new[] { "Id", "IsDeleted", "Name", "TypeName" },
+                values: new object[,]
+                {
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), false, "Урок по танци", 0 },
+                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), false, "Групов урок по танци", 1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TeacherAvailabilities",
+                columns: new[] { "Id", "DayOfWeek", "EndTime", "IsAvailable", "StartTime", "TeacherId" },
+                values: new object[,]
+                {
+                    { new Guid("61154f0c-8726-4dee-96a9-0c7c37916a41"), 1, new TimeOnly(12, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
+                    { new Guid("a1111111-1111-1111-1111-111111111111"), 2, new TimeOnly(17, 0, 0), true, new TimeOnly(13, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TeacherLessons",
+                columns: new[] { "Id", "LessonId", "TeacherId" },
+                values: new object[,]
+                {
+                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
+                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -484,9 +523,10 @@ namespace ChitalishteIskra.Data.Migrations
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TeacherLessons_TeacherId",
+                name: "IX_TeacherLessons_TeacherId_LessonId",
                 table: "TeacherLessons",
-                column: "TeacherId");
+                columns: new[] { "TeacherId", "LessonId" },
+                unique: true);
         }
 
         /// <inheritdoc />

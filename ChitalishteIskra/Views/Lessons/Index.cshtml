@@ -1,14 +1,28 @@
 ﻿@using ChitalishteIskra.Models.Lessons
 @model IEnumerable<LessonIndexViewModel>
 
-<h2 class="mb-3">Уроци</h2>
+<h2>Предмети</h2>
 
-<a asp-action="Create" class="btn btn-primary mb-3">Добави урок</a>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Добави предмет</a>
+</p>
+
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Име</th>
-            <th>Тип урок</th>
+            <th>Тип</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -18,9 +32,14 @@
                 <td>@lesson.Name</td>
                 <td>@lesson.TypeName</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm" method="Post" style="display:inline">Поправи</a>
-                    <form asp-action="Delete" asp-route-id="@lesson.Id" style="display:inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
+                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm">Редактирай</a>
+
+                    <form asp-action="Delete" asp-route-id="@lesson.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Сигурен ли си, че искаш да изтриеш този предмет?')">
+                            Изтрий
+                        </button>
                     </form>
                 </td>
             </tr>

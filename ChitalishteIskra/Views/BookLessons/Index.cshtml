@@ -4,43 +4,43 @@
 <h2 class="mb-3">Запазени уроци</h2>
 
 @if (TempData["SuccessMessage"] != null)
-
 {
     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
 }
 
 @if (TempData["ErrorMessage"] != null)
-
 {
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
 <div class="mb-3 d-flex gap-2 flex-wrap">
     @if (User.IsInRole("Student") || User.IsInRole("Parent") || User.IsInRole("Admin"))
-
     {
         <a asp-action="Create" class="btn btn-primary">Запази индивидуален урок</a>
     }
 
     @if (User.IsInRole("Teacher"))
-
     {
         <a asp-action="CreateGroup" class="btn btn-primary">Добави групов урок</a>
     }
 
     @if (User.IsInRole("Student"))
-
     {
         <a asp-action="GroupInvitations" class="btn btn-outline-secondary">Моите групови покани</a>
     }
 </div>
 
-<table class="table table-bordered">
+<table class="table table-bordered table-striped align-middle">
     <thead>
         <tr>
             <th>Дата</th>
             <th>Начало</th>
             <th>Край</th>
+            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+            {
+                <th>Група</th>
+                <th>Приели поканата</th>
+            }
             <th>Учител</th>
             <th>Урок</th>
             <th>Действия</th>
@@ -48,21 +48,39 @@
     </thead>
     <tbody>
         @foreach (var booking in Model)
-
         {
             <tr>
                 <td>@booking.Date</td>
-                <td>@booking.StartTime</td>
-                <td>@booking.EndTime</td>
+                <td>@booking.StartTime.ToString("HH:mm")</td>
+                <td>@booking.EndTime.ToString("HH:mm")</td>
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                {
+                    <td>@booking.GroupName</td>
+                    <td>@booking.AcceptedStudents</td>
+                }
+
                 <td>@booking.TeacherName</td>
                 <td>@booking.LessonName</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@booking.Id" class="btn btn-warning btn-sm" style="display:inline">Поправи</a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                    {
+                        <a asp-action="Edit"
+                           asp-route-id="@booking.Id"
+                           class="btn btn-warning btn-sm me-1">
+                            Поправи
+                        </a>
 
-                    <form asp-action="Delete" asp-route-id="@booking.Id" method="post" style="display:inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
-                    </form>
+                        <form asp-action="Delete" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@booking.Id" />
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Сигурен ли си, че искаш да изтриеш този час?');">
+                                Изтрий
+                            </button>
+                        </form>
+                    }
                 </td>
             </tr>
         }

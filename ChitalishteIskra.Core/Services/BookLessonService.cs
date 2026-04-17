@@ -4,11 +4,6 @@ using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ChitalishteIskra.Data.Entities.GroupLessonResponse;
 using static ChitalishteIskra.Data.Entities.Lesson;
 
@@ -27,25 +22,75 @@ namespace ChitalishteIskra.Core.Services
             this.userManager = userManager;
         }
 
-        public async Task<IEnumerable<BookLessonIndexDto>> GetAllAsync()
+        public async Task<IEnumerable<BookLessonIndexDto>> GetAllAsync(Guid currentUserId, bool isAdmin, bool isTeacher, bool isStudent)
         {
-            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
-            var teachersIds = teachers.Select(t => t.Id).ToList();
-
-            return await context.BookLessons
+            var query = context.BookLessons
                 .Include(b => b.Teacher)
                 .Include(b => b.Lesson)
-                .Where(x => teachersIds.Contains(x.TeacherId))
-                .Select(b => new BookLessonIndexDto
-                {
-                    Id = b.Id,
-                    Date = b.Date,
-                    StartTime = b.StartTime,
-                    EndTime = b.EndTime,
-                    TeacherName = b.Teacher.FirstName + " " + b.Teacher.LastName,
-                    LessonName = b.Lesson.Name
-                })
+                .Include(b => b.Student)
+                .Include(b => b.Group)
+                .AsQueryable();
+
+            if (isAdmin)
+            {
+            }
+            else if (isTeacher)
+            {
+                query = query.Where(b => b.TeacherId == currentUserId);
+            }
+            else if (isStudent)
+            {
+                query = query.Where(b =>
+                    b.StudentId == currentUserId ||
+                    context.GroupLessonResponses.Any(r => r.BookLessonId == b.Id && r.StudentId == currentUserId));
+            }
+            else
+            {
+                query = query.Where(b => false);
+            }
+
+            var bookings = await query
+                .OrderBy(b => b.Date)
+                .ThenBy(b => b.StartTime)
                 .ToListAsync();
+
+            var bookingIds = bookings.Select(b => b.Id).ToList();
+
+            var acceptedResponses = await context.GroupLessonResponses
+                .Where(r => bookingIds.Contains(r.BookLessonId) && r.Status == GroupLessonResponseStatus.Accepted)
+                .Join(context.Users,
+                    r => r.StudentId,
+                    u => u.Id,
+                    (r, u) => new
+                    {
+                        r.BookLessonId,
+                        StudentName = u.FirstName + " " + u.LastName
+                    })
+                .ToListAsync();
+
+            var acceptedStudentsByLesson = acceptedResponses
+                .GroupBy(x => x.BookLessonId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => string.Join(", ", g.Select(x => x.StudentName).Distinct().OrderBy(x => x)));
+
+            var result = bookings.Select(b => new BookLessonIndexDto
+            {
+                Id = b.Id,
+                Date = b.Date,
+                StartTime = b.StartTime,
+                EndTime = b.EndTime,
+                TeacherName = b.Teacher.FirstName + " " + b.Teacher.LastName,
+                LessonName = b.Lesson.Name,
+                GroupName = b.Group != null ? b.Group.Name : "-",
+                AcceptedStudents = b.Student != null
+                    ? b.Student.FirstName + " " + b.Student.LastName
+                    : acceptedStudentsByLesson.ContainsKey(b.Id)
+                        ? acceptedStudentsByLesson[b.Id]
+                        : "-"
+            });
+
+            return result.ToList();
         }
 
         public async Task<BookLessonCreatePageDto> GetCreatePageDataAsync()
@@ -70,7 +115,9 @@ namespace ChitalishteIskra.Core.Services
             var dayOfWeek = date.ToDateTime(TimeOnly.MinValue).DayOfWeek;
 
             var lessons = await context.TeacherLessons
-                .Where(tl => tl.TeacherId == teacherId && tl.Lesson.TypeName == LessonTypeName.Individual)
+                .Where(tl => tl.TeacherId == teacherId
+                          && tl.Lesson.TypeName == LessonTypeName.Individual
+                          && !tl.Lesson.IsDeleted)
                 .Select(tl => new { tl.LessonId, tl.Lesson.Name })
                 .Distinct()
                 .Select(tl => new BookLessonOptionDto
@@ -101,15 +148,32 @@ namespace ChitalishteIskra.Core.Services
                 .Select(bl => new { bl.StartTime, bl.EndTime })
                 .ToListAsync();
 
-            var availableSlots = workingHoursEntities
-                .Where(wh => !bookedSlots.Any(bs =>
-                    bs.StartTime == wh.StartTime && bs.EndTime == wh.EndTime))
-                .Select(wh => new BookLessonOptionDto
+            var availableSlots = new List<BookLessonOptionDto>();
+
+            foreach (var wh in workingHoursEntities)
+            {
+                var currentStart = wh.StartTime;
+                var rangeEnd = wh.EndTime;
+
+                while (currentStart.AddHours(1) <= rangeEnd)
                 {
-                    Value = wh.Id.ToString(),
-                    Text = $"{wh.StartTime:HH\\:mm} - {wh.EndTime:HH\\:mm}"
-                })
-                .ToList();
+                    var currentEnd = currentStart.AddHours(1);
+
+                    bool isBooked = bookedSlots.Any(bs =>
+                        bs.StartTime == currentStart && bs.EndTime == currentEnd);
+
+                    if (!isBooked)
+                    {
+                        availableSlots.Add(new BookLessonOptionDto
+                        {
+                            Value = $"{wh.Id}|{currentStart:HH\\:mm}|{currentEnd:HH\\:mm}",
+                            Text = $"{currentStart:HH\\:mm} - {currentEnd:HH\\:mm}"
+                        });
+                    }
+
+                    currentStart = currentEnd;
+                }
+            }
 
             var workingHours = workingHoursEntities
                 .Select(wh => $"{wh.DayOfWeek} : {wh.StartTime:HH\\:mm} - {wh.EndTime:HH\\:mm}")
@@ -127,7 +191,7 @@ namespace ChitalishteIskra.Core.Services
         public async Task CreateAsync(CreateBookLessonDto model)
         {
             var lesson = await context.Lessons
-                .FirstOrDefaultAsync(l => l.Id == model.LessonId);
+                .FirstOrDefaultAsync(l => l.Id == model.LessonId && !l.IsDeleted);
 
             if (lesson == null || lesson.TypeName != LessonTypeName.Individual)
             {
@@ -142,28 +206,43 @@ namespace ChitalishteIskra.Core.Services
                 throw new ArgumentException("Този учител не преподава избрания предмет.");
             }
 
-            var slot = await context.TeacherAvailabilities
+            var slotRange = await context.TeacherAvailabilities
                 .FirstOrDefaultAsync(x =>
                     x.Id == model.TeacherAvailabilityId &&
                     x.TeacherId == model.TeacherId &&
                     x.IsAvailable);
 
-            if (slot == null)
+            if (slotRange == null)
             {
                 throw new ArgumentException("Избраният час вече не е свободен.");
             }
 
             var requestedDay = model.Date.ToDateTime(TimeOnly.MinValue).DayOfWeek;
-            if (slot.DayOfWeek != requestedDay)
+            if (slotRange.DayOfWeek != requestedDay)
             {
                 throw new ArgumentException("Избраният час не съответства на избраната дата.");
+            }
+
+            if (model.EndTime <= model.StartTime)
+            {
+                throw new ArgumentException("Крайният час трябва да е след началния.");
+            }
+
+            if (model.EndTime != model.StartTime.AddHours(1))
+            {
+                throw new ArgumentException("Индивидуалният урок трябва да е точно 1 час.");
+            }
+
+            if (model.StartTime < slotRange.StartTime || model.EndTime > slotRange.EndTime)
+            {
+                throw new ArgumentException("Избраният час е извън работното време на учителя.");
             }
 
             bool alreadyBooked = await context.BookLessons.AnyAsync(bl =>
                 bl.TeacherId == model.TeacherId &&
                 bl.Date == model.Date &&
-                bl.StartTime == slot.StartTime &&
-                bl.EndTime == slot.EndTime);
+                bl.StartTime == model.StartTime &&
+                bl.EndTime == model.EndTime);
 
             if (alreadyBooked)
             {
@@ -177,18 +256,19 @@ namespace ChitalishteIskra.Core.Services
                 LessonId = model.LessonId,
                 StudentId = model.StudentId,
                 Date = model.Date,
-                StartTime = slot.StartTime,
-                EndTime = slot.EndTime,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
                 GroupId = null
             };
 
             await context.BookLessons.AddAsync(booking);
             await context.SaveChangesAsync();
         }
+
         public async Task CreateGroupAsync(CreateGroupLessonDto model)
         {
             var lesson = await context.Lessons
-                .FirstOrDefaultAsync(l => l.Id == model.LessonId);
+                .FirstOrDefaultAsync(l => l.Id == model.LessonId && !l.IsDeleted);
 
             if (lesson == null || lesson.TypeName != LessonTypeName.Group)
             {
@@ -250,28 +330,30 @@ namespace ChitalishteIskra.Core.Services
 
             await context.BookLessons.AddAsync(booking);
 
-            // ТУК е кодът, за който питаш
-            var students = await context.GroupStudents
-                .Where(gs => gs.GroupId == model.GroupId)
-                .Select(gs => gs.StudentId)
-                .ToListAsync();
+            var selectedStudentIds = model.SelectedStudentIds
+                .Where(id => id != Guid.Empty)
+                .Distinct()
+                .ToList();
 
-            if (!students.Any())
+            if (selectedStudentIds.Any())
             {
-                throw new ArgumentException("В избраната група няма записани деца.");
-            }
+                var validStudents = await context.Users
+                    .Where(u => selectedStudentIds.Contains(u.Id))
+                    .Select(u => u.Id)
+                    .ToListAsync();
 
-            foreach (var studentId in students)
-            {
-                var response = new GroupLessonResponse
+                foreach (var studentId in validStudents)
                 {
-                    Id = Guid.NewGuid(),
-                    BookLessonId = booking.Id,
-                    StudentId = studentId,
-                    Status = GroupLessonResponseStatus.Pending
-                };
+                    var response = new GroupLessonResponse
+                    {
+                        Id = Guid.NewGuid(),
+                        BookLessonId = booking.Id,
+                        StudentId = studentId,
+                        Status = GroupLessonResponseStatus.Pending
+                    };
 
-                await context.GroupLessonResponses.AddAsync(response);
+                    await context.GroupLessonResponses.AddAsync(response);
+                }
             }
 
             await context.SaveChangesAsync();

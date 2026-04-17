@@ -1,11 +1,6 @@
 ﻿using ChitalishteIskra.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data.Configurations
 {
@@ -17,6 +12,23 @@ namespace ChitalishteIskra.Data.Configurations
                 .Property(l => l.Name)
                 .HasMaxLength(100)
                 .IsRequired();
+
+            builder.HasData(
+                new Lesson
+                {
+                    Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                    Name = "Урок по танци",
+                    TypeName = Lesson.LessonTypeName.Individual,
+                    IsDeleted = false
+                },
+                new Lesson
+                {
+                    Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                    Name = "Групов урок по танци",
+                    TypeName = Lesson.LessonTypeName.Group,
+                    IsDeleted = false
+                }
+            );
         }
     }
 }

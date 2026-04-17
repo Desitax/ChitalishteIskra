@@ -1,5 +1,4 @@
-﻿@using ChitalishteIskra.Models.BookLessons
-@model BookLessonCreateViewModel
+﻿@model ChitalishteIskra.Models.BookLessons.BookLessonCreateViewModel
 
 <h2 class="mb-3">Запази индивидуален урок</h2>
 
@@ -81,37 +80,70 @@
                 return;
             }
 
-            const response = await fetch(`/BookLessons/GetTeacherBookingData?teacherId=${teacherId}&date=${date}`);
-            const data = await response.json();
+            try {
+                const response = await fetch(`/BookLessons/GetTeacherBookingData?teacherId=${teacherId}&date=${date}`);
 
-            data.lessons.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.value;
-                option.text = item.text;
-                lessonSelect.appendChild(option);
-            });
+                if (!response.ok) {
+                    console.error('Грешка при заявката:', response.status);
+                    return;
+                }
 
-            data.availableSlots.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.value;
-                option.text = item.text;
-                slotSelect.appendChild(option);
-            });
+                const data = await response.json();
 
-            data.groups.forEach(group => {
-                const li = document.createElement('li');
-                li.textContent = group;
-                groupsList.appendChild(li);
-            });
+                if (data.lessons && data.lessons.length > 0) {
+                    data.lessons.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.value;
+                        option.text = item.text;
+                        lessonSelect.appendChild(option);
+                    });
+                }
 
-            data.workingHours.forEach(hour => {
-                const li = document.createElement('li');
-                li.textContent = hour;
-                workingHoursList.appendChild(li);
-            });
+                if (data.availableSlots && data.availableSlots.length > 0) {
+                    data.availableSlots.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.value;
+                        option.text = item.text;
+                        slotSelect.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.text = 'Няма свободни часове';
+                    slotSelect.appendChild(option);
+                }
+
+                if (data.groups && data.groups.length > 0) {
+                    data.groups.forEach(group => {
+                        const li = document.createElement('li');
+                        li.textContent = group;
+                        groupsList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Няма възрастови групи';
+                    groupsList.appendChild(li);
+                }
+
+                if (data.workingHours && data.workingHours.length > 0) {
+                    data.workingHours.forEach(hour => {
+                        const li = document.createElement('li');
+                        li.textContent = hour;
+                        workingHoursList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Няма работно време за избрания ден';
+                    workingHoursList.appendChild(li);
+                }
+            }
+            catch (error) {
+                console.error('Грешка:', error);
+            }
         }
 
         document.getElementById('teacherSelect').addEventListener('change', loadTeacherBookingData);
         document.getElementById('dateInput').addEventListener('change', loadTeacherBookingData);
+        window.addEventListener('load', loadTeacherBookingData);
     </script>
 }

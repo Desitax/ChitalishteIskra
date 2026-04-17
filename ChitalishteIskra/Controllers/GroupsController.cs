@@ -1,18 +1,17 @@
 ﻿using ChitalishteIskra.Core.Contracts;
 using ChitalishteIskra.Core.DTOs.Groups;
-using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Models.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ChitalishteIskra.Controllers
 {
     [Authorize]
-    public class GroupsController:Controller
+    public class GroupsController : Controller
     {
         private readonly IGroupService groupService;
         private readonly UserManager<User> userManager;
@@ -23,10 +22,22 @@ namespace ChitalishteIskra.Controllers
             this.userManager = userManager;
         }
 
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var data = await groupService.GetAllAsync();
+            string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserIdString))
+            {
+                return Unauthorized();
+            }
+
+            Guid currentUserId = Guid.Parse(currentUserIdString);
+
+            var data = await groupService.GetAllAsync(
+                currentUserId,
+                User.IsInRole("Admin"),
+                User.IsInRole("Teacher"));
 
             var model = data.Select(g => new GroupIndexViewModel
             {
@@ -39,55 +50,81 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+            var model = new GroupCreateViewModel();
 
-            ViewBag.Teachers = teachers
-                .Select(t => new SelectListItem
-                {
-                    Value = t.Id.ToString(),
-                    Text = t.FirstName + " " + t.LastName
-                })
-                .ToList();
+            if (User.IsInRole("Admin"))
+            {
+                await PopulateTeachersInViewBagAsync();
+            }
 
-            return View();
+            return View(model);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GroupCreateViewModel model)
         {
+            string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserIdString))
+            {
+                return Unauthorized();
+            }
+
+            Guid currentUserId = Guid.Parse(currentUserIdString);
+            bool isAdmin = User.IsInRole("Admin");
+            bool isTeacher = User.IsInRole("Teacher");
+
+            if (!isAdmin && !isTeacher)
+            {
+                return Forbid();
+            }
+
+            if (isTeacher)
+            {
+                model.TeacherId = currentUserId;
+            }
+
             if (!ModelState.IsValid)
             {
-                var teachers = await userManager.GetUsersInRoleAsync("Teacher");
-
-                ViewBag.Teachers = teachers
-                    .Select(t => new SelectListItem
-                    {
-                        Value = t.Id.ToString(),
-                        Text = t.FirstName + " " + t.LastName
-                    })
-                    .ToList();
+                if (isAdmin)
+                {
+                    await PopulateTeachersInViewBagAsync();
+                }
 
                 return View(model);
             }
 
-            var dto = new CreateGroupDto
+            try
             {
-                Name = model.Name,
-                TeacherId = model.TeacherId
-            };
+                var dto = new CreateGroupDto
+                {
+                    Name = model.Name,
+                    TeacherId = model.TeacherId
+                };
 
-            await groupService.CreateAsync(dto);
+                await groupService.CreateAsync(dto);
+                TempData["SuccessMessage"] = "Групата беше създадена успешно.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
 
-            return RedirectToAction(nameof(Index));
+                if (isAdmin)
+                {
+                    await PopulateTeachersInViewBagAsync();
+                }
+
+                return View(model);
+            }
         }
 
-
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -98,15 +135,27 @@ namespace ChitalishteIskra.Controllers
                 return NotFound();
             }
 
-            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+            string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserIdString))
+            {
+                return Unauthorized();
+            }
 
-            ViewBag.Teachers = teachers
-                .Select(t => new SelectListItem
-                {
-                    Value = t.Id.ToString(),
-                    Text = t.FirstName + " " + t.LastName
-                })
-                .ToList();
+            Guid currentUserId = Guid.Parse(currentUserIdString);
+
+            if (User.IsInRole("Teacher") && data.TeacherId != currentUserId)
+            {
+                return Forbid();
+            }
+
+            if (User.IsInRole("Admin"))
+            {
+                await PopulateTeachersInViewBagAsync();
+            }
+            else
+            {
+                ViewBag.SelectedTeacherName = data.TeacherName;
+            }
 
             var model = new GroupEditViewModel
             {
@@ -118,44 +167,126 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(GroupEditViewModel model)
         {
+            string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserIdString))
+            {
+                return Unauthorized();
+            }
+
+            Guid currentUserId = Guid.Parse(currentUserIdString);
+            bool isAdmin = User.IsInRole("Admin");
+            bool isTeacher = User.IsInRole("Teacher");
+
+            var existingGroup = await groupService.GetByIdAsync(model.Id);
+            if (existingGroup == null)
+            {
+                return NotFound();
+            }
+
+            if (isTeacher && existingGroup.TeacherId != currentUserId)
+            {
+                return Forbid();
+            }
+
+            if (isTeacher)
+            {
+                model.TeacherId = currentUserId;
+            }
+
             if (!ModelState.IsValid)
             {
-                var teachers = await userManager.GetUsersInRoleAsync("Teacher");
-
-                ViewBag.Teachers = teachers
-                    .Select(t => new SelectListItem
-                    {
-                        Value = t.Id.ToString(),
-                        Text = t.FirstName + " " + t.LastName
-                    })
-                    .ToList();
+                if (isAdmin)
+                {
+                    await PopulateTeachersInViewBagAsync();
+                }
+                else
+                {
+                    ViewBag.SelectedTeacherName = existingGroup.TeacherName;
+                }
 
                 return View(model);
             }
 
-            var dto = new CreateGroupDto
+            try
             {
-                Name = model.Name,
-                TeacherId = model.TeacherId
-            };
+                var dto = new CreateGroupDto
+                {
+                    Name = model.Name,
+                    TeacherId = model.TeacherId
+                };
 
-            await groupService.UpdateAsync(model.Id, dto);
+                await groupService.UpdateAsync(model.Id, dto, currentUserId, isAdmin);
+                TempData["SuccessMessage"] = "Групата беше редактирана успешно.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
 
-            return RedirectToAction(nameof(Index));
+                if (isAdmin)
+                {
+                    await PopulateTeachersInViewBagAsync();
+                }
+                else
+                {
+                    ViewBag.SelectedTeacherName = existingGroup.TeacherName;
+                }
+
+                return View(model);
+            }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await groupService.DeleteAsync(id);
+            string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(currentUserIdString))
+            {
+                return Unauthorized();
+            }
+
+            Guid currentUserId = Guid.Parse(currentUserIdString);
+            bool isAdmin = User.IsInRole("Admin");
+
+            try
+            {
+                await groupService.DeleteAsync(id, currentUserId, isAdmin);
+                TempData["SuccessMessage"] = "Групата беше изтрита успешно.";
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (ArgumentException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
+        private async Task PopulateTeachersInViewBagAsync()
+        {
+            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
+
+            ViewBag.Teachers = teachers
+                .Select(t => new SelectListItem
+                {
+                    Value = t.Id.ToString(),
+                    Text = t.FirstName + " " + t.LastName
+                })
+                .ToList();
+        }
     }
 }

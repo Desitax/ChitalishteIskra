@@ -1,11 +1,6 @@
 ﻿using ChitalishteIskra.Data.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ChitalishteIskra.Data.Configurations
 {
@@ -24,24 +19,24 @@ namespace ChitalishteIskra.Data.Configurations
                 .IsUnique();
 
             builder.HasData(
-            new TeacherAvailability
-            {
-                Id = Guid.Parse("61154f0c-8726-4dee-96a9-0c7c37916a41"),
-                TeacherId = Guid.Parse("7b09320e-328b-4a50-fe83-08de9aae89ba"),
-                DayOfWeek = DayOfWeek.Monday,
-                StartTime = new TimeOnly(9, 0),
-                EndTime = new TimeOnly(12, 0),
-                IsAvailable = true
-            },
-            new TeacherAvailability
-            {
-                Id = Guid.Parse("a1111111-1111-1111-1111-111111111111"),
-                TeacherId = Guid.Parse("7b09320e-328b-4a50-fe83-08de9aae89ba"),
-                DayOfWeek = DayOfWeek.Tuesday,
-                StartTime = new TimeOnly(13, 0),
-                EndTime = new TimeOnly(17, 0),
-                IsAvailable = true
-            }
+                new TeacherAvailability
+                {
+                    Id = Guid.Parse("61154f0c-8726-4dee-96a9-0c7c37916a41"),
+                    TeacherId = Guid.Parse("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                    DayOfWeek = DayOfWeek.Monday,
+                    StartTime = new TimeOnly(9, 0),
+                    EndTime = new TimeOnly(12, 0),
+                    IsAvailable = true
+                },
+                new TeacherAvailability
+                {
+                    Id = Guid.Parse("a1111111-1111-1111-1111-111111111111"),
+                    TeacherId = Guid.Parse("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                    DayOfWeek = DayOfWeek.Tuesday,
+                    StartTime = new TimeOnly(13, 0),
+                    EndTime = new TimeOnly(17, 0),
+                    IsAvailable = true
+                }
             );
         }
     }

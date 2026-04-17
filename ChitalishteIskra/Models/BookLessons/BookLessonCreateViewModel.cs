@@ -1,36 +1,29 @@
-﻿using ChitalishteIskra.Models.User;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitalishteIskra.Models.BookLessons
 {
     public class BookLessonCreateViewModel
     {
-        [Required(ErrorMessage = "Избери учител")]
+        [Required]
         public Guid TeacherId { get; set; }
 
-        [Required(ErrorMessage = "Избери дата")]
+        [Required]
         public DateOnly Date { get; set; }
 
-        [Required(ErrorMessage = "Избери предмет")]
+        [Required]
         public Guid LessonId { get; set; }
 
-        [Required(ErrorMessage = "Избери свободен час")]
-        public Guid TeacherAvailabilityId { get; set; }
+        [Required(ErrorMessage = "Избери свободен час.")]
+        public string TeacherAvailabilityId { get; set; } = string.Empty;
 
-        public IEnumerable<SelectListItem> Teachers { get; set; }
-            = new List<SelectListItem>();
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
-        public IEnumerable<SelectListItem> Lessons { get; set; }
-            = new List<SelectListItem>();
-
-        public IEnumerable<SelectListItem> AvailableSlots { get; set; }
-            = new List<SelectListItem>();
-
-        public IEnumerable<string> TeacherGroups { get; set; }
-            = new List<string>();
-
-        public IEnumerable<string> WorkingHours { get; set; }
-            = new List<string>();
+        public IEnumerable<SelectListItem> Teachers { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Lessons { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> AvailableSlots { get; set; } = new List<SelectListItem>();
+        public IEnumerable<string> TeacherGroups { get; set; } = new List<string>();
+        public IEnumerable<string> WorkingHours { get; set; } = new List<string>();
     }
 }

@@ -2,18 +2,6 @@
     ViewData["Title"] = "Начало";
 }
 
-@if (User.IsInRole("Teacher"))
-
-{
-    <div class="text-end mb-3">
-        <a asp-controller="BookLessons"
-           asp-action="CreateGroup"
-           class="btn btn-success">
-            Добави урок
-        </a>
-    </div>
-} 
-
  @* <!-- HERO -->
 <section class="py-5" style="background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=60') center/cover; color:white;">
     <div class="container py-5">

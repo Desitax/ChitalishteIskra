@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Core.DTOs.BookLessons
 {
@@ -19,5 +15,9 @@ namespace ChitalishteIskra.Core.DTOs.BookLessons
         public string TeacherName { get; set; } = null!;
 
         public string LessonName { get; set; } = null!;
+
+        public string GroupName { get; set; } = "-";
+
+        public string AcceptedStudents { get; set; } = "-";
     }
 }

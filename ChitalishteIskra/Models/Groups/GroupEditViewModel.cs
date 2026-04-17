@@ -6,7 +6,7 @@ namespace ChitalishteIskra.Models.Groups
     {
         public Guid Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Моля въведи име на групата.")]
         public string Name { get; set; } = null!;
 
         [Required]

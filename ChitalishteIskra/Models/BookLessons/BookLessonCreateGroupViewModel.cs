@@ -20,8 +20,12 @@ namespace ChitalishteIskra.Models.BookLessons
         [Required]
         public Guid GroupId { get; set; }
 
+        public List<Guid> SelectedStudentIds { get; set; } = new List<Guid>();
+
         public IEnumerable<SelectListItem> Lessons { get; set; } = new List<SelectListItem>();
 
         public IEnumerable<SelectListItem> Groups { get; set; } = new List<SelectListItem>();
+
+        public IEnumerable<SelectListItem> Students { get; set; } = new List<SelectListItem>();
     }
 }

@@ -1,21 +1,27 @@
-﻿@using ChitalishteIskra.Models.Lessons
-@model LessonCreateViewModel
+﻿@model ChitalishteIskra.Models.Lessons.LessonCreateViewModel
 
-
-<h2 class="mb-3">Добави урок</h2>
+<h2>Добави предмет</h2>
 
 <form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
     <div class="mb-3">
-        <label class="form-label">Име</label>
-        <input class="form-control" asp-for="Name" />
+        <label asp-for="Name" class="form-label">Име на предмет</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Тип</label>
-        <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control" required>
-            <option selected disabled>Избери тип урок</option>
+        <label asp-for="TypeName" class="form-label">Тип</label>
+        <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control">
+            <option value="">Избери тип</option>
         </select>
+        <span asp-validation-for="TypeName" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary btn-lg" type="submit">Създай</button>
+    <button type="submit" class="btn btn-primary">Запази</button>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

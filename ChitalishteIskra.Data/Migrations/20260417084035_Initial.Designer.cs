@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChitalishteIskra.Data.Migrations
 {
     [DbContext(typeof(ChitalishteIskraDbContext))]
-    [Migration("20260416182106_Initial")]
+    [Migration("20260417084035_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -172,6 +172,9 @@ namespace ChitalishteIskra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -183,6 +186,22 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Lessons");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            IsDeleted = false,
+                            Name = "Урок по танци",
+                            TypeName = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            IsDeleted = false,
+                            Name = "Групов урок по танци",
+                            TypeName = 1
+                        });
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.TeacherAvailability", b =>
@@ -212,6 +231,26 @@ namespace ChitalishteIskra.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("TeacherAvailabilities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("61154f0c-8726-4dee-96a9-0c7c37916a41"),
+                            DayOfWeek = 1,
+                            EndTime = new TimeOnly(12, 0, 0),
+                            IsAvailable = true,
+                            StartTime = new TimeOnly(9, 0, 0),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        },
+                        new
+                        {
+                            Id = new Guid("a1111111-1111-1111-1111-111111111111"),
+                            DayOfWeek = 2,
+                            EndTime = new TimeOnly(17, 0, 0),
+                            IsAvailable = true,
+                            StartTime = new TimeOnly(13, 0, 0),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        });
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.TeacherEvent", b =>
@@ -252,9 +291,24 @@ namespace ChitalishteIskra.Data.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("TeacherId", "LessonId")
+                        .IsUnique();
 
                     b.ToTable("TeacherLessons");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                            LessonId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        },
+                        new
+                        {
+                            Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                            LessonId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        });
                 });
 
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.User", b =>
@@ -340,6 +394,92 @@ namespace ChitalishteIskra.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            AccessFailedCount = 0,
+                            Age = 30,
+                            ConcurrencyStamp = "2c85bcf6-9cdb-4bc5-9c98-16c01f20335b",
+                            Email = "admin@admin.com",
+                            EmailConfirmed = true,
+                            FirstName = "Admin",
+                            IsApprovedTeacher = false,
+                            IsTeacherRequest = false,
+                            LastName = "Adminov",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@ADMIN.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKVJXJC+1tCUOI1w0um/UJaDlWfGsUBGwNoRPxflDnvNll5RDIejaF9JQRNojcuwHQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "401f68d6-ab15-4702-bf83-c3e8ef574ead",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                            AccessFailedCount = 0,
+                            Age = 35,
+                            ConcurrencyStamp = "da77bc9e-eb48-4104-8537-b5576cbe7233",
+                            Email = "teacher@teacher.com",
+                            EmailConfirmed = true,
+                            FirstName = "Ivan",
+                            IsApprovedTeacher = true,
+                            IsTeacherRequest = false,
+                            LastName = "Ivanov",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TEACHER@TEACHER.COM",
+                            NormalizedUserName = "TEACHER",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPNCr1xzWfjZRljOybw2Z8y45Ocqb+qZOjOe5QfFP9pnxmaP0Q0DqeC71WpUTgA8aA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c7c7b52a-117f-4c31-b79f-d2191968b7f9",
+                            TwoFactorEnabled = false,
+                            UserName = "teacher"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            AccessFailedCount = 0,
+                            Age = 18,
+                            ConcurrencyStamp = "4543cc3a-c891-4eb5-ad26-941ca722460b",
+                            Email = "student@student.com",
+                            EmailConfirmed = true,
+                            FirstName = "Petko",
+                            IsApprovedTeacher = false,
+                            IsTeacherRequest = false,
+                            LastName = "Petkov",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "STUDENT@STUDENT.COM",
+                            NormalizedUserName = "STUDENT",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEDAZMQ3bu6RRLu6NRfi8igRh6WVuR2F39ev2tEUuhNzxsXXn7c/miYdv6mWqOAK/Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "4329d158-500e-4c00-ae0e-e398cab5c569",
+                            TwoFactorEnabled = false,
+                            UserName = "student"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            AccessFailedCount = 0,
+                            Age = 40,
+                            ConcurrencyStamp = "5d8d7ea5-b77f-4443-b088-aa8ace96908e",
+                            Email = "parent@parent.com",
+                            EmailConfirmed = true,
+                            FirstName = "Maria",
+                            IsApprovedTeacher = false,
+                            IsTeacherRequest = false,
+                            LastName = "Petrova",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PARENT@PARENT.COM",
+                            NormalizedUserName = "PARENT",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN8sr0msGWI3RnTeTQsZhhxRmRiBsI2e6VEWf2UXHb6Jx7QjvR9ChUozcPqx20HDEg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "4bc4b618-fad3-4ef2-904b-eb677d22cc40",
+                            TwoFactorEnabled = false,
+                            UserName = "parent"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -511,7 +651,7 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
                         .WithMany("Groups")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Teacher");
@@ -590,13 +730,13 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasOne("ChitalishteIskra.Data.Entities.Lesson", "Lesson")
                         .WithMany("TeacherLessons")
                         .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
                         .WithMany("TeacherLessons")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Lesson");

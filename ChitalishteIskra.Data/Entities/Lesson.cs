@@ -16,12 +16,13 @@ namespace ChitalishteIskra.Data.Entities
         public string Name { get; set; } = null!;
 
         public LessonTypeName TypeName { get; set; }
-        public ICollection<BookLesson> BookLessons { get; set; }=new List<BookLesson>();
+        public ICollection<BookLesson> BookLessons { get; set; } = new List<BookLesson>();
         public ICollection<TeacherLesson> TeacherLessons { get; set; } = new List<TeacherLesson>();
         public enum LessonTypeName
         {
             Individual,
             Group
         }
+        public bool IsDeleted { get; set; }
     }
 }

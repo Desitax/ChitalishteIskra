@@ -1,12 +1,11 @@
-﻿using ChitalishteIskra.Models.User;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.DataAnnotations;
+﻿using System;
 
 namespace ChitalishteIskra.Models.BookLessons
 {
     public class BookLessonIndexViewModel
     {
         public Guid Id { get; set; }
+
         public DateOnly Date { get; set; }
 
         public TimeOnly StartTime { get; set; }
@@ -17,6 +16,8 @@ namespace ChitalishteIskra.Models.BookLessons
 
         public string LessonName { get; set; } = null!;
 
+        public string GroupName { get; set; } = "-";
 
+        public string AcceptedStudents { get; set; } = "-";
     }
 }

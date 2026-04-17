@@ -1,18 +1,13 @@
 ﻿using ChitalishteIskra.Core.Contracts;
 using ChitalishteIskra.Core.DTOs.Lessons;
-using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static ChitalishteIskra.Data.Entities.Lesson;
+using ChitalishteIskra.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Core.Services
 {
-    public class LessonService:ILessonService
+    public class LessonService : ILessonService
     {
         private readonly ChitalishteIskraDbContext context;
 
@@ -24,6 +19,8 @@ namespace ChitalishteIskra.Core.Services
         public async Task<IEnumerable<LessonDto>> GetAllAsync()
         {
             return await context.Lessons
+                .Where(l => !l.IsDeleted)
+                .OrderBy(l => l.Name)
                 .Select(l => new LessonDto
                 {
                     Id = l.Id,
@@ -35,11 +32,30 @@ namespace ChitalishteIskra.Core.Services
 
         public async Task CreateAsync(CreateLessonDto model)
         {
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                throw new ArgumentException("Името на предмета е задължително.");
+            }
+
+            var parsedType = Enum.Parse<LessonTypeName>(model.TypeName);
+
+            bool alreadyExists = await context.Lessons
+                .AnyAsync(l =>
+                    !l.IsDeleted &&
+                    l.Name.ToLower() == model.Name.Trim().ToLower() &&
+                    l.TypeName == parsedType);
+
+            if (alreadyExists)
+            {
+                throw new ArgumentException("Такъв предмет вече съществува.");
+            }
+
             var lesson = new Lesson
             {
                 Id = Guid.NewGuid(),
-                Name = model.Name,
-                TypeName = Enum.Parse<LessonTypeName>(model.TypeName)
+                Name = model.Name.Trim(),
+                TypeName = parsedType,
+                IsDeleted = false
             };
 
             await context.Lessons.AddAsync(lesson);
@@ -49,7 +65,7 @@ namespace ChitalishteIskra.Core.Services
         public async Task<LessonDto?> GetByIdAsync(Guid id)
         {
             return await context.Lessons
-                .Where(l => l.Id == id)
+                .Where(l => l.Id == id && !l.IsDeleted)
                 .Select(l => new LessonDto
                 {
                     Id = l.Id,
@@ -61,29 +77,50 @@ namespace ChitalishteIskra.Core.Services
 
         public async Task UpdateAsync(Guid id, CreateLessonDto model)
         {
-            var lesson = await context.Lessons.FindAsync(id);
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                throw new ArgumentException("Името на предмета е задължително.");
+            }
+
+            var lesson = await context.Lessons
+                .FirstOrDefaultAsync(l => l.Id == id && !l.IsDeleted);
 
             if (lesson == null)
             {
-                throw new ArgumentException("Lesson not found");
+                throw new ArgumentException("Предметът не е намерен.");
             }
 
-            lesson.Name = model.Name;
-            lesson.TypeName = Enum.Parse<LessonTypeName>(model.TypeName);
+            var parsedType = Enum.Parse<LessonTypeName>(model.TypeName);
+
+            bool alreadyExists = await context.Lessons
+                .AnyAsync(l =>
+                    l.Id != id &&
+                    !l.IsDeleted &&
+                    l.Name.ToLower() == model.Name.Trim().ToLower() &&
+                    l.TypeName == parsedType);
+
+            if (alreadyExists)
+            {
+                throw new ArgumentException("Вече съществува друг предмет със същото име и тип.");
+            }
+
+            lesson.Name = model.Name.Trim();
+            lesson.TypeName = parsedType;
 
             await context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var lesson = await context.Lessons.FindAsync(id);
+            var lesson = await context.Lessons
+                .FirstOrDefaultAsync(l => l.Id == id && !l.IsDeleted);
 
             if (lesson == null)
             {
-                throw new ArgumentException("Lesson not found");
+                throw new ArgumentException("Предметът не е намерен.");
             }
 
-            context.Lessons.Remove(lesson);
+            lesson.IsDeleted = true;
             await context.SaveChangesAsync();
         }
     }

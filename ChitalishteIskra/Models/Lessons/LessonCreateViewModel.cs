@@ -4,10 +4,10 @@ namespace ChitalishteIskra.Models.Lessons
 {
     public class LessonCreateViewModel
     {
-        [Required]
-        public string Name { get; set; } = null!;
+        [Required(ErrorMessage = "Въведи име на предмет")]
+        public string Name { get; set; } = string.Empty;
 
-        [Required]
-        public string TypeName { get; set; } = null!;
+        [Required(ErrorMessage = "Избери тип")]
+        public string TypeName { get; set; } = string.Empty;
     }
 }

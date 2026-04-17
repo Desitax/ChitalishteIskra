@@ -45,6 +45,15 @@
         <span asp-validation-for="GroupId" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="SelectedStudentIds" class="form-label">Изпрати покана на деца</label>
+        <select asp-for="SelectedStudentIds" asp-items="Model.Students" class="form-control" multiple size="8"></select>
+        <small class="form-text text-muted">
+            Задръж Ctrl, за да избереш повече от едно дете.
+        </small>
+        <span asp-validation-for="SelectedStudentIds" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Създай</button>
 </form>
 

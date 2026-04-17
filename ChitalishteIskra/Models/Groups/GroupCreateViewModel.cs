@@ -4,7 +4,7 @@ namespace ChitalishteIskra.Models.Groups
 {
     public class GroupCreateViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Моля въведи име на групата.")]
         public string Name { get; set; } = null!;
 
         [Required]

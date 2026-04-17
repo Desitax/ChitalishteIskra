@@ -9,7 +9,7 @@ namespace ChitalishteIskra.Core.Contracts
 {
     public interface IBookLessonService
     {
-        Task<IEnumerable<BookLessonIndexDto>> GetAllAsync();
+        Task<IEnumerable<BookLessonIndexDto>> GetAllAsync(Guid currentUserId, bool isAdmin, bool isTeacher, bool isStudent);
 
         Task<BookLessonCreatePageDto> GetCreatePageDataAsync();
 
