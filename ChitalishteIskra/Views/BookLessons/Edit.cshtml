@@ -27,6 +27,14 @@
         <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>
 
+    <div class="mb-3">
+        <label asp-for="GroupId" class="form-label">Възрастова група</label>
+        <select asp-for="GroupId" asp-items="Model.Groups" class="form-control">
+            <option value="">Без възрастова група</option>
+        </select>
+        <span asp-validation-for="GroupId" class="text-danger"></span>
+    </div>
+
     @if (User.IsInRole("Admin"))
     {
         <div class="mb-3">

@@ -64,7 +64,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Student,Parent")]
+        [Authorize(Roles = "Student,Parent")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -83,7 +83,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Student,Parent")]
+        [Authorize(Roles = "Student,Parent")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookLessonCreateViewModel model)
@@ -286,9 +286,9 @@ namespace ChitalishteIskra.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var booking = await context.BookLessons
-                .Include(b => b.Teacher)
-                .FirstOrDefaultAsync(b => b.Id == id);
-
+               .Include(b => b.Teacher)
+               .Include(b => b.Group)
+               .FirstOrDefaultAsync(b => b.Id == id);
             if (booking == null)
             {
                 return NotFound();
@@ -314,7 +314,8 @@ namespace ChitalishteIskra.Controllers
                 StartTime = booking.StartTime,
                 EndTime = booking.EndTime,
                 TeacherId = booking.TeacherId,
-                LessonId = booking.LessonId
+                LessonId = booking.LessonId,
+                GroupId = booking.GroupId
             };
 
             await PopulateEditViewModelAsync(model, booking.TeacherId);
@@ -340,6 +341,7 @@ namespace ChitalishteIskra.Controllers
 
             var booking = await context.BookLessons
                 .Include(b => b.Teacher)
+                .Include(b => b.Group)
                 .FirstOrDefaultAsync(b => b.Id == model.Id);
 
             if (booking == null)
@@ -375,6 +377,18 @@ namespace ChitalishteIskra.Controllers
                 ModelState.AddModelError(nameof(model.LessonId), "Този учител не преподава избрания урок.");
             }
 
+            if (model.GroupId.HasValue)
+            {
+                bool validGroup = await context.Groups.AnyAsync(g =>
+                    g.Id == model.GroupId.Value &&
+                    g.TeacherId == model.TeacherId);
+
+                if (!validGroup)
+                {
+                    ModelState.AddModelError(nameof(model.GroupId), "Избраната възрастова група не принадлежи на този учител.");
+                }
+            }
+
             bool hasConflict = await context.BookLessons.AnyAsync(b =>
                 b.Id != model.Id &&
                 b.TeacherId == model.TeacherId &&
@@ -399,9 +413,9 @@ namespace ChitalishteIskra.Controllers
             booking.EndTime = model.EndTime;
             booking.TeacherId = model.TeacherId;
             booking.LessonId = model.LessonId;
+            booking.GroupId = model.GroupId;
 
             await context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Часът беше редактиран успешно.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -445,7 +459,7 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Admin,Student,Parent")]
+        [Authorize(Roles = "Student,Parent")]
         [HttpGet]
         public async Task<IActionResult> GetTeacherBookingData(Guid teacherId, DateOnly date)
         {
@@ -454,7 +468,6 @@ namespace ChitalishteIskra.Controllers
             return Json(new
             {
                 lessons = data.Lessons.Select(x => new { value = x.Value, text = x.Text }),
-                groups = data.Groups.Select(x => x.Text),
                 workingHours = data.WorkingHours,
                 availableSlots = data.AvailableSlots.Select(x => new { value = x.Value, text = x.Text })
             });
@@ -482,7 +495,6 @@ namespace ChitalishteIskra.Controllers
                     Value = x.Value,
                     Text = x.Text
                 });
-                model.TeacherGroups = teacherData.Groups.Select(g => g.Text);
                 model.WorkingHours = teacherData.WorkingHours;
             }
         }
@@ -533,11 +545,11 @@ namespace ChitalishteIskra.Controllers
                     ? new List<SelectListItem>()
                     : new List<SelectListItem>
                     {
-                        new SelectListItem
-                        {
-                            Value = teacher.Id.ToString(),
-                            Text = teacher.FirstName + " " + teacher.LastName
-                        }
+                new SelectListItem
+                {
+                    Value = teacher.Id.ToString(),
+                    Text = teacher.FirstName + " " + teacher.LastName
+                }
                     };
             }
             else
@@ -560,7 +572,17 @@ namespace ChitalishteIskra.Controllers
                 })
                 .Distinct()
                 .ToListAsync();
+
+            model.Groups = await context.Groups
+                .Where(g => g.TeacherId == selectedTeacherId)
+                .Select(g => new SelectListItem
+                {
+                    Value = g.Id.ToString(),
+                    Text = g.Name
+                })
+                .ToListAsync();
         }
+
 
         private Task<Guid?> ResolveTeacherIdForGroupActionsAsync()
         {

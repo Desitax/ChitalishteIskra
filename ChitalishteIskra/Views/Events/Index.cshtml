@@ -1,63 +1,546 @@
 ﻿@using ChitalishteIskra.Models.Events
-@model IEnumerable<EventIndexViewModel>
+@using System.Globalization
+@model EventsListViewModel
+
+@{
+    ViewData["Title"] = "Събития";
+    var now = DateTime.Now;
+
+    var eventNames = Model?.NameSuggestions ?? new List<string>();
+    var eventLocations = Model?.LocationSuggestions ?? new List<string>();
+    var eventsList = Model?.Events ?? new List<EventIndexViewModel>();
+}
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
+    <div class="alert alert-success shadow-sm">@TempData["SuccessMessage"]</div>
 }
 
-@if (TempData["WarningMessage"] != null)
-{
-    <div class="alert alert-warning">
-        @TempData["WarningMessage"]
-    </div>
-}
+<div class="events-page">
+    <section class="events-hero">
+        <div>
+            <span class="events-kicker">Програма</span>
+            <h1>Събития</h1>
+            <p>Филтрирай по име, дата, място или статус.</p>
+        </div>
+    </section>
 
-<h2 class="mb-3">Събития</h2>
+    <section class="filter-box shadow-sm">
+        <form method="get" asp-action="Index" class="filter-form">
+            <div class="filter-group">
+                <label for="searchName">Име</label>
+                <input id="searchName"
+                       name="searchName"
+                       class="form-control"
+                       list="eventNames"
+                       placeholder="Въведи име на събитие"
+                       value="@Model?.SearchName" />
+                <datalist id="eventNames">
+                    @foreach (var name in eventNames)
+                    {
+                        <option value="@name"></option>
+                    }
+                </datalist>
+            </div>
 
-@if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-{
-    <a asp-action="Create" class="btn btn-primary mb-3">Добави събитие</a>
-}
+            <div class="filter-group">
+                <label for="searchDateType">Търси по дата</label>
+                <select id="searchDateType" name="searchDateType" class="form-select">
+                    <option value="">Избери</option>
+                    <option value="day" selected="@(Model?.SearchDateType == "day")">Ден</option>
+                    <option value="month" selected="@(Model?.SearchDateType == "month")">Месец</option>
+                    <option value="year" selected="@(Model?.SearchDateType == "year")">Година</option>
+                </select>
+            </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Име</th>
-            <th>Дата</th>
-            <th>Начало</th>
-            <th>Край</th>
-            <th>Местоположение</th>
-            <th>Действия</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+            <div class="filter-group" id="datePartGroup" style="display:none;">
+                <label for="searchDatePart">Дата</label>
+                <input id="searchDatePart"
+                       name="searchDatePart"
+                       class="form-control"
+                       placeholder="Въведи стойност"
+                       value="@Model?.SearchDatePart" />
+            </div>
 
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Date</td>
-                <td>@item.StartTime</td>
-                <td>@item.EndTime</td>
-                <td>@item.Location</td>
+            <div class="filter-group">
+                <label for="searchLocation">Място</label>
+                <input id="searchLocation"
+                       name="searchLocation"
+                       class="form-control"
+                       list="eventLocations"
+                       placeholder="Въведи място"
+                       value="@Model?.SearchLocation" />
+                <datalist id="eventLocations">
+                    @foreach (var location in eventLocations)
+                    {
+                        <option value="@location"></option>
+                    }
+                </datalist>
+            </div>
 
-                @if (User.IsInRole("Admin"))
+            <div class="filter-group">
+                <label for="searchStatus">Статус</label>
+                <select id="searchStatus" name="searchStatus" class="form-select">
+                    <option value="">Всички</option>
+                    <option value="predstoqshti" selected="@(Model?.SearchStatus == "predstoqshti")">Предстоящи</option>
+                    <option value="izminali" selected="@(Model?.SearchStatus == "izminali")">Изминали</option>
+                </select>
+            </div>
 
-                {
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Поправи</a>
+            <div class="filter-actions">
+                <button type="submit" class="filter-btn">Филтрирай</button>
+                <a asp-action="Index" class="clear-btn">Изчисти</a>
+            </div>
+        </form>
+    </section>
 
-                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
-                        </form>
-                    </td>
-                }
-            </tr>
+    @if (eventsList.Any())
+    {
+        <section class="events-grid">
+            @foreach (var item in eventsList)
+            {
+                var eventEndDateTime = item.Date.ToDateTime(item.EndTime);
+                var isUpcoming = eventEndDateTime >= now;
+
+                <article class="event-card shadow-sm">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="event-image-link">
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.Name" class="event-card-image" />
+                        }
+                        else
+                        {
+                            <div class="event-card-image event-card-image-placeholder">
+                                <span>@item.Name</span>
+                            </div>
+                        }
+                    </a>
+
+                    <div class="event-card-body">
+                        <div class="event-card-date">
+                            @item.Date.ToString("dd.MM.yyyy") · @item.StartTime.ToString("HH\\:mm") ч.
+                        </div>
+
+                        <h3>@item.Name</h3>
+                        <p class="event-card-location">@item.Location</p>
+
+                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                        {
+                            <p class="event-card-description">@item.Description</p>
+                        }
+
+                        <div class="event-card-status-wrap">
+                            @if (isUpcoming)
+                            {
+                                <span class="event-status upcoming">Предстоящо</span>
+                            }
+                            else
+                            {
+                                <span class="event-status past">Изминало</span>
+                            }
+                        </div>
+
+                        <div class="event-card-footer">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="event-read-more">Виж повече...</a>
+                        </div>
+                    </div>
+                </article>
+            }
+        </section>
+    }
+    else
+    {
+        <div class="no-events-box shadow-sm">
+            <h3>Няма намерени събития</h3>
+            <p>Пробвай с други стойности.</p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .events-page {
+            padding: 2rem 0 4rem;
         }
-    </tbody>
-</table>
 
+        .events-hero {
+            background: linear-gradient(135deg, #9f0712 0%, #ef1724 100%);
+            color: #fff;
+            border-radius: 36px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .events-kicker {
+            display: inline-block;
+            background: rgba(255,255,255,0.16);
+            padding: .6rem 1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .events-hero h1 {
+            font-size: clamp(2.4rem, 5vw, 4.4rem);
+            line-height: 1.02;
+            margin-bottom: 1rem;
+            font-family: Georgia, serif;
+            font-weight: 700;
+        }
+
+        .events-hero p {
+            max-width: 720px;
+            font-size: 1.25rem;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .filter-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: .45rem;
+        }
+
+            .filter-group label {
+                font-weight: 700;
+                color: #7f1d1d;
+            }
+
+        .filter-actions {
+            display: flex;
+            gap: .75rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn,
+        .clear-btn {
+            border: none;
+            border-radius: 14px;
+            padding: .8rem 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: #b91c1c;
+            color: #fff;
+        }
+
+            .filter-btn:hover {
+                background: #991b1b;
+                color: #fff;
+            }
+
+        .clear-btn {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+            .clear-btn:hover {
+                background: #e5e7eb;
+                color: #111827;
+            }
+
+        .events-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            align-items: flex-start;
+        }
+
+        .event-card {
+            width: 100%;
+            background: #fff;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @@media (min-width: 768px) {
+            .event-card {
+                width: calc(50% - 0.6rem);
+            }
+        }
+
+        @@media (min-width: 1200px) {
+            .event-card {
+                width: calc(33.333% - 0.8rem);
+            }
+        }
+
+        .event-card-image {
+            width: 100%;
+            height: 260px;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            background: #f8fafc;
+            padding: 8px;
+        }
+
+        .event-card-image-placeholder {
+            background: linear-gradient(135deg, #fecaca, #fca5a5, #f87171);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: #7f1d1d;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            height: 260px;
+        }
+
+        .event-card-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .55rem;
+            flex: 1;
+        }
+
+        .event-card-date {
+            align-self: flex-start;
+            background: #b91c1c;
+            color: #fff;
+            padding: .35rem .7rem;
+            border-radius: 999px;
+            font-size: .95rem;
+            font-weight: 700;
+        }
+
+        .event-card-body h3 {
+            color: #991b1b;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+            font-size: 1.1rem;
+        }
+
+        .event-card-location {
+            color: #475569;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .event-card-description {
+            margin: 0;
+            color: #334155;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .event-card-status-wrap {
+            margin-top: .25rem;
+        }
+
+        .event-status {
+            display: inline-block;
+            padding: .4rem .8rem;
+            border-radius: 999px;
+            font-size: .9rem;
+            font-weight: 700;
+        }
+
+            .event-status.upcoming {
+                background: #dcfce7;
+                color: #166534;
+            }
+
+            .event-status.past {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+        .event-card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .event-read-more {
+            color: #b91c1c;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+            .event-read-more:hover {
+                color: #7f1d1d;
+            }
+
+        .no-events-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            margin-top: 1rem;
+        }
+
+            .no-events-box h3 {
+                color: #991b1b;
+                margin-bottom: .5rem;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        const form = document.querySelector('.filter-form');
+
+        const searchName = document.getElementById('searchName');
+        const searchDateType = document.getElementById('searchDateType');
+        const searchDatePart = document.getElementById('searchDatePart');
+        const datePartGroup = document.getElementById('datePartGroup');
+        const searchLocation = document.getElementById('searchLocation');
+        const searchStatus = document.getElementById('searchStatus');
+
+        function clearNameFilter() {
+            if (searchName) {
+                searchName.value = '';
+            }
+        }
+
+        function clearDateFilter() {
+            if (searchDateType) {
+                searchDateType.value = '';
+            }
+
+            if (searchDatePart) {
+                searchDatePart.value = '';
+            }
+
+            if (datePartGroup) {
+                datePartGroup.style.display = 'none';
+            }
+        }
+
+        function clearLocationFilter() {
+            if (searchLocation) {
+                searchLocation.value = '';
+            }
+        }
+
+        function clearStatusFilter() {
+            if (searchStatus) {
+                searchStatus.value = '';
+            }
+        }
+
+        function toggleDateInput() {
+            if (!searchDateType || !datePartGroup || !searchDatePart) {
+                return;
+            }
+
+            if (searchDateType.value === '') {
+                datePartGroup.style.display = 'none';
+                searchDatePart.value = '';
+            } else {
+                datePartGroup.style.display = 'flex';
+
+                if (searchDateType.value === 'day') {
+                    searchDatePart.placeholder = 'Въведи ден (1-31)';
+                } else if (searchDateType.value === 'month') {
+                    searchDatePart.placeholder = 'Въведи месец (1-12)';
+                } else if (searchDateType.value === 'year') {
+                    searchDatePart.placeholder = 'Въведи година';
+                }
+            }
+        }
+
+        if (searchName) {
+            searchName.addEventListener('input', function () {
+                clearDateFilter();
+                clearLocationFilter();
+                clearStatusFilter();
+            });
+        }
+
+        if (searchDateType) {
+            searchDateType.addEventListener('change', function () {
+                clearNameFilter();
+                clearLocationFilter();
+                clearStatusFilter();
+                toggleDateInput();
+            });
+        }
+
+        if (searchDatePart) {
+            searchDatePart.addEventListener('input', function () {
+                clearNameFilter();
+                clearLocationFilter();
+                clearStatusFilter();
+            });
+        }
+
+        if (searchLocation) {
+            searchLocation.addEventListener('input', function () {
+                clearNameFilter();
+                clearDateFilter();
+                clearStatusFilter();
+            });
+        }
+
+        if (searchStatus) {
+            searchStatus.addEventListener('change', function () {
+                clearNameFilter();
+                clearDateFilter();
+                clearLocationFilter();
+            });
+        }
+
+        if (form) {
+            form.addEventListener('submit', function () {
+                const activeElement = document.activeElement;
+
+                if (activeElement === searchName) {
+                    clearDateFilter();
+                    clearLocationFilter();
+                    clearStatusFilter();
+                }
+                else if (activeElement === searchDateType || activeElement === searchDatePart) {
+                    clearNameFilter();
+                    clearLocationFilter();
+                    clearStatusFilter();
+                }
+                else if (activeElement === searchLocation) {
+                    clearNameFilter();
+                    clearDateFilter();
+                    clearStatusFilter();
+                }
+                else if (activeElement === searchStatus) {
+                    clearNameFilter();
+                    clearDateFilter();
+                    clearLocationFilter();
+                }
+            });
+        }
+
+        window.addEventListener('load', toggleDateInput);
+    </script>
+}

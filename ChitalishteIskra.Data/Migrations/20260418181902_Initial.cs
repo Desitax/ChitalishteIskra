@@ -58,15 +58,34 @@ namespace ChitalishteIskra.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ContactMessages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    SentOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContactMessages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Location = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -381,10 +400,10 @@ namespace ChitalishteIskra.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Age", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsApprovedTeacher", "IsTeacherRequest", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, 30, "2c85bcf6-9cdb-4bc5-9c98-16c01f20335b", "admin@admin.com", true, "Admin", false, false, "Adminov", false, null, "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEKVJXJC+1tCUOI1w0um/UJaDlWfGsUBGwNoRPxflDnvNll5RDIejaF9JQRNojcuwHQ==", null, false, "401f68d6-ab15-4702-bf83-c3e8ef574ead", false, "admin" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, 18, "4543cc3a-c891-4eb5-ad26-941ca722460b", "student@student.com", true, "Petko", false, false, "Petkov", false, null, "STUDENT@STUDENT.COM", "STUDENT", "AQAAAAIAAYagAAAAEEDAZMQ3bu6RRLu6NRfi8igRh6WVuR2F39ev2tEUuhNzxsXXn7c/miYdv6mWqOAK/Q==", null, false, "4329d158-500e-4c00-ae0e-e398cab5c569", false, "student" },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), 0, 40, "5d8d7ea5-b77f-4443-b088-aa8ace96908e", "parent@parent.com", true, "Maria", false, false, "Petrova", false, null, "PARENT@PARENT.COM", "PARENT", "AQAAAAIAAYagAAAAEN8sr0msGWI3RnTeTQsZhhxRmRiBsI2e6VEWf2UXHb6Jx7QjvR9ChUozcPqx20HDEg==", null, false, "4bc4b618-fad3-4ef2-904b-eb677d22cc40", false, "parent" },
-                    { new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 0, 35, "da77bc9e-eb48-4104-8537-b5576cbe7233", "teacher@teacher.com", true, "Ivan", true, false, "Ivanov", false, null, "TEACHER@TEACHER.COM", "TEACHER", "AQAAAAIAAYagAAAAEPNCr1xzWfjZRljOybw2Z8y45Ocqb+qZOjOe5QfFP9pnxmaP0Q0DqeC71WpUTgA8aA==", null, false, "c7c7b52a-117f-4c31-b79f-d2191968b7f9", false, "teacher" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, 30, "31fbb238-6c58-40e4-a9bd-f5cf0749eab9", "admin@admin.com", true, "Admin", false, false, "Adminov", false, null, "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEJ2m0NX3KHcRovHo4+Q2K71VhtyOkzyyFGlsM9qXjHQ1C6z6YlzQN18OY0VMdDATdw==", null, false, "29c30478-658e-40e9-9456-da9d6a1b45c5", false, "admin" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, 18, "12a88a0e-e0d0-43af-822e-6a437b0a490e", "student@student.com", true, "Petko", false, false, "Petkov", false, null, "STUDENT@STUDENT.COM", "STUDENT", "AQAAAAIAAYagAAAAEPLccMam534dP7MjFx+jz99vAYdEt+iLcx52V2b2YenXGPP01WhDQBSAcrkaLwZyaQ==", null, false, "315ec0d9-9e37-41f0-9d25-bb593928fec9", false, "student" },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 0, 40, "3c5acdff-f037-4336-b84d-47f48becf969", "parent@parent.com", true, "Maria", false, false, "Petrova", false, null, "PARENT@PARENT.COM", "PARENT", "AQAAAAIAAYagAAAAECjNQVhXBfeKB24BBJQi46+E7aN20DZYtbAvaModYVvjv3YcBNyBdAAfi5Yaxbj8ag==", null, false, "41d2c5e7-33b5-4597-9510-4b09a3f3484d", false, "parent" },
+                    { new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 0, 35, "e599eaf0-7c6e-4c2c-af46-07c242784ba9", "teacher@teacher.com", true, "Ivan", true, false, "Ivanov", false, null, "TEACHER@TEACHER.COM", "TEACHER", "AQAAAAIAAYagAAAAEL4xQYD7cJn72f9HqkuRZYw1VI7V/zG6FW+AkgdugifZD4kGqMj01qZhEvs+DVPW3A==", null, false, "eff82770-2ea7-44e2-a130-8aff68f6e642", false, "teacher" }
                 });
 
             migrationBuilder.InsertData(
@@ -546,6 +565,9 @@ namespace ChitalishteIskra.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "ContactMessages");
 
             migrationBuilder.DropTable(
                 name: "GroupLessonResponses");

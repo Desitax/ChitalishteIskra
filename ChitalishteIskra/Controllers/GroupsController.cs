@@ -5,12 +5,11 @@ using ChitalishteIskra.Models.Groups;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace ChitalishteIskra.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Teacher")]
     public class GroupsController : Controller
     {
         private readonly IGroupService groupService;
@@ -22,7 +21,6 @@ namespace ChitalishteIskra.Controllers
             this.userManager = userManager;
         }
 
-        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -36,8 +34,8 @@ namespace ChitalishteIskra.Controllers
 
             var data = await groupService.GetAllAsync(
                 currentUserId,
-                User.IsInRole("Admin"),
-                User.IsInRole("Teacher"));
+                false,
+                true);
 
             var model = data.Select(g => new GroupIndexViewModel
             {
@@ -50,21 +48,13 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
             var model = new GroupCreateViewModel();
-
-            if (User.IsInRole("Admin"))
-            {
-                await PopulateTeachersInViewBagAsync();
-            }
-
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(GroupCreateViewModel model)
@@ -76,26 +66,10 @@ namespace ChitalishteIskra.Controllers
             }
 
             Guid currentUserId = Guid.Parse(currentUserIdString);
-            bool isAdmin = User.IsInRole("Admin");
-            bool isTeacher = User.IsInRole("Teacher");
-
-            if (!isAdmin && !isTeacher)
-            {
-                return Forbid();
-            }
-
-            if (isTeacher)
-            {
-                model.TeacherId = currentUserId;
-            }
+            model.TeacherId = currentUserId;
 
             if (!ModelState.IsValid)
             {
-                if (isAdmin)
-                {
-                    await PopulateTeachersInViewBagAsync();
-                }
-
                 return View(model);
             }
 
@@ -114,17 +88,10 @@ namespace ChitalishteIskra.Controllers
             catch (ArgumentException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-
-                if (isAdmin)
-                {
-                    await PopulateTeachersInViewBagAsync();
-                }
-
                 return View(model);
             }
         }
 
-        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -143,19 +110,12 @@ namespace ChitalishteIskra.Controllers
 
             Guid currentUserId = Guid.Parse(currentUserIdString);
 
-            if (User.IsInRole("Teacher") && data.TeacherId != currentUserId)
+            if (data.TeacherId != currentUserId)
             {
                 return Forbid();
             }
 
-            if (User.IsInRole("Admin"))
-            {
-                await PopulateTeachersInViewBagAsync();
-            }
-            else
-            {
-                ViewBag.SelectedTeacherName = data.TeacherName;
-            }
+            ViewBag.SelectedTeacherName = data.TeacherName;
 
             var model = new GroupEditViewModel
             {
@@ -167,7 +127,6 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(GroupEditViewModel model)
@@ -179,8 +138,6 @@ namespace ChitalishteIskra.Controllers
             }
 
             Guid currentUserId = Guid.Parse(currentUserIdString);
-            bool isAdmin = User.IsInRole("Admin");
-            bool isTeacher = User.IsInRole("Teacher");
 
             var existingGroup = await groupService.GetByIdAsync(model.Id);
             if (existingGroup == null)
@@ -188,27 +145,16 @@ namespace ChitalishteIskra.Controllers
                 return NotFound();
             }
 
-            if (isTeacher && existingGroup.TeacherId != currentUserId)
+            if (existingGroup.TeacherId != currentUserId)
             {
                 return Forbid();
             }
 
-            if (isTeacher)
-            {
-                model.TeacherId = currentUserId;
-            }
+            model.TeacherId = currentUserId;
 
             if (!ModelState.IsValid)
             {
-                if (isAdmin)
-                {
-                    await PopulateTeachersInViewBagAsync();
-                }
-                else
-                {
-                    ViewBag.SelectedTeacherName = existingGroup.TeacherName;
-                }
-
+                ViewBag.SelectedTeacherName = existingGroup.TeacherName;
                 return View(model);
             }
 
@@ -220,7 +166,7 @@ namespace ChitalishteIskra.Controllers
                     TeacherId = model.TeacherId
                 };
 
-                await groupService.UpdateAsync(model.Id, dto, currentUserId, isAdmin);
+                await groupService.UpdateAsync(model.Id, dto, currentUserId, false);
                 TempData["SuccessMessage"] = "Групата беше редактирана успешно.";
                 return RedirectToAction(nameof(Index));
             }
@@ -231,21 +177,11 @@ namespace ChitalishteIskra.Controllers
             catch (ArgumentException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-
-                if (isAdmin)
-                {
-                    await PopulateTeachersInViewBagAsync();
-                }
-                else
-                {
-                    ViewBag.SelectedTeacherName = existingGroup.TeacherName;
-                }
-
+                ViewBag.SelectedTeacherName = existingGroup.TeacherName;
                 return View(model);
             }
         }
 
-        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
@@ -257,11 +193,10 @@ namespace ChitalishteIskra.Controllers
             }
 
             Guid currentUserId = Guid.Parse(currentUserIdString);
-            bool isAdmin = User.IsInRole("Admin");
 
             try
             {
-                await groupService.DeleteAsync(id, currentUserId, isAdmin);
+                await groupService.DeleteAsync(id, currentUserId, false);
                 TempData["SuccessMessage"] = "Групата беше изтрита успешно.";
             }
             catch (UnauthorizedAccessException)
@@ -274,19 +209,6 @@ namespace ChitalishteIskra.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private async Task PopulateTeachersInViewBagAsync()
-        {
-            var teachers = await userManager.GetUsersInRoleAsync("Teacher");
-
-            ViewBag.Teachers = teachers
-                .Select(t => new SelectListItem
-                {
-                    Value = t.Id.ToString(),
-                    Text = t.FirstName + " " + t.LastName
-                })
-                .ToList();
         }
     }
 }

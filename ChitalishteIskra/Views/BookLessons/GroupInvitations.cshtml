@@ -19,6 +19,8 @@
 }
 else
 {
+    bool hasPendingInvitations = Model.Any(x => x.Status == "Чака отговор");
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -29,7 +31,11 @@ else
                 <th>Група</th>
                 <th>Учител</th>
                 <th>Статус</th>
-                <th>Действия</th>
+
+                @if (hasPendingInvitations)
+                {
+                    <th>Действия</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -43,26 +49,26 @@ else
                     <td>@item.GroupName</td>
                     <td>@item.TeacherName</td>
                     <td>@item.Status</td>
-                    <td>
-                        @if (item.Status == "Чака отговор")
-                        {
-                            <form asp-action="AcceptGroupLesson" method="post" style="display:inline; margin-right:5px;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="bookLessonId" value="@item.BookLessonId" />
-                                <button type="submit" class="btn btn-success btn-sm">Приеми</button>
-                            </form>
 
-                            <form asp-action="DeclineGroupLesson" method="post" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="bookLessonId" value="@item.BookLessonId" />
-                                <button type="submit" class="btn btn-danger btn-sm">Откажи</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <span class="text-muted">Няма налични действия</span>
-                        }
-                    </td>
+                    @if (hasPendingInvitations)
+                    {
+                        <td>
+                            @if (item.Status == "Чака отговор")
+                            {
+                                <form asp-action="AcceptGroupLesson" method="post" style="display:inline; margin-right:5px;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="bookLessonId" value="@item.BookLessonId" />
+                                    <button type="submit" class="btn btn-success btn-sm">Приеми</button>
+                                </form>
+
+                                <form asp-action="DeclineGroupLesson" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="bookLessonId" value="@item.BookLessonId" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Откажи</button>
+                                </form>
+                            }
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

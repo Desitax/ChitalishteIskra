@@ -4,8 +4,6 @@ using ChitalishteIskra.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Controllers
@@ -16,12 +14,14 @@ namespace ChitalishteIskra.Controllers
         private readonly SignInManager<User> signInManager;
         private readonly RoleManager<IdentityRole<Guid>> roleManager;
 
-        public UsersController(UserManager<User> _userManager, SignInManager<User> _signInManager,
-            RoleManager<IdentityRole<Guid>> _roleManager)
+        public UsersController(
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            RoleManager<IdentityRole<Guid>> roleManager)
         {
-            userManager = _userManager;
-            signInManager = _signInManager;
-            roleManager = _roleManager;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.roleManager = roleManager;
         }
 
         [HttpGet]
@@ -32,10 +32,8 @@ namespace ChitalishteIskra.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            //var model = new RegisterViewModel();
             return View();
         }
-
 
         [HttpGet]
         public IActionResult RegisterStudent()
@@ -71,13 +69,17 @@ namespace ChitalishteIskra.Controllers
 
             if (hasParentInfo)
             {
+                string parentFirstName = model.ParentInfo.FirstName!;
+                string parentLastName = model.ParentInfo.LastName!;
+                int parentAge = model.ParentInfo.Age!.Value;
+
                 var parent = new User
                 {
                     Email = model.Email,
                     UserName = model.UserName,
-                    FirstName = model.ParentInfo.FirstName,
-                    LastName = model.ParentInfo.LastName!,
-                    Age = model.ParentInfo.Age.Value
+                    FirstName = parentFirstName,
+                    LastName = parentLastName,
+                    Age = parentAge
                 };
 
                 child.Email = "child_" + model.Email;
@@ -175,7 +177,6 @@ namespace ChitalishteIskra.Controllers
             {
                 if (user.IsTeacherRequest == true && user.IsApprovedTeacher == false)
                 {
-
                     ModelState.AddModelError(string.Empty, "Teacher not approved, contact admin to continue");
                     return View(model);
                 }
@@ -185,7 +186,6 @@ namespace ChitalishteIskra.Controllers
                     model.Password,
                     false,
                     false);
-                
 
                 if (result.Succeeded)
                 {
@@ -204,7 +204,6 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-
         [AllowAnonymous]
         public async Task<IActionResult> SeedRoles()
         {
@@ -217,9 +216,9 @@ namespace ChitalishteIskra.Controllers
                     await roleManager.CreateAsync(new IdentityRole<Guid>(role));
                 }
             }
+
             return Content("Roles seeded (created if missing).");
         }
-
 
         [HttpGet]
         public IActionResult RegisterTeacher()
@@ -269,12 +268,10 @@ namespace ChitalishteIskra.Controllers
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> PendingTeachers()
-        { 
+        {
             var users = await userManager.Users
                 .Where(u => u.IsTeacherRequest && !u.IsApprovedTeacher)
                 .ToListAsync();
-
-            //var users = await userManager.Users.ToListAsync();
 
             return View(users);
         }
@@ -302,6 +299,5 @@ namespace ChitalishteIskra.Controllers
 
             return RedirectToAction(nameof(PendingTeachers));
         }
-
     }
 }

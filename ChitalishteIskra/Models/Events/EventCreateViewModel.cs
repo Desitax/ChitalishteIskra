@@ -1,22 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChitalishteIskra.Models.Events
 {
     public class EventCreateViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Името е задължително.")]
+        [StringLength(100)]
         public string Name { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Датата е задължителна.")]
         public DateOnly Date { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Началният час е задължителен.")]
         public TimeOnly StartTime { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Крайният час е задължителен.")]
         public TimeOnly EndTime { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Местоположението е задължително.")]
+        [StringLength(200)]
         public string Location { get; set; } = null!;
+
+        [Required(ErrorMessage = "Описанието е задължително.")]
+        [StringLength(2000)]
+        public string Description { get; set; } = null!;
+
+        [Required(ErrorMessage = "Снимката е задължителна.")]
+        public IFormFile? ImageFile { get; set; }
     }
 }

@@ -46,11 +46,31 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="SelectedStudentIds" class="form-label">Изпрати покана на деца</label>
-        <select asp-for="SelectedStudentIds" asp-items="Model.Students" class="form-control" multiple size="8"></select>
-        <small class="form-text text-muted">
-            Задръж Ctrl, за да избереш повече от едно дете.
-        </small>
+        <label class="form-label">Изпрати покана на деца</label>
+
+        <div class="student-list form-control p-0" style="max-height:260px; overflow-y:auto;">
+            @if (Model.Students != null && Model.Students.Any())
+            {
+                foreach (var student in Model.Students)
+                {
+                    bool isChecked = Model.SelectedStudentIds.Any(x => x.ToString() == student.Value);
+
+                    <label class="student-row d-flex align-items-center m-0 px-3 py-2 border-bottom" style="cursor:pointer;">
+                        <input type="checkbox"
+                               name="SelectedStudentIds"
+                               value="@student.Value"
+                               class="form-check-input me-2 student-checkbox"
+                        @(isChecked ? "checked" : null) />
+                        <span>@student.Text</span>
+                    </label>
+                }
+            }
+            else
+            {
+                <div class="px-3 py-2 text-muted">Няма налични ученици.</div>
+            }
+        </div>
+
         <span asp-validation-for="SelectedStudentIds" class="text-danger"></span>
     </div>
 
@@ -59,4 +79,44 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rows = document.querySelectorAll(".student-row");
+
+            rows.forEach(row => {
+                row.addEventListener("click", function (e) {
+                    if (e.target.tagName.toLowerCase() === "input") {
+                        toggleRowStyle(row);
+                        return;
+                    }
+
+                    const checkbox = row.querySelector(".student-checkbox");
+                    checkbox.checked = !checkbox.checked;
+                    toggleRowStyle(row);
+                });
+
+                const checkbox = row.querySelector(".student-checkbox");
+                if (checkbox) {
+                    checkbox.addEventListener("change", function () {
+                        toggleRowStyle(row);
+                    });
+
+                    toggleRowStyle(row);
+                }
+            });
+
+            function toggleRowStyle(row) {
+                const checkbox = row.querySelector(".student-checkbox");
+
+                if (checkbox && checkbox.checked) {
+                    row.classList.add("bg-light");
+                    row.style.fontWeight = "600";
+                } else {
+                    row.classList.remove("bg-light");
+                    row.style.fontWeight = "400";
+                }
+            }
+        });
+    </script>
 }

@@ -4,7 +4,6 @@ namespace ChitalishteIskra.Models.TeacherAvailabilities
 {
     public class TeacherAvailabilitiesCreateViewModel
     {
-        [Required]
         public Guid TeacherId { get; set; }
 
         [Required]

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ChitalishteIskra.Data.Entities
 {
@@ -25,9 +20,13 @@ namespace ChitalishteIskra.Data.Entities
         public TimeOnly EndTime { get; set; }
 
         [Required]
-        public string Location { get; set; }=null!;
+        public string Location { get; set; } = null!;
 
-		public ICollection<TeacherEvent> TeacherEvents { get; set; } = new List<TeacherEvent>();
+        [Required]
+        public string Description { get; set; } 
 
-	}
+        public string? ImageUrl { get; set; }
+
+        public ICollection<TeacherEvent> TeacherEvents { get; set; } = new List<TeacherEvent>();
+    }
 }

@@ -63,6 +63,40 @@ namespace ChitalishteIskra.Data.Migrations
                     b.ToTable("BookLessons");
                 });
 
+            modelBuilder.Entity("ChitalishteIskra.Data.Entities.ContactMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("SentOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContactMessages");
+                });
+
             modelBuilder.Entity("ChitalishteIskra.Data.Entities.Event", b =>
                 {
                     b.Property<Guid>("Id")
@@ -72,8 +106,15 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -82,8 +123,8 @@ namespace ChitalishteIskra.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
@@ -398,7 +439,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             AccessFailedCount = 0,
                             Age = 30,
-                            ConcurrencyStamp = "2c85bcf6-9cdb-4bc5-9c98-16c01f20335b",
+                            ConcurrencyStamp = "31fbb238-6c58-40e4-a9bd-f5cf0749eab9",
                             Email = "admin@admin.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -408,9 +449,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKVJXJC+1tCUOI1w0um/UJaDlWfGsUBGwNoRPxflDnvNll5RDIejaF9JQRNojcuwHQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ2m0NX3KHcRovHo4+Q2K71VhtyOkzyyFGlsM9qXjHQ1C6z6YlzQN18OY0VMdDATdw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "401f68d6-ab15-4702-bf83-c3e8ef574ead",
+                            SecurityStamp = "29c30478-658e-40e9-9456-da9d6a1b45c5",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -419,7 +460,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
                             AccessFailedCount = 0,
                             Age = 35,
-                            ConcurrencyStamp = "da77bc9e-eb48-4104-8537-b5576cbe7233",
+                            ConcurrencyStamp = "e599eaf0-7c6e-4c2c-af46-07c242784ba9",
                             Email = "teacher@teacher.com",
                             EmailConfirmed = true,
                             FirstName = "Ivan",
@@ -429,9 +470,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "TEACHER@TEACHER.COM",
                             NormalizedUserName = "TEACHER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPNCr1xzWfjZRljOybw2Z8y45Ocqb+qZOjOe5QfFP9pnxmaP0Q0DqeC71WpUTgA8aA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL4xQYD7cJn72f9HqkuRZYw1VI7V/zG6FW+AkgdugifZD4kGqMj01qZhEvs+DVPW3A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c7c7b52a-117f-4c31-b79f-d2191968b7f9",
+                            SecurityStamp = "eff82770-2ea7-44e2-a130-8aff68f6e642",
                             TwoFactorEnabled = false,
                             UserName = "teacher"
                         },
@@ -440,7 +481,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
                             Age = 18,
-                            ConcurrencyStamp = "4543cc3a-c891-4eb5-ad26-941ca722460b",
+                            ConcurrencyStamp = "12a88a0e-e0d0-43af-822e-6a437b0a490e",
                             Email = "student@student.com",
                             EmailConfirmed = true,
                             FirstName = "Petko",
@@ -450,9 +491,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "STUDENT@STUDENT.COM",
                             NormalizedUserName = "STUDENT",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEDAZMQ3bu6RRLu6NRfi8igRh6WVuR2F39ev2tEUuhNzxsXXn7c/miYdv6mWqOAK/Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPLccMam534dP7MjFx+jz99vAYdEt+iLcx52V2b2YenXGPP01WhDQBSAcrkaLwZyaQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4329d158-500e-4c00-ae0e-e398cab5c569",
+                            SecurityStamp = "315ec0d9-9e37-41f0-9d25-bb593928fec9",
                             TwoFactorEnabled = false,
                             UserName = "student"
                         },
@@ -461,7 +502,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             AccessFailedCount = 0,
                             Age = 40,
-                            ConcurrencyStamp = "5d8d7ea5-b77f-4443-b088-aa8ace96908e",
+                            ConcurrencyStamp = "3c5acdff-f037-4336-b84d-47f48becf969",
                             Email = "parent@parent.com",
                             EmailConfirmed = true,
                             FirstName = "Maria",
@@ -471,9 +512,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "PARENT@PARENT.COM",
                             NormalizedUserName = "PARENT",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN8sr0msGWI3RnTeTQsZhhxRmRiBsI2e6VEWf2UXHb6Jx7QjvR9ChUozcPqx20HDEg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECjNQVhXBfeKB24BBJQi46+E7aN20DZYtbAvaModYVvjv3YcBNyBdAAfi5Yaxbj8ag==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4bc4b618-fad3-4ef2-904b-eb677d22cc40",
+                            SecurityStamp = "41d2c5e7-33b5-4597-9510-4b09a3f3484d",
                             TwoFactorEnabled = false,
                             UserName = "parent"
                         });

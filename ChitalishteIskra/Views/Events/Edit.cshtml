@@ -1,36 +1,170 @@
 ﻿@using ChitalishteIskra.Models.Events
 @model EventEditViewModel
 
-<h2 class="mb-3">Поправи събитие</h2>
+@{
+    ViewData["Title"] = "Редакция на събитие";
+}
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+<div class="event-form-page">
+    <div class="event-form-card shadow-lg">
+        <div class="event-form-header">
+            <span class="event-form-kicker">Редакция</span>
+            <h2>Поправи събитие</h2>
+            <p>Актуализирай съдържанието, което посетителите виждат.</p>
+        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Име</label>
-        <input class="form-control" asp-for="Name" />
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="row g-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ExistingImageUrl" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-12">
+                <label asp-for="Name" class="form-label">Заглавие</label>
+                <input class="form-control form-control-lg" asp-for="Name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Date" class="form-label">Дата</label>
+                <input class="form-control" type="date" asp-for="Date" min="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="StartTime" class="form-label">Начало</label>
+                <input class="form-control" type="time" asp-for="StartTime" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="EndTime" class="form-label">Край</label>
+                <input class="form-control" type="time" asp-for="EndTime" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Location" class="form-label">Място</label>
+                <input class="form-control" asp-for="Location" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Description" class="form-label">Описание</label>
+                <textarea class="form-control" asp-for="Description" rows="6"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="ImageFile" class="form-label">Смени снимката</label>
+                <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" id="eventImageInput" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ExistingImageUrl))
+                {
+                    <div class="mt-3">
+                        <p class="mb-2 fw-semibold">Текуща снимка:</p>
+                        <img src="@Model.ExistingImageUrl" alt="@Model.Name" class="current-event-image" />
+                    </div>
+                }
+
+                <div class="image-preview-box mt-3" id="imagePreviewBox" style="display:none;">
+                    <p class="mb-2 fw-semibold">Нова снимка:</p>
+                    <img id="imagePreview" class="img-fluid rounded" alt="Преглед на снимката" />
+                </div>
+            </div>
+
+            <div class="col-12 d-flex gap-3 flex-wrap">
+                <button class="btn btn-danger btn-lg px-4" type="submit">Запази</button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">Назад</a>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="mb-3">
-        <label class="form-label">Дата</label>
-        <input class="form-control" type="date" asp-for="Date"
-               min="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")" />
-    </div>
+@section Styles {
+    <style>
+        .event-form-page {
+            padding: 2rem 0 4rem;
+        }
 
-    <div class="mb-3">
-        <label class="form-label">Начало</label>
-        <input class="form-control" type="time" asp-for="StartTime" />
-    </div>
+        .event-form-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid rgba(160, 20, 40, 0.08);
+        }
 
-    <div class="mb-3">
-        <label class="form-label">Край</label>
-        <input class="form-control" type="time" asp-for="EndTime" />
-    </div>
+        .event-form-header {
+            margin-bottom: 1.5rem;
+        }
 
-    <div class="mb-3">
-        <label class="form-label">Местоположение</label>
-        <input class="form-control" asp-for="Location" />
-    </div>
+            .event-form-header h2 {
+                color: #991b1b;
+                font-weight: 700;
+                margin-bottom: .5rem;
+            }
 
-    <button class="btn btn-primary btn-lg" type="submit">Запази промените</button>
-</form>
+        .event-form-kicker {
+            display: inline-block;
+            background: rgba(153, 27, 27, 0.1);
+            color: #991b1b;
+            border-radius: 999px;
+            padding: .35rem .8rem;
+            font-size: .9rem;
+            font-weight: 700;
+            margin-bottom: .75rem;
+        }
+
+        .event-form-card .form-control {
+            border-radius: 14px;
+            padding: .85rem 1rem;
+        }
+
+        .current-event-image,
+        .image-preview-box img {
+            max-width: 420px;
+            max-height: 260px;
+            border-radius: 16px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-preview-box {
+            max-width: 440px;
+            padding: .75rem;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            background: #fffaf9;
+        }
+    </style>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const input = document.getElementById('eventImageInput');
+        const preview = document.getElementById('imagePreview');
+        const box = document.getElementById('imagePreviewBox');
+
+        if (input) {
+            input.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (!file) {
+                    box.style.display = 'none';
+                    preview.src = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    box.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+}

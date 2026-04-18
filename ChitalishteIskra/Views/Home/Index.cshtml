@@ -1,82 +1,98 @@
 ﻿@{
-    ViewData["Title"] = "Начало";
+    ViewData["Title"] = "За нас";
 }
 
- @* <!-- HERO -->
-<section class="py-5" style="background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=60') center/cover; color:white;">
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-lg-7">
-                <h1 class="display-title" style="font-size:3rem; font-weight:700;">
-                    Народно читалище „Искра“
-                </h1>
-                <p class="mt-3" style="font-size:1.1rem; max-width:52ch;">
-                    Култура, традиции и образование за всички възрасти.
-                    Следете нашите събития, школи и инициативи.
+<section class="home-hero my-4">
+    <div class="home-hero-overlay"></div>
+    <div class="home-hero-content">
+        <span class="home-badge">Народно читалище „Искра - 1860”</span>
+        <h1 class="home-title mt-3">Добре дошли в Народно читалище „Искра - 1860”</h1>
+        <p class="home-lead mt-3">
+            НЧ „Искра – 1860“ е сърцето на културния живот в Казанлък вече 165 години – място,
+            където духовността и традициите се предават от поколение на поколение.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 mt-4">
+            <a href="/Contact/Index" class="btn btn-primary px-4">
+                Контакти
+            </a>
+            <a href="/Home/Donate" class="btn btn-outline-light px-4">
+                Дарителска сметка
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="content-card h-100">
+                <h2 class="section-heading">За читалището</h2>
+                <div class="accent-line"></div>
+
+                <p>
+                    Читалището е дом на разнообразни творчески, музикални и спортни школи и състави,
+                    където всеки може да развие своите таланти и интереси.
                 </p>
 
-                <div class="d-flex gap-2 mt-4 flex-wrap">
-                    <a class="btn btn-primary btn-lg" asp-controller="News" asp-action="Index">Актуално</a>
-                    <a class="btn btn-outline-light btn-lg" asp-controller="Groups" asp-action="Index">Групи и школи</a>
-                </div>
+                <p>
+                    Тук обединяваме хората, създаваме възможности за по-активен социален живот и
+                    непрекъснато инициираме събития, които вдъхновяват и провокират както малки,
+                    така и големи.
+                </p>
+
+                <p class="mb-0">
+                    Организираме и участваме в доброволчески кампании, защото вярваме,
+                    че заедно градим едно по-добро бъдеще.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="content-card h-100 soft-highlight">
+                <h2 class="section-heading">Място с история и дух</h2>
+                <div class="accent-line"></div>
+
+                <p>
+                    Сградата на НЧ „Искра- 1860” се намира на улица „Искра” № 1.
+                    Обявена е за паметник на културата с местно значение.
+                </p>
+
+                <p class="mb-0">
+                    Във фоайетата на читалището е разположена богата изложба,
+                    показваща историята на културната институция.
+                </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- QUICK INFO -->
-<section class="section">
-    <div class="container">
-        <div class="row g-4">
+<section class="home-section pt-0">
+    <div class="content-card">
+        <h2 class="section-heading">Сцена за изкуство и събития</h2>
+        <div class="accent-line"></div>
 
-            <div class="col-md-4">
-                <div class="ui-card p-4 h-100">
-                    <h4 class="mb-2">🎭 Събития</h4>
-                    <p class="text-muted2 mb-0">Концерти, тържества, постановки и празници.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="ui-card p-4 h-100">
-                    <h4 class="mb-2">🎶 Школи</h4>
-                    <p class="text-muted2 mb-0">Музика, танци и творчески занимания.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="ui-card p-4 h-100">
-                    <h4 class="mb-2">📚 Библиотека</h4>
-                    <p class="text-muted2 mb-0">Книги и ресурси за деца и възрастни.</p>
-                </div>
-            </div>
-
-        </div>
+        <p class="mb-0">
+            Сцената на читалището е притегателен център за различни театрални постановки и концерти
+            на местни и гостуващи трупи и състави.
+        </p>
     </div>
 </section>
 
-<!-- ABOUT PREVIEW -->
-<section class="section pt-0">
-    <div class="container">
-        <div class="row g-4 align-items-center">
+<section class="home-section pt-0">
+    <div class="donation-banner">
+        <div>
+            <h3 class="mb-2">Подкрепете дейността на читалището</h3>
+            <p class="mb-0">
+                Ако желаете да помогнете за развитието на културните ни инициативи,
+                можете да направите дарение.
+            </p>
+        </div>
 
-            <div class="col-lg-6">
-                <div class="ui-card p-4">
-                    <h2 class="section-title mb-3">За читалището</h2>
-                    <p class="text-muted2">
-                        Читалище „Искра“ е културен център, който съхранява българските традиции
-                        и развива дейности за деца, младежи и възрастни.
-                    </p>
-                    <a class="btn btn-primary" asp-controller="About" asp-action="History">История</a>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="ui-card p-0 overflow-hidden">
-                    <img class="img-fluid" alt="Chitalishte"
-                         src="https://images.unsplash.com/photo-1520694478161-2c3c1b94c5b8?auto=format&fit=crop&w=1400&q=60">
-                </div>
-            </div>
-
+        <div class="mt-3 mt-md-0">
+            <a asp-controller="Home" asp-action="Donate" class="btn btn-warning donation-btn">
+                Виж дарителска сметка
+            </a>
         </div>
     </div>
-</section> *@
+</section>

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ChitalishteIskra.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Teacher")]
     public class LessonsController : Controller
     {
         private readonly ILessonService lessonService;
@@ -141,14 +141,19 @@ namespace ChitalishteIskra.Controllers
 
         private void PopulateLessonTypes()
         {
-            ViewBag.LessonTypes = Enum.GetValues(typeof(Lesson.LessonTypeName))
-                .Cast<Lesson.LessonTypeName>()
-                .Select(x => new SelectListItem
+            ViewBag.LessonTypes = new List<SelectListItem>
+            {
+                new SelectListItem
                 {
-                    Value = x.ToString(),
-                    Text = x.ToString()
-                })
-                .ToList();
+                    Value = Lesson.LessonTypeName.Individual.ToString(),
+                    Text = "Индивидуален"
+                },
+                new SelectListItem
+                {
+                    Value = Lesson.LessonTypeName.Group.ToString(),
+                    Text = "Групов"
+                }
+            };
         }
     }
 }

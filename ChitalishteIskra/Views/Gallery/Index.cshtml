@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<ChitalishteIskra.Models.Gallery.GalleryAlbumViewModel>
+
 @{
     ViewData["Title"] = "Галерия";
 }
@@ -14,13 +15,83 @@
         padding: 2.5rem;
         border-radius: 24px;
         box-shadow: 0 18px 40px rgba(123, 0, 28, 0.18);
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
 
+    .gallery-search-wrap {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .gallery-search-input {
+        width: 100%;
+        padding: 0.95rem 1.1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 16px;
+        font-size: 1.05rem;
+        outline: none;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+        .gallery-search-input:focus {
+            border-color: #8b0000;
+            box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.08);
+        }
+
+    .gallery-suggestions {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        z-index: 1000;
+        display: none;
+    }
+
+    .gallery-suggestion-item {
+        padding: 0.9rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f1f1;
+        transition: background-color 0.2s ease;
+    }
+
+        .gallery-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .gallery-suggestion-item:hover {
+            background-color: #fff5f5;
+        }
+
     .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 1.75rem;
+        align-items: flex-start;
+    }
+
+    .gallery-item {
+        width: 100%;
+    }
+
+    @@media (min-width: 768px) {
+        .gallery-item {
+            width: calc(50% - 0.875rem);
+        }
+    }
+
+    @@media (min-width: 1200px) {
+        .gallery-item {
+            width: calc(33.333% - 1.17rem);
+        }
+    }
+
+    .gallery-item {
+        display: block;
+        flex: 0 0 auto;
     }
 
     .album-card {
@@ -87,16 +158,19 @@
         margin-bottom: .75rem;
     }
 
-    .album-card-description {
-        color: #4b5563;
-        margin-bottom: 0;
-    }
-
     .album-card-link {
         display: inline-block;
         margin-top: 1rem;
         font-weight: 700;
         color: #8b0000;
+    }
+
+    .no-results {
+        display: none;
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 1.1rem;
+        color: #6b7280;
     }
 </style>
 
@@ -105,25 +179,121 @@
         <h1 class="mb-3">Галерия</h1>
     </div>
 
-    <div class="gallery-grid">
+    <div class="gallery-search-wrap">
+        <input type="text"
+               id="gallerySearch"
+               class="gallery-search-input"
+               placeholder="Търси по име на концерт..." />
+
+        <div id="gallerySuggestions" class="gallery-suggestions"></div>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid">
         @foreach (var album in Model)
         {
-            <a asp-controller="Gallery"
-               asp-action="Details"
-               asp-route-id="@album.Slug"
-               class="album-card">
-                <div class="album-card-image-wrap">
-                    <img src="@album.CoverImageUrl" alt="@album.Title" class="album-card-image" />
-                    <div class="album-card-overlay">
-                        <span class="album-card-badge">@album.PhotoCount снимки</span>
+            <div class="gallery-item"
+                 data-title="@album.Title.ToLowerInvariant()">
+                <a asp-controller="Gallery"
+                   asp-action="Details"
+                   asp-route-id="@album.Slug"
+                   class="album-card">
+                    <div class="album-card-image-wrap">
+                        <img src="@album.CoverImageUrl" alt="@album.Title" class="album-card-image" />
+                        <div class="album-card-overlay">
+                            <span class="album-card-badge">@album.PhotoCount снимки</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="album-card-body">
-                    <h2 class="album-card-title">@album.Title</h2>
-                    <span class="album-card-link">Виж галерията →</span>
-                </div>
-            </a>
+                    <div class="album-card-body">
+                        <h2 class="album-card-title">@album.Title</h2>
+                        <span class="album-card-link">Виж галерията →</span>
+                    </div>
+                </a>
+            </div>
         }
     </div>
+
+    <div id="noResults" class="no-results">
+        Няма намерени резултати.
+    </div>
 </section>
+
+@section Scripts {
+    <script>
+        const searchInput = document.getElementById('gallerySearch');
+        const suggestionsBox = document.getElementById('gallerySuggestions');
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const noResults = document.getElementById('noResults');
+
+        function filterGallery() {
+            const value = searchInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            galleryItems.forEach(item => {
+                const title = item.getAttribute('data-title');
+
+                if (value === '' || title.startsWith(value)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
+        }
+
+        function updateSuggestions() {
+            const value = searchInput.value.trim().toLowerCase();
+            suggestionsBox.innerHTML = '';
+
+            if (value === '') {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            const titles = [];
+            galleryItems.forEach(item => {
+                const title = item.getAttribute('data-title');
+                const visibleTitle = item.querySelector('.album-card-title').textContent.trim();
+
+                if (title.startsWith(value) && !titles.includes(visibleTitle)) {
+                    titles.push(visibleTitle);
+                }
+            });
+
+            if (titles.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            titles.forEach(title => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'gallery-suggestion-item';
+                suggestion.textContent = title;
+
+                suggestion.addEventListener('click', function () {
+                    searchInput.value = title;
+                    suggestionsBox.innerHTML = '';
+                    suggestionsBox.style.display = 'none';
+                    filterGallery();
+                });
+
+                suggestionsBox.appendChild(suggestion);
+            });
+
+            suggestionsBox.style.display = 'block';
+        }
+
+        searchInput.addEventListener('input', function () {
+            filterGallery();
+            updateSuggestions();
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!suggestionsBox.contains(e.target) && e.target !== searchInput) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    </script>
+}

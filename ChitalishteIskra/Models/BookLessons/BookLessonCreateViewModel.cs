@@ -23,7 +23,6 @@ namespace ChitalishteIskra.Models.BookLessons
         public IEnumerable<SelectListItem> Teachers { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Lessons { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> AvailableSlots { get; set; } = new List<SelectListItem>();
-        public IEnumerable<string> TeacherGroups { get; set; } = new List<string>();
         public IEnumerable<string> WorkingHours { get; set; } = new List<string>();
     }
 }

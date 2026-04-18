@@ -4,13 +4,7 @@
 <h2 class="mb-3">Добави свободен час</h2>
 
 <form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label asp-for="TeacherId" class="form-label">Учител</label>
-        <select asp-for="TeacherId" class="form-control" asp-items="ViewBag.Teachers">
-            <option value="">Изберете учител</option>
-        </select>
-        <span asp-validation-for="TeacherId" class="text-danger"></span>
-    </div>
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <div class="mb-3">
         <label asp-for="DayOfWeek" class="form-label">Ден от седмицата</label>
@@ -20,29 +14,34 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Начало</label>
+        <label asp-for="StartTime" class="form-label">Начало</label>
         <input class="form-control" type="time" asp-for="StartTime" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Край</label>
+        <label asp-for="EndTime" class="form-label">Край</label>
         <input class="form-control" type="time" asp-for="EndTime" />
+        <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
+    <div class="form-group mb-3">
         <label class="form-label">Наличен ли е</label><br />
 
         <div class="form-check form-check-inline">
-            @Html.RadioButtonFor(model => model.IsAvailable, true, new { @class = "form-check-input" })
-            <label class="form-check-label">Да</label>
+            @Html.RadioButtonFor(model => model.IsAvailable, true, new { @class = "form-check-input", id = "availableYes" })
+            <label class="form-check-label" for="availableYes">Да</label>
         </div>
 
         <div class="form-check form-check-inline">
-            @Html.RadioButtonFor(model => model.IsAvailable, false, new { @class = "form-check-input" })
-            <label class="form-check-label">Не</label>
+            @Html.RadioButtonFor(model => model.IsAvailable, false, new { @class = "form-check-input", id = "availableNo" })
+            <label class="form-check-label" for="availableNo">Не</label>
         </div>
     </div>
 
     <button class="btn btn-primary btn-lg" type="submit">Създай</button>
 </form>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

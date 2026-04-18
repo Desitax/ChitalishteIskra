@@ -36,16 +36,6 @@
     </div>
 
     <div class="mb-3">
-        <h5>Възрастови групи на учителя</h5>
-        <ul id="groupsList">
-            @foreach (var group in Model.TeacherGroups)
-            {
-                <li>@group</li>
-            }
-        </ul>
-    </div>
-
-    <div class="mb-3">
         <h5>Работно време за избрания ден</h5>
         <ul id="workingHoursList">
             @foreach (var hour in Model.WorkingHours)
@@ -68,12 +58,10 @@
 
             const lessonSelect = document.getElementById('lessonSelect');
             const slotSelect = document.getElementById('slotSelect');
-            const groupsList = document.getElementById('groupsList');
             const workingHoursList = document.getElementById('workingHoursList');
 
             lessonSelect.innerHTML = '<option value="">Избери предмет</option>';
             slotSelect.innerHTML = '<option value="">Избери свободен час</option>';
-            groupsList.innerHTML = '';
             workingHoursList.innerHTML = '';
 
             if (!teacherId || !date) {
@@ -111,18 +99,6 @@
                     option.value = '';
                     option.text = 'Няма свободни часове';
                     slotSelect.appendChild(option);
-                }
-
-                if (data.groups && data.groups.length > 0) {
-                    data.groups.forEach(group => {
-                        const li = document.createElement('li');
-                        li.textContent = group;
-                        groupsList.appendChild(li);
-                    });
-                } else {
-                    const li = document.createElement('li');
-                    li.textContent = 'Няма възрастови групи';
-                    groupsList.appendChild(li);
                 }
 
                 if (data.workingHours && data.workingHours.length > 0) {

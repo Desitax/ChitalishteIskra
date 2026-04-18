@@ -29,6 +29,7 @@ namespace ChitalishteIskra.Data
         public DbSet<BookLesson> BookLessons { get; set; } = null!;
         public DbSet<TeacherLesson> TeacherLessons { get; set; } = null!;
         public DbSet<GroupLessonResponse> GroupLessonResponses { get; set; } = null!;
+        public DbSet<ContactMessage> ContactMessages { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -116,7 +117,7 @@ namespace ChitalishteIskra.Data
 
             builder.Entity<Event>()
                 .Property(e => e.Name)
-                .HasMaxLength(100)
+                .HasMaxLength(200)
                 .IsRequired();
 
             builder.Entity<Event>()

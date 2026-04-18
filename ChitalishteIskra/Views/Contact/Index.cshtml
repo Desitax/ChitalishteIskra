@@ -1,5 +1,128 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ChitalishteIskra.Models.Messages.ContactFormViewModel
+
 @{
+    ViewData["Title"] = "Контакти";
+}
+
+<section class="inner-page py-4">
+
+    <div class="page-header-card mb-4">
+        <h1 class="mb-2">Контакти</h1>
+        <p class="mb-0">
+            Свържете се с Народно читалище „Искра - 1860”
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <div class="col-lg-5">
+            <div class="content-card mb-4">
+                <h2 class="section-heading">Информация</h2>
+                <div class="accent-line"></div>
+
+                <div class="contact-list">
+                    <div class="contact-row">
+                        <span class="contact-label">
+                            <i class="bi bi-geo-alt-fill me-2"></i>Адрес
+                        </span>
+                        <span>6100, гр. Казанлък, ул. „Искра” 1</span>
+                    </div>
+
+                    <div class="contact-row">
+                        <span class="contact-label">
+                            <i class="bi bi-telephone-fill me-2"></i>Телефон
+                        </span>
+                        <a href="tel:+35943162986">+35943162986</a>
+                    </div>
+
+                    <div class="contact-row">
+                        <span class="contact-label">
+                            <i class="bi bi-envelope-fill me-2"></i>Email
+                        </span>
+                        <a href="mailto:iskrakz@abv.bg">iskrakz@abv.bg</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card soft-highlight">
+                <h2 class="section-heading">Социални мрежи</h2>
+                <div class="accent-line"></div>
+
+                <div class="social-links-vertical">
+                    <button type="button"
+                            class="social-pill social-pill-button"
+                            onclick="window.open('https://www.facebook.com/iskra1860', '_blank')">
+                        <i class="bi bi-facebook me-2"></i>
+                        <span>Facebook</span>
+                    </button>
+
+                    <button type="button"
+                            class="social-pill social-pill-button"
+                            onclick="window.open('https://www.instagram.com/iskra_1860', '_blank')">
+                        <i class="bi bi-instagram me-2"></i>
+                        <span>Instagram</span>
+                    </button>
+
+                    <button type="button"
+                            class="social-pill social-pill-button"
+                            onclick="window.open('https://www.youtube.com/channel/UCvMTEwMZZ_Fv0odKx3M8Y8g', '_blank')">
+                        <i class="bi bi-youtube me-2"></i>
+                        <span>YouTube</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="content-card">
+                <h2 class="section-heading">Пишете ни</h2>
+                <div class="accent-line"></div>
+
+                <form asp-controller="Contact" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input asp-for="Name" class="form-control contact-input" placeholder="Вашето име" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <input asp-for="Email" class="form-control contact-input" placeholder="Вашият email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <textarea asp-for="Content"
+                                      rows="7"
+                                      class="form-control contact-input"
+                                      placeholder="Вашето съобщение"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn contact-btn px-5">
+                                Изпрати съобщение
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

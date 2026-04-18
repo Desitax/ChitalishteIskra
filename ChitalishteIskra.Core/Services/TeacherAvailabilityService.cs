@@ -1,12 +1,7 @@
 ﻿using ChitalishteIskra.Core.Contracts;
 using ChitalishteIskra.Core.DTOs.TeacherAvailabilities;
-using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChitalishteIskra.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Core.Services
@@ -27,6 +22,7 @@ namespace ChitalishteIskra.Core.Services
                 .Select(t => new TeacherAvailabilityDto
                 {
                     Id = t.Id,
+                    TeacherId = t.TeacherId,
                     DayOfWeek = t.DayOfWeek,
                     StartTime = t.StartTime,
                     EndTime = t.EndTime,
@@ -66,6 +62,7 @@ namespace ChitalishteIskra.Core.Services
             return new TeacherAvailabilityDto
             {
                 Id = entity.Id,
+                TeacherId = entity.TeacherId,
                 DayOfWeek = entity.DayOfWeek,
                 StartTime = entity.StartTime,
                 EndTime = entity.EndTime,
@@ -86,6 +83,7 @@ namespace ChitalishteIskra.Core.Services
             entity.DayOfWeek = model.DayOfWeek;
             entity.StartTime = model.StartTime;
             entity.EndTime = model.EndTime;
+            entity.TeacherId = model.TeacherId;
             entity.IsAvailable = model.IsAvailable;
 
             await context.SaveChangesAsync();

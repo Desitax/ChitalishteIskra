@@ -65,6 +65,7 @@ using (var scope = app.Services.CreateScope())
 
     await IdentitySeeder.SeedRolesAsync(roleManager);
     await IdentitySeeder.AssignUsersToRolesAsync(userManager);
+    await EventSeeder.SeedAsync(dbContext);
 }
 
 // Configure the HTTP request pipeline.

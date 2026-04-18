@@ -30,13 +30,26 @@
         {
             <tr>
                 <td>@lesson.Name</td>
-                <td>@lesson.TypeName</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm">Редактирай</a>
 
-                    <form asp-action="Delete" asp-route-id="@lesson.Id" method="post" style="display:inline;">
+                <td>
+                    @(lesson.TypeName == "Individual" ? "Индивидуален" :
+                        lesson.TypeName == "Group" ? "Групов" :
+                        lesson.TypeName)
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm">
+                        Редактирай
+                    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@lesson.Id"
+                          method="post"
+                          style="display:inline;">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger btn-sm"
+
+                        <button type="submit"
+                                class="btn btn-danger btn-sm"
                                 onclick="return confirm('Сигурен ли си, че искаш да изтриеш този предмет?')">
                             Изтрий
                         </button>

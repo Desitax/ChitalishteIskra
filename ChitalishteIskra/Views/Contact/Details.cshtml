@@ -1,0 +1,60 @@
+﻿@model ChitalishteIskra.Data.Entities.ContactMessage
+
+@{
+    ViewData["Title"] = "Детайли за съобщение";
+}
+
+<section class="inner-page py-4">
+    <div class="page-header-card mb-4">
+        <h1 class="mb-2">Детайли за съобщение</h1>
+        <p class="mb-0">Преглед на изпратено съобщение</p>
+    </div>
+
+    <div class="content-card">
+        <div class="mb-3">
+            <strong>Име:</strong> @Model.Name
+        </div>
+
+        <div class="mb-3">
+            <strong>Email:</strong> @Model.Email
+        </div>
+
+        <div class="mb-3">
+            <strong>Изпратено на:</strong> @Model.SentOn.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+        </div>
+
+        <div class="mb-3">
+            <strong>Статус:</strong>
+            @if (Model.IsRead)
+            {
+                <span class="badge bg-success">Прочетено</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">Непрочетено</span>
+            }
+        </div>
+
+        <div class="mb-4">
+            <strong>Съобщение:</strong>
+            <div class="border rounded p-3 mt-2 bg-light" style="white-space: pre-wrap;">@Model.Content</div>
+        </div>
+
+        <a asp-controller="Contact" asp-action="Messages" class="btn btn-secondary">
+            Назад
+        </a>
+
+        <form asp-controller="Contact"
+              asp-action="Delete"
+              asp-route-id="@Model.Id"
+              method="post"
+              class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit"
+                    class="btn btn-danger"
+                    onclick="return confirm('Сигурни ли сте, че искате да изтриете това съобщение?');">
+                Изтрий
+            </button>
+        </form>
+    </div>
+</section>

@@ -3,11 +3,6 @@ using ChitalishteIskra.Core.DTOs.TeacherLessons;
 using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChitalishteIskra.Core.Services
@@ -62,7 +57,7 @@ namespace ChitalishteIskra.Core.Services
                     .Select(l => new TeacherLessonOptionDto
                     {
                         Value = l.Id.ToString(),
-                        Text = $"{l.Name} ({l.TypeName})"
+                        Text = l.Name
                     })
                     .ToList()
             };

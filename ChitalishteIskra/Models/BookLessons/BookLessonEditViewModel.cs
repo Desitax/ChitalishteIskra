@@ -1,5 +1,4 @@
-﻿    using ChitalishteIskra.Models.User;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChitalishteIskra.Models.BookLessons
@@ -26,7 +25,10 @@ namespace ChitalishteIskra.Models.BookLessons
         [Required(ErrorMessage = "Изберете урок")]
         public Guid LessonId { get; set; }
 
+        public Guid? GroupId { get; set; }
+
         public IEnumerable<SelectListItem> Teachers { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Lessons { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> Groups { get; set; } = new List<SelectListItem>();
     }
 }

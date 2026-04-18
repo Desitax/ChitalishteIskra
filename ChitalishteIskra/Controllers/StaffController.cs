@@ -8,7 +8,6 @@ namespace ChitalishteIskra.Controllers
         public IActionResult Babsbg() => View();
         public IActionResult Iskritsa() => View();
         public IActionResult Sevtopolis() => View();
-        public IActionResult Ekarte() => View();
         public IActionResult PetkoStainov() => View();
         public IActionResult DetskaTeatralna() => View();
         public IActionResult MladejkaTeatralna() => View();

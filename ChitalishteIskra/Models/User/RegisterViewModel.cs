@@ -12,7 +12,6 @@ namespace ChitalishteIskra.Models
         [Required]
         [EmailAddress]
         [StringLength(60, MinimumLength = 10)]
-
         public string Email { get; set; } = null!;
 
         [Required]
@@ -22,11 +21,10 @@ namespace ChitalishteIskra.Models
 
         [Compare(nameof(Password))]
         [DataType(DataType.Password)]
-
         public string ConfirmPassword { get; set; } = null!;
 
-        public ParentInfoRegisterViewModel ParentInfo { get; set; }
+        public ParentInfoRegisterViewModel ParentInfo { get; set; } = new ParentInfoRegisterViewModel();
 
-        public StudentInfoRegisterViewModel ChildInfo { get; set; }
+        public StudentInfoRegisterViewModel ChildInfo { get; set; } = new StudentInfoRegisterViewModel();
     }
 }

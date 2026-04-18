@@ -237,7 +237,39 @@ namespace ChitalishteIskra.Controllers
 
                         "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776379240/w4gmridxq8o9rhhtnabp.jpg"
                     }
-                }
+                },
+                new GalleryDetailsViewModel
+                {
+                    Slug = "zeh-ta-radke-zeh-ta",
+                    Title = "„Зех тъ, Радке, Зех тъ”",
+                    CoverImageUrl = "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462602/xby4nilg3eufik2ukoqu.jpg",
+                    ImageUrls = new List<string>
+                    {
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776458933/pid4b0hemj4anecpmzah.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462576/zzzh6cxvstmivoi6zfrb.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462602/xby4nilg3eufik2ukoqu.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462623/ib6fqjmr6zxs6fututbh.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462637/grp59jlppibbljm2wd6i.jpg",
+
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462662/kkwr0neijic7okmsfe4t.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462679/r6pe4pnzmcijidoknnf9.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462695/oxzxkkmbkuhvbuuad8yw.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462718/bqer5q48lggif8gutz76.jpg ",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462751/a7hjsfm39evsomtys8bn.jpg",
+
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462780/ab6xohdyp0vn5rkprqoa.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462804/xwvqvxyqzc3w7jxzwqub.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462821/rre75irgqdsjoak6pify.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462837/adtf8jejlrqbsz1v0kv8.jpg ",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462855/vocgthbqjgdrkajcdsie.jpg",
+
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462881/yh2c23hszokkcfgwkvby.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462900/q0yvkxpygnvrpuiw3nq6.jpg",
+
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462934/wjb69ra1zevmycye4txi.jpg",
+                        "https://res.cloudinary.com/dxloy3tkq/image/upload/v1776462950/x2iioiwpg3kps7pvuiyr.jpg"
+                    }
+                },
             };
         }
     }

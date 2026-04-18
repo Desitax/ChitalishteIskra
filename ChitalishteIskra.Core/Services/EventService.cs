@@ -3,12 +3,6 @@ using ChitalishteIskra.Core.DTOs.Events;
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Core.Services
 {
@@ -20,9 +14,12 @@ namespace ChitalishteIskra.Core.Services
         {
             this.context = context;
         }
+
         public async Task<IEnumerable<EventDto>> GetAllAsync()
         {
             return await context.Events
+                .OrderBy(e => e.Date)
+                .ThenBy(e => e.StartTime)
                 .Select(e => new EventDto
                 {
                     Id = e.Id,
@@ -30,7 +27,9 @@ namespace ChitalishteIskra.Core.Services
                     Date = e.Date,
                     StartTime = e.StartTime,
                     EndTime = e.EndTime,
-                    Location = e.Location
+                    Location = e.Location,
+                    Description = e.Description,
+                    ImageUrl = e.ImageUrl
                 })
                 .ToListAsync();
         }
@@ -44,20 +43,12 @@ namespace ChitalishteIskra.Core.Services
                 Date = model.Date,
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
-                Location = model.Location
+                Location = model.Location,
+                Description = model.Description,
+                ImageUrl = model.ImageUrl
             };
 
             await context.Events.AddAsync(entity);
-            //var users = await context.Users.ToListAsync();
-            //foreach(var user in users)
-            //{
-            //    var notification = new Notification
-            //    {
-            //        recipient = user.Id,
-            //        TextReader = "Event " + model.Name + " was created on " + model.Date + " at " + model.StartTime + <a href="/event/id"> </a>,
-            //        Checked = false,
-            //    };
-            //}
             await context.SaveChangesAsync();
         }
 
@@ -72,7 +63,9 @@ namespace ChitalishteIskra.Core.Services
                     Date = e.Date,
                     StartTime = e.StartTime,
                     EndTime = e.EndTime,
-                    Location = e.Location
+                    Location = e.Location,
+                    Description = e.Description,
+                    ImageUrl = e.ImageUrl
                 })
                 .FirstOrDefaultAsync();
         }
@@ -91,6 +84,8 @@ namespace ChitalishteIskra.Core.Services
             entity.StartTime = model.StartTime;
             entity.EndTime = model.EndTime;
             entity.Location = model.Location;
+            entity.Description = model.Description;
+            entity.ImageUrl = model.ImageUrl;
 
             await context.SaveChangesAsync();
         }
