@@ -24,8 +24,11 @@
         <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
             <div class="container-fluid">
 
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
-                    НЧ „Искра - 1860“
+                <a class="navbar-brand site-brand" asp-controller="Home" asp-action="Index">
+                    <img src="https://res.cloudinary.com/dxloy3tkq/image/upload/v1776552112/cf2trljhgtoleyc5ajxr.png"
+                         alt="НЧ Искра-1860"
+                         class="site-brand-logo" />
+                    <span class="site-brand-text">НЧ „Искра - 1860“</span>
                 </a>
 
                 <button class="navbar-toggler"
@@ -43,7 +46,7 @@
                     <ul class="navbar-nav me-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Начало</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">За нас</a>
                         </li>
 
                         <li class="nav-item dropdown">
@@ -69,7 +72,6 @@
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="Babsbg">Бабсбг</a></li>
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="Iskritsa">ВС „Искрица”</a></li>
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="Sevtopolis">ВС „Севтополис”</a></li>
-                                <li><a class="dropdown-item" asp-controller="Staff" asp-action="Ekarte">Студио за модерен балет „Екарте”</a></li>
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="PetkoStainov">СХ „Петко Стайнов”</a></li>
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="DetskaTeatralna">Детска театрална школа</a></li>
                                 <li><a class="dropdown-item" asp-controller="Staff" asp-action="MladejkaTeatralna">Младежка театрална студия</a></li>
@@ -87,7 +89,7 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Функционалности
+                                    Управление
                                 </a>
                                 <ul class="dropdown-menu">
 
@@ -219,10 +221,6 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="News" asp-action="Index">Актуално</a>
-                        </li>
-
-                        <li class="nav-item">
                             <a class="nav-link" asp-controller="Gallery" asp-action="Index">Галерия</a>
                         </li>
 
@@ -274,7 +272,7 @@
                     <ul class="footer-links">
                         <li>
                             <a asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house-door-fill me-2"></i>Начало
+                                <i class="bi bi-house-door-fill me-2"></i>За нас
                             </a>
                         </li>
 
@@ -322,7 +320,6 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

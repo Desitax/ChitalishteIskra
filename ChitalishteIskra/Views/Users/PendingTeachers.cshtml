@@ -1,13 +1,11 @@
 ﻿@using ChitalishteIskra.Data.Entities
 @model IEnumerable<User>
 
-@* <h2>Pending Teacher Requests</h2> *@
-
 @{
-    ViewData["Title"] = "Регистрация на учител";
+    ViewData["Title"] = "Заявки за учители";
 }
 
-<h2>Регистрация на учител</h2>
+<h2>Заявки за учители</h2>
 
 @if (!Model.Any())
 {
@@ -21,8 +19,8 @@ else
                 <th>Име</th>
                 <th>Имейл</th>
                 <th>Години</th>
-                <th>Заявен</th>
-                <th>Приет</th>
+                <th>Заявка</th>
+                <th>Одобрен</th>
                 <th>Действия</th>
             </tr>
         </thead>
@@ -33,11 +31,18 @@ else
                     <td>@teacher.FirstName @teacher.LastName</td>
                     <td>@teacher.Email</td>
                     <td>@teacher.Age</td>
-                    <td>@teacher.IsTeacherRequest</td>
-                    <td>@teacher.IsApprovedTeacher</td>
-                    <td>
+                    <td>@(teacher.IsTeacherRequest ? "Да" : "Не")</td>
+                    <td>@(teacher.IsApprovedTeacher ? "Да" : "Не")</td>
+                    <td class="d-flex gap-2">
                         <form asp-action="ApproveTeacher" asp-route-id="@teacher.Id" method="post">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-success btn-sm">Одобряване</button>
+                        </form>
+
+                        <form asp-action="RemoveTeacherRequest" asp-route-id="@teacher.Id" method="post"
+                              onsubmit="return confirm('Сигурни ли сте, че искате да премахнете тази заявка?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">Премахване</button>
                         </form>
                     </td>
                 </tr>
@@ -45,4 +50,3 @@ else
         </tbody>
     </table>
 }
-

@@ -50,6 +50,16 @@ namespace ChitalishteIskra.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterStudent(RegisterViewModel model)
         {
+            bool hasParentInfo =
+                !string.IsNullOrWhiteSpace(model.ParentInfo.FirstName) &&
+                !string.IsNullOrWhiteSpace(model.ParentInfo.LastName) &&
+                model.ParentInfo.Age.HasValue;
+
+            if (model.ChildInfo.Age < 8 && !hasParentInfo)
+            {
+                ModelState.AddModelError(string.Empty, "Трябва да се регистрирате с родител.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -61,11 +71,6 @@ namespace ChitalishteIskra.Controllers
                 LastName = model.ChildInfo.LastName,
                 Age = model.ChildInfo.Age
             };
-
-            bool hasParentInfo =
-                !string.IsNullOrWhiteSpace(model.ParentInfo.FirstName) &&
-                !string.IsNullOrWhiteSpace(model.ParentInfo.LastName) &&
-                model.ParentInfo.Age.HasValue;
 
             if (hasParentInfo)
             {
@@ -146,6 +151,7 @@ namespace ChitalishteIskra.Controllers
             });
         }
 
+        [HttpGet]
         public IActionResult Login(string? username, string? password)
         {
             var model = new LoginViewModel();
@@ -177,7 +183,7 @@ namespace ChitalishteIskra.Controllers
             {
                 if (user.IsTeacherRequest == true && user.IsApprovedTeacher == false)
                 {
-                    ModelState.AddModelError(string.Empty, "Teacher not approved, contact admin to continue");
+                    ModelState.AddModelError(string.Empty, "Профилът на учителя все още не е одобрен. Свържете се с администратор.");
                     return View(model);
                 }
 
@@ -193,7 +199,7 @@ namespace ChitalishteIskra.Controllers
                 }
             }
 
-            ModelState.AddModelError(string.Empty, "Invalid login");
+            ModelState.AddModelError(string.Empty, "Невалидно потребителско име или парола.");
             return View(model);
         }
 
@@ -278,6 +284,7 @@ namespace ChitalishteIskra.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveTeacher(Guid id)
         {
             var user = await userManager.FindByIdAsync(id.ToString());
@@ -295,6 +302,31 @@ namespace ChitalishteIskra.Controllers
             if (!await userManager.IsInRoleAsync(user, "Teacher"))
             {
                 await userManager.AddToRoleAsync(user, "Teacher");
+            }
+
+            return RedirectToAction(nameof(PendingTeachers));
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveTeacherRequest(Guid id)
+        {
+            var user = await userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.IsTeacherRequest = false;
+            user.IsApprovedTeacher = false;
+
+            await userManager.UpdateAsync(user);
+
+            if (await userManager.IsInRoleAsync(user, "Teacher"))
+            {
+                await userManager.RemoveFromRoleAsync(user, "Teacher");
             }
 
             return RedirectToAction(nameof(PendingTeachers));
