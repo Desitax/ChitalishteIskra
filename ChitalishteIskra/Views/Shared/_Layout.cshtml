@@ -87,133 +87,135 @@
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Управление
-                                </a>
-                                <ul class="dropdown-menu">
+                            var isAdmin = User.IsInRole("Admin");
+                            var isTeacher = User.IsInRole("Teacher");
+                            var isStudent = User.IsInRole("Student");
 
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Users" asp-action="PendingTeachers">
-                                                Регистрация на учител
-                                            </a>
-                                        </li>
+                            if (isAdmin || isTeacher || isStudent)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Управление
+                                    </a>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Image" asp-action="Upload">
-                                                Качи снимка
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Contact" asp-action="Messages">
-                                                Съобщения
-                                            </a>
-                                        </li>
+                                    <ul class="dropdown-menu">
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Image" asp-action="UploadFile">
-                                                Качи документ
-                                            </a>
-                                        </li>
+                                        @if (isAdmin)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Users" asp-action="PendingTeachers">
+                                                    Регистрации на учители
+                                                </a>
+                                            </li>
 
-                                        <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Image" asp-action="Upload">
+                                                    Качи снимка
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Lessons" asp-action="Index">
-                                                Предмети
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Contact" asp-action="Messages">
+                                                    Съобщения
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="TeacherLessons" asp-action="Index">
-                                                Назначаване на предмет
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Image" asp-action="UploadFile">
+                                                    Качи документ
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
-                                                Запазени уроци
-                                            </a>
-                                        </li>
+                                            <li><hr class="dropdown-divider"></li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Events" asp-action="Create">
-                                                Добави събитие
-                                            </a>
-                                        </li>
-                                    }
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Lessons" asp-action="Index">
+                                                    Предмети
+                                                </a>
+                                            </li>
 
-                                    @if (User.IsInRole("Teacher"))
-                                    {
-                                        <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="TeacherLessons" asp-action="Index">
+                                                    Назначаване на предмет
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Lessons" asp-action="Index">
-                                                Създаване на предмети
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
+                                                    Запазени уроци
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Groups" asp-action="Index">
-                                                Възрастови групи
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Events" asp-action="Create">
+                                                    Добави събитие
+                                                </a>
+                                            </li>
+                                        }
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="TeacherAvailabilities" asp-action="Index">
-                                                Свободни часове
-                                            </a>
-                                        </li>
+                                        @if (isTeacher)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Lessons" asp-action="Create">
+                                                    Добави предмет
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
-                                                Запазени уроци
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Groups" asp-action="Index">
+                                                    Възрастови групи
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="CreateGroup">
-                                                Създай групов урок
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="TeacherAvailabilities" asp-action="Index">
+                                                    Работно време
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Events" asp-action="Create">
-                                                Добави събитие
-                                            </a>
-                                        </li>
-                                    }
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
+                                                    Запазени уроци
+                                                </a>
+                                            </li>
 
-                                    @if (User.IsInRole("Student") || User.IsInRole("Parent"))
-                                    {
-                                        <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="BookLessons" asp-action="CreateGroup">
+                                                    Създай групов урок
+                                                </a>
+                                            </li>
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
-                                                Запазени уроци
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Events" asp-action="Create">
+                                                    Добави събитие
+                                                </a>
+                                            </li>
+                                        }
 
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="Create">
-                                                Запази индивидуален урок
-                                            </a>
-                                        </li>
-                                    }
+                                        @if (isStudent)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="BookLessons" asp-action="Index">
+                                                    Запазени уроци
+                                                </a>
+                                            </li>
 
-                                    @if (User.IsInRole("Student"))
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="BookLessons" asp-action="GroupInvitations">
-                                                Моите групови покани
-                                            </a>
-                                        </li>
-                                    }
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="BookLessons" asp-action="Create">
+                                                    Запази индивидуален урок
+                                                </a>
+                                            </li>
 
-                                </ul>
-                            </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="BookLessons" asp-action="GroupInvitations">
+                                                    Моите групови покани
+                                                </a>
+                                            </li>
+                                        }
+
+                                    </ul>
+                                </li>
+                            }
                         }
 
                         <li class="nav-item">

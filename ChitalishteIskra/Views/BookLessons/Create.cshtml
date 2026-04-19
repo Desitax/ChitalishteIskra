@@ -15,7 +15,7 @@
 
     <div class="mb-3">
         <label asp-for="Date" class="form-label">Дата</label>
-        <input asp-for="Date" type="date" class="form-control" id="dateInput" />
+        <input asp-for="Date" type="date" class="form-control" id="dateInput" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
         <span asp-validation-for="Date" class="text-danger"></span>
     </div>
 
@@ -85,6 +85,11 @@
                         option.text = item.text;
                         lessonSelect.appendChild(option);
                     });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.text = 'Няма налични индивидуални предмети';
+                    lessonSelect.appendChild(option);
                 }
 
                 if (data.availableSlots && data.availableSlots.length > 0) {

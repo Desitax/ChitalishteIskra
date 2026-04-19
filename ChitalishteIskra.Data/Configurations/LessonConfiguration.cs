@@ -18,14 +18,12 @@ namespace ChitalishteIskra.Data.Configurations
                 {
                     Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                     Name = "Урок по танци",
-                    TypeName = Lesson.LessonTypeName.Individual,
                     IsDeleted = false
                 },
                 new Lesson
                 {
                     Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                     Name = "Групов урок по танци",
-                    TypeName = Lesson.LessonTypeName.Group,
                     IsDeleted = false
                 }
             );

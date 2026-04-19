@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChitalishteIskra.Data.Migrations
 {
     [DbContext(typeof(ChitalishteIskraDbContext))]
-    [Migration("20260418181902_Initial")]
+    [Migration("20260419134547_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -221,9 +221,6 @@ namespace ChitalishteIskra.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("TypeName")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Lessons");
@@ -233,15 +230,13 @@ namespace ChitalishteIskra.Data.Migrations
                         {
                             Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                             IsDeleted = false,
-                            Name = "Урок по танци",
-                            TypeName = 0
+                            Name = "Урок по танци"
                         },
                         new
                         {
                             Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                             IsDeleted = false,
-                            Name = "Групов урок по танци",
-                            TypeName = 1
+                            Name = "Групов урок по танци"
                         });
                 });
 
@@ -278,7 +273,7 @@ namespace ChitalishteIskra.Data.Migrations
                         {
                             Id = new Guid("61154f0c-8726-4dee-96a9-0c7c37916a41"),
                             DayOfWeek = 1,
-                            EndTime = new TimeOnly(12, 0, 0),
+                            EndTime = new TimeOnly(17, 0, 0),
                             IsAvailable = true,
                             StartTime = new TimeOnly(9, 0, 0),
                             TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
@@ -289,7 +284,34 @@ namespace ChitalishteIskra.Data.Migrations
                             DayOfWeek = 2,
                             EndTime = new TimeOnly(17, 0, 0),
                             IsAvailable = true,
-                            StartTime = new TimeOnly(13, 0, 0),
+                            StartTime = new TimeOnly(9, 0, 0),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        },
+                        new
+                        {
+                            Id = new Guid("b2222222-2222-2222-2222-222222222222"),
+                            DayOfWeek = 3,
+                            EndTime = new TimeOnly(17, 0, 0),
+                            IsAvailable = true,
+                            StartTime = new TimeOnly(9, 0, 0),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        },
+                        new
+                        {
+                            Id = new Guid("c3333333-3333-3333-3333-333333333333"),
+                            DayOfWeek = 4,
+                            EndTime = new TimeOnly(17, 0, 0),
+                            IsAvailable = true,
+                            StartTime = new TimeOnly(9, 0, 0),
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                        },
+                        new
+                        {
+                            Id = new Guid("d4444444-4444-4444-4444-444444444444"),
+                            DayOfWeek = 5,
+                            EndTime = new TimeOnly(17, 0, 0),
+                            IsAvailable = true,
+                            StartTime = new TimeOnly(9, 0, 0),
                             TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
                         });
                 });
@@ -328,6 +350,9 @@ namespace ChitalishteIskra.Data.Migrations
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("TypeName")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");
@@ -342,13 +367,15 @@ namespace ChitalishteIskra.Data.Migrations
                         {
                             Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                             LessonId = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                            TypeName = 0
                         },
                         new
                         {
                             Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                             LessonId = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
-                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7")
+                            TeacherId = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
+                            TypeName = 1
                         });
                 });
 
@@ -442,7 +469,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             AccessFailedCount = 0,
                             Age = 30,
-                            ConcurrencyStamp = "31fbb238-6c58-40e4-a9bd-f5cf0749eab9",
+                            ConcurrencyStamp = "c725dcc2-f16c-4e62-9082-02db3661ae28",
                             Email = "admin@admin.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -452,9 +479,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ2m0NX3KHcRovHo4+Q2K71VhtyOkzyyFGlsM9qXjHQ1C6z6YlzQN18OY0VMdDATdw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEArZpwcJgaJGn3ko8htgzqFoDNqv6vrQMppq8EGPltb6sM2Y5LFO1yvxoagKqXXrEw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "29c30478-658e-40e9-9456-da9d6a1b45c5",
+                            SecurityStamp = "ed68b1ae-55db-41dc-a838-26edadddaf9e",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
@@ -463,7 +490,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
                             AccessFailedCount = 0,
                             Age = 35,
-                            ConcurrencyStamp = "e599eaf0-7c6e-4c2c-af46-07c242784ba9",
+                            ConcurrencyStamp = "2a808837-cbc0-419e-a1cb-3a9370b7e46c",
                             Email = "teacher@teacher.com",
                             EmailConfirmed = true,
                             FirstName = "Ivan",
@@ -473,9 +500,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "TEACHER@TEACHER.COM",
                             NormalizedUserName = "TEACHER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL4xQYD7cJn72f9HqkuRZYw1VI7V/zG6FW+AkgdugifZD4kGqMj01qZhEvs+DVPW3A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECiwrSuRjv+u1fgQVXoIRm0geaEFtLc9PnyK5qjkoprglkg4tCgLDRYglLHp/4iCiQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "eff82770-2ea7-44e2-a130-8aff68f6e642",
+                            SecurityStamp = "50a468ac-57ba-4251-afce-46f57ae8299a",
                             TwoFactorEnabled = false,
                             UserName = "teacher"
                         },
@@ -484,7 +511,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             AccessFailedCount = 0,
                             Age = 18,
-                            ConcurrencyStamp = "12a88a0e-e0d0-43af-822e-6a437b0a490e",
+                            ConcurrencyStamp = "dda2eca7-b18a-45d4-a736-4f61e934c33c",
                             Email = "student@student.com",
                             EmailConfirmed = true,
                             FirstName = "Petko",
@@ -494,9 +521,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "STUDENT@STUDENT.COM",
                             NormalizedUserName = "STUDENT",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPLccMam534dP7MjFx+jz99vAYdEt+iLcx52V2b2YenXGPP01WhDQBSAcrkaLwZyaQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEI3c27qxpRjvrV2G6YvqROh3n+1LM4CejXCsYV36dFx4wtdciMt/OEur6sOL/Ct/Ew==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "315ec0d9-9e37-41f0-9d25-bb593928fec9",
+                            SecurityStamp = "0c4735a3-ff0a-4d6b-8890-f8de9704ad9c",
                             TwoFactorEnabled = false,
                             UserName = "student"
                         },
@@ -505,7 +532,7 @@ namespace ChitalishteIskra.Data.Migrations
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             AccessFailedCount = 0,
                             Age = 40,
-                            ConcurrencyStamp = "3c5acdff-f037-4336-b84d-47f48becf969",
+                            ConcurrencyStamp = "36ae525f-7436-4236-9063-0576ba4602f2",
                             Email = "parent@parent.com",
                             EmailConfirmed = true,
                             FirstName = "Maria",
@@ -515,9 +542,9 @@ namespace ChitalishteIskra.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "PARENT@PARENT.COM",
                             NormalizedUserName = "PARENT",
-                            PasswordHash = "AQAAAAIAAYagAAAAECjNQVhXBfeKB24BBJQi46+E7aN20DZYtbAvaModYVvjv3YcBNyBdAAfi5Yaxbj8ag==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK4fBH1VhXhbhvupgUdA5sdsTaUnQ4ZarjQtNOuKbFmBL2HdXFlAUCNJEBf9Eddodw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "41d2c5e7-33b5-4597-9510-4b09a3f3484d",
+                            SecurityStamp = "423776a1-9ddb-424b-9cc5-6d9567cbf6e0",
                             TwoFactorEnabled = false,
                             UserName = "parent"
                         });
@@ -771,13 +798,13 @@ namespace ChitalishteIskra.Data.Migrations
                     b.HasOne("ChitalishteIskra.Data.Entities.Lesson", "Lesson")
                         .WithMany("TeacherLessons")
                         .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ChitalishteIskra.Data.Entities.User", "Teacher")
                         .WithMany("TeacherLessons")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Lesson");

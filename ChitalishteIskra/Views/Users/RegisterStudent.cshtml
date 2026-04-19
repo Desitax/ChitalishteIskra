@@ -1,7 +1,7 @@
 ﻿@model ChitalishteIskra.Models.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Регистрация";
+    ViewData["Title"] = "Регистрация на ученик";
 }
 
 <h1 class="text-center">@ViewData["Title"]</h1>
@@ -20,7 +20,7 @@
 
             <div class="text-center mb-3">
                 <label asp-for="Email">Имейл</label>
-                <input class="form-control" autocomplete="username" aria-required="true" asp-for="Email" />
+                <input class="form-control" autocomplete="email" aria-required="true" asp-for="Email" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
@@ -38,74 +38,31 @@
 
             <hr />
 
-            <div id="childInfoSection">
-                <h4 class="text-center">Child Info</h4>
-                <div class="mb-3">
-                    <label asp-for="ChildInfo.FirstName">Име</label>
-                    <input class="form-control" asp-for="ChildInfo.FirstName" />
-                    <span asp-validation-for="ChildInfo.FirstName" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="ChildInfo.LastName">Фамилия</label>
-                    <input class="form-control" asp-for="ChildInfo.LastName" />
-                    <span asp-validation-for="ChildInfo.LastName" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="ChildInfo.Age">Години</label>
-                    <input class="form-control" asp-for="ChildInfo.Age" type="number" />
-                    <span asp-validation-for="ChildInfo.Age" class="text-danger"></span>
-                </div>
+            <div class="mb-3">
+                <label asp-for="FirstName">Име</label>
+                <input class="form-control" asp-for="FirstName" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
 
-            <div id="parentInfoSection" style="display:none;">
-                <hr />
-                <h4 class="text-center">Parent Info</h4>
-                <div class="mb-3">
-                    <label asp-for="ParentInfo.FirstName">Име на родител</label>
-                    <input class="form-control" asp-for="ParentInfo.FirstName" />
-                    <span asp-validation-for="ParentInfo.FirstName" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="ParentInfo.LastName">Фамилия на родител</label>
-                    <input class="form-control" asp-for="ParentInfo.LastName" />
-                    <span asp-validation-for="ParentInfo.LastName" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="ParentInfo.Age">Години на родител</label>
-                    <input class="form-control" asp-for="ParentInfo.Age" type="number" />
-                    <span asp-validation-for="ParentInfo.Age" class="text-danger"></span>
-                </div>
+            <div class="mb-3">
+                <label asp-for="LastName">Фамилия</label>
+                <input class="form-control" asp-for="LastName" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
 
-            <div class="text-center mb-4">
-                <button type="button" class="btn btn-outline-primary me-2" id="singleChildBtn">Регистриране на ученик</button>
-                <button type="button" class="btn btn-outline-secondary" id="childWithParentBtn">Регистриране на ученик с родител</button>
+            <div class="mb-3">
+                <label asp-for="Age">Години</label>
+                <input class="form-control" asp-for="Age" type="number" />
+                <span asp-validation-for="Age" class="text-danger"></span>
             </div>
 
             <div class="text-center mt-3">
                 <button id="registerSubmit" type="submit" class="btn btn-primary">Регистрирай се</button>
             </div>
-        </form>                             
+        </form>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        const singleChildBtn = document.getElementById('singleChildBtn');
-        const childWithParentBtn = document.getElementById('childWithParentBtn');
-        const parentInfoSection = document.getElementById('parentInfoSection');
-
-        singleChildBtn.addEventListener('click', () => {
-            parentInfoSection.style.display = 'none';
-        });
-
-        childWithParentBtn.addEventListener('click', () => {
-            parentInfoSection.style.display = 'block';
-        });
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 }
-

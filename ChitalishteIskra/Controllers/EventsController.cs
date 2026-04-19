@@ -248,11 +248,11 @@ namespace ChitalishteIskra.Controllers
 
             var teachers = await userManager.GetUsersInRoleAsync("Teacher");
             var students = await userManager.GetUsersInRoleAsync("Student");
-            var parents = await userManager.GetUsersInRoleAsync("Parent");
+            var admins = await userManager.GetUsersInRoleAsync("Admin");
 
             var recipients = teachers
                 .Concat(students)
-                .Concat(parents)
+                .Concat(admins)
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
                 .GroupBy(u => u.Id)
                 .Select(g => g.First())

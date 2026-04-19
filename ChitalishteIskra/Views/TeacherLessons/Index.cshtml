@@ -2,6 +2,11 @@
 
 <h2>Учители и предмети</h2>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
 <p>
     <a asp-action="Create" class="btn btn-primary">Назначи предмет</a>
 </p>
@@ -11,6 +16,7 @@
         <tr>
             <th>Учител</th>
             <th>Предмет</th>
+            <th>Тип</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +25,11 @@
             <tr>
                 <td>@item.TeacherName</td>
                 <td>@item.LessonName</td>
+                <td>
+                    @(item.LessonType == "Individual" ? "Индивидуален" :
+                        item.LessonType == "Group" ? "Групов" :
+                        item.LessonType)
+                </td>
             </tr>
         }
     </tbody>

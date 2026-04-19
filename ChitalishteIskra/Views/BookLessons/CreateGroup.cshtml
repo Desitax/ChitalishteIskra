@@ -1,7 +1,7 @@
 ﻿@using ChitalishteIskra.Models.BookLessons
 @model BookLessonCreateGroupViewModel
 
-<h2 class="mb-3">Добави групов урок</h2>
+<h2 class="mb-3">Създай групово занятие</h2>
 
 <form asp-action="CreateGroup" method="post">
     @Html.AntiForgeryToken()
@@ -30,9 +30,9 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="LessonId" class="form-label">Урок</label>
+        <label asp-for="LessonId" class="form-label">Предмет</label>
         <select asp-for="LessonId" asp-items="Model.Lessons" class="form-control">
-            <option value="">Избери групов урок</option>
+            <option value="">Избери предмет</option>
         </select>
         <span asp-validation-for="LessonId" class="text-danger"></span>
     </div>
@@ -46,7 +46,7 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Изпрати покана на деца</label>
+        <label class="form-label">Изпрати покана на ученици</label>
 
         <div class="student-list form-control p-0" style="max-height:260px; overflow-y:auto;">
             @if (Model.Students != null && Model.Students.Any())

@@ -2,23 +2,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Data
-
 {
     public class ChitalishteIskraDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public ChitalishteIskraDbContext(DbContextOptions<ChitalishteIskraDbContext> options)
-        : base(options)
+            : base(options)
         {
         }
-
 
         public DbSet<TeacherAvailability> TeacherAvailabilities { get; set; } = null!;
         public DbSet<TeacherEvent> TeacherEvents { get; set; } = null!;
@@ -30,9 +23,11 @@ namespace ChitalishteIskra.Data
         public DbSet<TeacherLesson> TeacherLessons { get; set; } = null!;
         public DbSet<GroupLessonResponse> GroupLessonResponses { get; set; } = null!;
         public DbSet<ContactMessage> ContactMessages { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             builder.Entity<BookLesson>()
@@ -89,6 +84,18 @@ namespace ChitalishteIskra.Data
                 .HasForeignKey(gs => gs.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<TeacherLesson>()
+                .HasOne(tl => tl.Teacher)
+                .WithMany(t => t.TeacherLessons)
+                .HasForeignKey(tl => tl.TeacherId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<TeacherLesson>()
+                .HasOne(tl => tl.Lesson)
+                .WithMany(l => l.TeacherLessons)
+                .HasForeignKey(tl => tl.LessonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<TeacherEvent>()
                 .HasIndex(x => new { x.TeacherId, x.EventId })
                 .IsUnique();
@@ -103,6 +110,10 @@ namespace ChitalishteIskra.Data
 
             builder.Entity<BookLesson>()
                 .HasIndex(x => new { x.TeacherId, x.Date, x.StartTime, x.EndTime })
+                .IsUnique();
+
+            builder.Entity<TeacherLesson>()
+                .HasIndex(x => new { x.TeacherId, x.LessonId })
                 .IsUnique();
 
             builder.Entity<Group>()
@@ -134,19 +145,6 @@ namespace ChitalishteIskra.Data
                 .Property(u => u.LastName)
                 .HasMaxLength(50)
                 .IsRequired();
-
-            builder.Entity<TeacherLesson>()
-              .HasOne(tl => tl.Teacher)
-              .WithMany(t => t.TeacherLessons)
-              .HasForeignKey(tl => tl.TeacherId)
-              .OnDelete(DeleteBehavior.NoAction);
-
-            builder.Entity<TeacherLesson>()
-                .HasOne(tl => tl.Lesson)
-                .WithMany(l => l.TeacherLessons)
-                .HasForeignKey(tl => tl.LessonId)
-                .OnDelete(DeleteBehavior.NoAction);
         }
-
     }
 }

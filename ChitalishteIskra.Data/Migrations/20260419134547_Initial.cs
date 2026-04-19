@@ -98,7 +98,6 @@ namespace ChitalishteIskra.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    TypeName = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -284,7 +283,8 @@ namespace ChitalishteIskra.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TeacherId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TypeName = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -293,12 +293,14 @@ namespace ChitalishteIskra.Data.Migrations
                         name: "FK_TeacherLessons_AspNetUsers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TeacherLessons_Lessons_LessonId",
                         column: x => x.LessonId,
                         principalTable: "Lessons",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -400,19 +402,19 @@ namespace ChitalishteIskra.Data.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Age", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "IsApprovedTeacher", "IsTeacherRequest", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, 30, "31fbb238-6c58-40e4-a9bd-f5cf0749eab9", "admin@admin.com", true, "Admin", false, false, "Adminov", false, null, "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEJ2m0NX3KHcRovHo4+Q2K71VhtyOkzyyFGlsM9qXjHQ1C6z6YlzQN18OY0VMdDATdw==", null, false, "29c30478-658e-40e9-9456-da9d6a1b45c5", false, "admin" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, 18, "12a88a0e-e0d0-43af-822e-6a437b0a490e", "student@student.com", true, "Petko", false, false, "Petkov", false, null, "STUDENT@STUDENT.COM", "STUDENT", "AQAAAAIAAYagAAAAEPLccMam534dP7MjFx+jz99vAYdEt+iLcx52V2b2YenXGPP01WhDQBSAcrkaLwZyaQ==", null, false, "315ec0d9-9e37-41f0-9d25-bb593928fec9", false, "student" },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), 0, 40, "3c5acdff-f037-4336-b84d-47f48becf969", "parent@parent.com", true, "Maria", false, false, "Petrova", false, null, "PARENT@PARENT.COM", "PARENT", "AQAAAAIAAYagAAAAECjNQVhXBfeKB24BBJQi46+E7aN20DZYtbAvaModYVvjv3YcBNyBdAAfi5Yaxbj8ag==", null, false, "41d2c5e7-33b5-4597-9510-4b09a3f3484d", false, "parent" },
-                    { new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 0, 35, "e599eaf0-7c6e-4c2c-af46-07c242784ba9", "teacher@teacher.com", true, "Ivan", true, false, "Ivanov", false, null, "TEACHER@TEACHER.COM", "TEACHER", "AQAAAAIAAYagAAAAEL4xQYD7cJn72f9HqkuRZYw1VI7V/zG6FW+AkgdugifZD4kGqMj01qZhEvs+DVPW3A==", null, false, "eff82770-2ea7-44e2-a130-8aff68f6e642", false, "teacher" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), 0, 30, "c725dcc2-f16c-4e62-9082-02db3661ae28", "admin@admin.com", true, "Admin", false, false, "Adminov", false, null, "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAIAAYagAAAAEArZpwcJgaJGn3ko8htgzqFoDNqv6vrQMppq8EGPltb6sM2Y5LFO1yvxoagKqXXrEw==", null, false, "ed68b1ae-55db-41dc-a838-26edadddaf9e", false, "admin" },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), 0, 18, "dda2eca7-b18a-45d4-a736-4f61e934c33c", "student@student.com", true, "Petko", false, false, "Petkov", false, null, "STUDENT@STUDENT.COM", "STUDENT", "AQAAAAIAAYagAAAAEI3c27qxpRjvrV2G6YvqROh3n+1LM4CejXCsYV36dFx4wtdciMt/OEur6sOL/Ct/Ew==", null, false, "0c4735a3-ff0a-4d6b-8890-f8de9704ad9c", false, "student" },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), 0, 40, "36ae525f-7436-4236-9063-0576ba4602f2", "parent@parent.com", true, "Maria", false, false, "Petrova", false, null, "PARENT@PARENT.COM", "PARENT", "AQAAAAIAAYagAAAAEK4fBH1VhXhbhvupgUdA5sdsTaUnQ4ZarjQtNOuKbFmBL2HdXFlAUCNJEBf9Eddodw==", null, false, "423776a1-9ddb-424b-9cc5-6d9567cbf6e0", false, "parent" },
+                    { new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 0, 35, "2a808837-cbc0-419e-a1cb-3a9370b7e46c", "teacher@teacher.com", true, "Ivan", true, false, "Ivanov", false, null, "TEACHER@TEACHER.COM", "TEACHER", "AQAAAAIAAYagAAAAECiwrSuRjv+u1fgQVXoIRm0geaEFtLc9PnyK5qjkoprglkg4tCgLDRYglLHp/4iCiQ==", null, false, "50a468ac-57ba-4251-afce-46f57ae8299a", false, "teacher" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Lessons",
-                columns: new[] { "Id", "IsDeleted", "Name", "TypeName" },
+                columns: new[] { "Id", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), false, "Урок по танци", 0 },
-                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), false, "Групов урок по танци", 1 }
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), false, "Урок по танци" },
+                    { new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), false, "Групов урок по танци" }
                 });
 
             migrationBuilder.InsertData(
@@ -420,17 +422,20 @@ namespace ChitalishteIskra.Data.Migrations
                 columns: new[] { "Id", "DayOfWeek", "EndTime", "IsAvailable", "StartTime", "TeacherId" },
                 values: new object[,]
                 {
-                    { new Guid("61154f0c-8726-4dee-96a9-0c7c37916a41"), 1, new TimeOnly(12, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
-                    { new Guid("a1111111-1111-1111-1111-111111111111"), 2, new TimeOnly(17, 0, 0), true, new TimeOnly(13, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") }
+                    { new Guid("61154f0c-8726-4dee-96a9-0c7c37916a41"), 1, new TimeOnly(17, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
+                    { new Guid("a1111111-1111-1111-1111-111111111111"), 2, new TimeOnly(17, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
+                    { new Guid("b2222222-2222-2222-2222-222222222222"), 3, new TimeOnly(17, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
+                    { new Guid("c3333333-3333-3333-3333-333333333333"), 4, new TimeOnly(17, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
+                    { new Guid("d4444444-4444-4444-4444-444444444444"), 5, new TimeOnly(17, 0, 0), true, new TimeOnly(9, 0, 0), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") }
                 });
 
             migrationBuilder.InsertData(
                 table: "TeacherLessons",
-                columns: new[] { "Id", "LessonId", "TeacherId" },
+                columns: new[] { "Id", "LessonId", "TeacherId", "TypeName" },
                 values: new object[,]
                 {
-                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") },
-                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7") }
+                    { new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"), new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 0 },
+                    { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new Guid("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"), 1 }
                 });
 
             migrationBuilder.CreateIndex(

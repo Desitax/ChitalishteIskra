@@ -30,7 +30,7 @@ namespace ChitalishteIskra.Controllers
             this.bookLessonService = bookLessonService;
         }
 
-        [Authorize(Roles = "Admin,Parent,Student,Teacher")]
+        [Authorize(Roles = "Admin,Student,Teacher")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -64,7 +64,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Student,Parent")]
+        [Authorize(Roles = "Student")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -83,7 +83,7 @@ namespace ChitalishteIskra.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "Student,Parent")]
+        [Authorize(Roles = "Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookLessonCreateViewModel model)
@@ -289,6 +289,7 @@ namespace ChitalishteIskra.Controllers
                .Include(b => b.Teacher)
                .Include(b => b.Group)
                .FirstOrDefaultAsync(b => b.Id == id);
+
             if (booking == null)
             {
                 return NotFound();
@@ -416,6 +417,7 @@ namespace ChitalishteIskra.Controllers
             booking.GroupId = model.GroupId;
 
             await context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Часът беше редактиран успешно.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -459,7 +461,7 @@ namespace ChitalishteIskra.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Student,Parent")]
+        [Authorize(Roles = "Student")]
         [HttpGet]
         public async Task<IActionResult> GetTeacherBookingData(Guid teacherId, DateOnly date)
         {
@@ -476,6 +478,7 @@ namespace ChitalishteIskra.Controllers
         private async Task PopulateCreateViewModelAsync(BookLessonCreateViewModel model)
         {
             var pageData = await bookLessonService.GetCreatePageDataAsync();
+
             model.Teachers = pageData.Teachers.Select(x => new SelectListItem
             {
                 Value = x.Value,
@@ -485,16 +488,19 @@ namespace ChitalishteIskra.Controllers
             if (model.TeacherId != Guid.Empty)
             {
                 var teacherData = await bookLessonService.GetTeacherBookingDataAsync(model.TeacherId, model.Date);
+
                 model.Lessons = teacherData.Lessons.Select(x => new SelectListItem
                 {
                     Value = x.Value,
                     Text = x.Text
                 });
+
                 model.AvailableSlots = teacherData.AvailableSlots.Select(x => new SelectListItem
                 {
                     Value = x.Value,
                     Text = x.Text
                 });
+
                 model.WorkingHours = teacherData.WorkingHours;
             }
         }
@@ -503,8 +509,8 @@ namespace ChitalishteIskra.Controllers
         {
             model.Lessons = await context.TeacherLessons
                 .Where(tl => tl.TeacherId == teacherId
-                          && tl.Lesson.TypeName == LessonTypeName.Group
-                          && !tl.Lesson.IsDeleted)
+                    && tl.TypeName == LessonTypeName.Group
+                    && !tl.Lesson.IsDeleted)
                 .Select(tl => new { tl.LessonId, tl.Lesson.Name })
                 .Distinct()
                 .Select(tl => new SelectListItem
@@ -524,11 +530,14 @@ namespace ChitalishteIskra.Controllers
                 .ToListAsync();
 
             var students = await userManager.GetUsersInRoleAsync("Student");
+
             model.Students = students
+                .OrderBy(s => s.FirstName)
+                .ThenBy(s => s.LastName)
                 .Select(s => new SelectListItem
                 {
                     Value = s.Id.ToString(),
-                    Text = s.FirstName + " " + s.LastName
+                    Text = $"{s.FirstName} {s.LastName} ({s.UserName})"
                 })
                 .ToList();
         }
@@ -545,22 +554,26 @@ namespace ChitalishteIskra.Controllers
                     ? new List<SelectListItem>()
                     : new List<SelectListItem>
                     {
-                new SelectListItem
-                {
-                    Value = teacher.Id.ToString(),
-                    Text = teacher.FirstName + " " + teacher.LastName
-                }
+                        new SelectListItem
+                        {
+                            Value = teacher.Id.ToString(),
+                            Text = teacher.FirstName + " " + teacher.LastName
+                        }
                     };
             }
             else
             {
-                model.Teachers = await context.Users
-                    .Select(u => new SelectListItem
+                var teacherIds = await userManager.GetUsersInRoleAsync("Teacher");
+
+                model.Teachers = teacherIds
+                    .OrderBy(t => t.FirstName)
+                    .ThenBy(t => t.LastName)
+                    .Select(t => new SelectListItem
                     {
-                        Value = u.Id.ToString(),
-                        Text = u.FirstName + " " + u.LastName
+                        Value = t.Id.ToString(),
+                        Text = t.FirstName + " " + t.LastName
                     })
-                    .ToListAsync();
+                    .ToList();
             }
 
             model.Lessons = await context.TeacherLessons
@@ -583,10 +596,10 @@ namespace ChitalishteIskra.Controllers
                 .ToListAsync();
         }
 
-
         private Task<Guid?> ResolveTeacherIdForGroupActionsAsync()
         {
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (string.IsNullOrWhiteSpace(currentUserId))
             {
                 return Task.FromResult<Guid?>(null);

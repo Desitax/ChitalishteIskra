@@ -8,8 +8,5 @@ namespace ChitalishteIskra.Models.Lessons
 
         [Required(ErrorMessage = "Въведи име на предмет")]
         public string Name { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Избери тип")]
-        public string TypeName { get; set; } = string.Empty;
     }
 }

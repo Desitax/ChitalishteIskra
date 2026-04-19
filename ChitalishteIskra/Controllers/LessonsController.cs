@@ -5,6 +5,7 @@ using ChitalishteIskra.Models.Lessons;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace ChitalishteIskra.Controllers
 {
@@ -21,7 +22,24 @@ namespace ChitalishteIskra.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var data = await lessonService.GetAllAsync();
+            IEnumerable<LessonDto> data;
+
+            if (User.IsInRole("Admin"))
+            {
+                data = await lessonService.GetAllAsync();
+            }
+            else
+            {
+                string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrWhiteSpace(currentUserIdString))
+                {
+                    return Unauthorized();
+                }
+
+                Guid currentUserId = Guid.Parse(currentUserIdString);
+                data = await lessonService.GetByTeacherIdAsync(currentUserId);
+            }
 
             var model = data.Select(l => new LessonIndexViewModel
             {
@@ -34,45 +52,126 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            PopulateLessonTypes();
-            return View();
+            var model = new LessonCreateViewModel();
+
+            if (User.IsInRole("Teacher"))
+            {
+                string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrWhiteSpace(currentUserIdString))
+                {
+                    return Unauthorized();
+                }
+
+                Guid currentUserId = Guid.Parse(currentUserIdString);
+                await PopulateAssignedLessonsAsync(model, currentUserId);
+                PopulateLessonTypes();
+            }
+
+            ViewBag.IsAdmin = User.IsInRole("Admin");
+            ViewBag.IsTeacher = User.IsInRole("Teacher");
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LessonCreateViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                PopulateLessonTypes();
-                return View(model);
-            }
+            ViewBag.IsAdmin = User.IsInRole("Admin");
+            ViewBag.IsTeacher = User.IsInRole("Teacher");
 
-            try
+            if (User.IsInRole("Admin"))
             {
-                var dto = new CreateLessonDto
+                if (string.IsNullOrWhiteSpace(model.Name))
                 {
-                    Name = model.Name,
-                    TypeName = model.TypeName
-                };
+                    ModelState.AddModelError(nameof(model.Name), "Въведи име на предмет");
+                }
 
-                await lessonService.CreateAsync(dto);
-                TempData["SuccessMessage"] = "Предметът беше добавен успешно.";
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                try
+                {
+                    await lessonService.CreateAsync(new CreateLessonDto
+                    {
+                        Name = model.Name
+                    });
+
+                    TempData["SuccessMessage"] = "Предметът беше добавен успешно.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (ArgumentException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                    return View(model);
+                }
             }
-            catch (ArgumentException ex)
+
+            if (User.IsInRole("Teacher"))
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                PopulateLessonTypes();
-                return View(model);
+                string? currentUserIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrWhiteSpace(currentUserIdString))
+                {
+                    return Unauthorized();
+                }
+
+                Guid currentUserId = Guid.Parse(currentUserIdString);
+
+                if (model.LessonId == Guid.Empty)
+                {
+                    ModelState.AddModelError(nameof(model.LessonId), "Избери предмет");
+                }
+
+                if (string.IsNullOrWhiteSpace(model.TypeName))
+                {
+                    ModelState.AddModelError(nameof(model.TypeName), "Избери тип");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    await PopulateAssignedLessonsAsync(model, currentUserId);
+                    PopulateLessonTypes();
+                    return View(model);
+                }
+
+                try
+                {
+                    await lessonService.CreateForTeacherAsync(new TeacherCreateLessonDto
+                    {
+                        TeacherId = currentUserId,
+                        LessonId = model.LessonId,
+                        TypeName = model.TypeName
+                    });
+
+                    TempData["SuccessMessage"] = "Типът на предмета беше запазен успешно.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (ArgumentException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                    await PopulateAssignedLessonsAsync(model, currentUserId);
+                    PopulateLessonTypes();
+                    return View(model);
+                }
             }
+
+            return Forbid();
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
             var data = await lessonService.GetByIdAsync(id);
 
             if (data == null)
@@ -80,13 +179,10 @@ namespace ChitalishteIskra.Controllers
                 return NotFound();
             }
 
-            PopulateLessonTypes();
-
             var model = new LessonEditViewModel
             {
                 Id = data.Id,
-                Name = data.Name,
-                TypeName = data.TypeName
+                Name = data.Name
             };
 
             return View(model);
@@ -96,28 +192,29 @@ namespace ChitalishteIskra.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(LessonEditViewModel model)
         {
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
-                PopulateLessonTypes();
                 return View(model);
             }
 
             try
             {
-                var dto = new CreateLessonDto
+                await lessonService.UpdateAsync(model.Id, new CreateLessonDto
                 {
-                    Name = model.Name,
-                    TypeName = model.TypeName
-                };
+                    Name = model.Name
+                });
 
-                await lessonService.UpdateAsync(model.Id, dto);
                 TempData["SuccessMessage"] = "Предметът беше редактиран успешно.";
                 return RedirectToAction(nameof(Index));
             }
             catch (ArgumentException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                PopulateLessonTypes();
                 return View(model);
             }
         }
@@ -126,6 +223,11 @@ namespace ChitalishteIskra.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
+            if (!User.IsInRole("Admin"))
+            {
+                return Forbid();
+            }
+
             try
             {
                 await lessonService.DeleteAsync(id);
@@ -154,6 +256,17 @@ namespace ChitalishteIskra.Controllers
                     Text = "Групов"
                 }
             };
+        }
+
+        private async Task PopulateAssignedLessonsAsync(LessonCreateViewModel model, Guid teacherId)
+        {
+            var assignedLessons = await lessonService.GetAssignedToTeacherAsync(teacherId);
+
+            model.Lessons = assignedLessons.Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Name
+            });
         }
     }
 }

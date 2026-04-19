@@ -7,7 +7,7 @@ namespace ChitalishteIskra.Data.Seed
     {
         public static async Task SeedRolesAsync(RoleManager<IdentityRole<Guid>> roleManager)
         {
-            string[] roles = { "Admin", "Teacher", "Parent", "Student" };
+            string[] roles = { "Admin", "Teacher", "Student" };
 
             foreach (var role in roles)
             {
@@ -27,7 +27,6 @@ namespace ChitalishteIskra.Data.Seed
             await AssignRole(userManager, "admin", "Admin");
             await AssignRole(userManager, "teacher", "Teacher");
             await AssignRole(userManager, "student", "Student");
-            await AssignRole(userManager, "parent", "Parent");
         }
 
         private static async Task AssignRole(

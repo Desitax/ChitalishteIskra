@@ -101,6 +101,8 @@ namespace ChitalishteIskra.Core.Services
             {
                 Teachers = teachers
                     .Where(t => t.IsApprovedTeacher)
+                    .OrderBy(t => t.FirstName)
+                    .ThenBy(t => t.LastName)
                     .Select(t => new BookLessonOptionDto
                     {
                         Value = t.Id.ToString(),
@@ -115,9 +117,10 @@ namespace ChitalishteIskra.Core.Services
             var dayOfWeek = date.ToDateTime(TimeOnly.MinValue).DayOfWeek;
 
             var lessons = await context.TeacherLessons
-                .Where(tl => tl.TeacherId == teacherId
-                          && tl.Lesson.TypeName == LessonTypeName.Individual
-                          && !tl.Lesson.IsDeleted)
+                .Where(tl =>
+                    tl.TeacherId == teacherId &&
+                    tl.TypeName == LessonTypeName.Individual &&
+                    !tl.Lesson.IsDeleted)
                 .Select(tl => new { tl.LessonId, tl.Lesson.Name })
                 .Distinct()
                 .Select(tl => new BookLessonOptionDto
@@ -190,20 +193,23 @@ namespace ChitalishteIskra.Core.Services
 
         public async Task CreateAsync(CreateBookLessonDto model)
         {
-            var lesson = await context.Lessons
-                .FirstOrDefaultAsync(l => l.Id == model.LessonId && !l.IsDeleted);
+            var teacherLesson = await context.TeacherLessons
+                .Include(tl => tl.Lesson)
+                .FirstOrDefaultAsync(tl =>
+                    tl.TeacherId == model.TeacherId &&
+                    tl.LessonId == model.LessonId &&
+                    tl.TypeName == LessonTypeName.Individual &&
+                    !tl.Lesson.IsDeleted);
 
-            if (lesson == null || lesson.TypeName != LessonTypeName.Individual)
+            if (teacherLesson == null)
             {
-                throw new ArgumentException("Избраният урок не е индивидуален.");
+                throw new ArgumentException("Този учител не преподава избрания индивидуален предмет.");
             }
 
-            bool teacherCanTeachLesson = await context.TeacherLessons
-                .AnyAsync(tl => tl.TeacherId == model.TeacherId && tl.LessonId == model.LessonId);
-
-            if (!teacherCanTeachLesson)
+            var student = await userManager.FindByIdAsync(model.StudentId.ToString());
+            if (student == null || !await userManager.IsInRoleAsync(student, "Student"))
             {
-                throw new ArgumentException("Този учител не преподава избрания предмет.");
+                throw new ArgumentException("Само ученик може да записва индивидуален урок.");
             }
 
             var slotRange = await context.TeacherAvailabilities
@@ -267,20 +273,16 @@ namespace ChitalishteIskra.Core.Services
 
         public async Task CreateGroupAsync(CreateGroupLessonDto model)
         {
-            var lesson = await context.Lessons
-                .FirstOrDefaultAsync(l => l.Id == model.LessonId && !l.IsDeleted);
+            var teacherLesson = await context.TeacherLessons
+                .Include(tl => tl.Lesson)
+                .FirstOrDefaultAsync(tl =>
+                    tl.TeacherId == model.TeacherId &&
+                    tl.LessonId == model.LessonId &&
+                    !tl.Lesson.IsDeleted);
 
-            if (lesson == null || lesson.TypeName != LessonTypeName.Group)
+            if (teacherLesson == null || teacherLesson.TypeName != LessonTypeName.Group)
             {
-                throw new ArgumentException("Избраният урок не е групов.");
-            }
-
-            bool teacherCanTeachLesson = await context.TeacherLessons
-                .AnyAsync(tl => tl.TeacherId == model.TeacherId && tl.LessonId == model.LessonId);
-
-            if (!teacherCanTeachLesson)
-            {
-                throw new ArgumentException("Този учител не преподава избрания групов предмет.");
+                throw new ArgumentException("Избраният предмет не е групов.");
             }
 
             var group = await context.Groups
@@ -302,7 +304,7 @@ namespace ChitalishteIskra.Core.Services
 
             if (!teacherIsWorking)
             {
-                throw new ArgumentException("Урокът е извън работното време на учителя.");
+                throw new ArgumentException("Занятието е извън работното време на учителя.");
             }
 
             bool hasConflict = await context.BookLessons.AnyAsync(bl =>
@@ -313,7 +315,7 @@ namespace ChitalishteIskra.Core.Services
 
             if (hasConflict)
             {
-                throw new ArgumentException("Учителят вече има урок в този часови диапазон.");
+                throw new ArgumentException("Учителят вече има занятие в този часови диапазон.");
             }
 
             var booking = new BookLesson
@@ -337,12 +339,13 @@ namespace ChitalishteIskra.Core.Services
 
             if (selectedStudentIds.Any())
             {
-                var validStudents = await context.Users
-                    .Where(u => selectedStudentIds.Contains(u.Id))
-                    .Select(u => u.Id)
-                    .ToListAsync();
+                var students = await userManager.GetUsersInRoleAsync("Student");
+                var validStudentIds = students
+                    .Where(s => selectedStudentIds.Contains(s.Id))
+                    .Select(s => s.Id)
+                    .ToList();
 
-                foreach (var studentId in validStudents)
+                foreach (var studentId in validStudentIds)
                 {
                     var response = new GroupLessonResponse
                     {
@@ -391,18 +394,24 @@ namespace ChitalishteIskra.Core.Services
 
         public async Task RespondToGroupLessonAsync(Guid bookLessonId, Guid studentId, bool isAccepted)
         {
+            var student = await userManager.FindByIdAsync(studentId.ToString());
+            if (student == null || !await userManager.IsInRoleAsync(student, "Student"))
+            {
+                throw new ArgumentException("Само ученик може да отговаря на покана.");
+            }
+
             var response = await context.GroupLessonResponses
                 .Include(x => x.BookLesson)
                 .FirstOrDefaultAsync(x => x.BookLessonId == bookLessonId && x.StudentId == studentId);
 
             if (response == null)
             {
-                throw new ArgumentException("Няма намерена покана за този групов урок.");
+                throw new ArgumentException("Няма намерена покана за това групово занятие.");
             }
 
             if (response.BookLesson.Date < DateOnly.FromDateTime(DateTime.Today))
             {
-                throw new ArgumentException("Не може да отговаряш на минал урок.");
+                throw new ArgumentException("Не може да отговаряш на минало занятие.");
             }
 
             response.Status = isAccepted

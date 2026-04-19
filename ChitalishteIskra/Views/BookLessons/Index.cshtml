@@ -1,7 +1,7 @@
 ﻿@using ChitalishteIskra.Models.BookLessons
 @model IEnumerable<BookLessonIndexViewModel>
 
-<h2 class="mb-3">Виж запазените уроци</h2>
+<h2 class="mb-3">Запазени уроци</h2>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -19,14 +19,17 @@
             <th>Дата</th>
             <th>Начало</th>
             <th>Край</th>
+
             @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
             {
                 <th>Възрастова група</th>
                 <th>Приели поканата</th>
             }
+
             <th>Учител</th>
             <th>Урок</th>
-            @if (User.IsInRole("Admin"))
+
+            @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
             {
                 <th>Действия</th>
             }
@@ -48,9 +51,10 @@
 
                 <td>@booking.TeacherName</td>
                 <td>@booking.LessonName</td>
-                <td>
-                    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
-                    {
+
+                @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                {
+                    <td>
                         <a asp-action="Edit"
                            asp-route-id="@booking.Id"
                            class="btn btn-warning btn-sm me-1">
@@ -66,8 +70,8 @@
                                 Изтрий
                             </button>
                         </form>
-                    }
-                </td>
+                    </td>
+                }
             </tr>
         }
     </tbody>

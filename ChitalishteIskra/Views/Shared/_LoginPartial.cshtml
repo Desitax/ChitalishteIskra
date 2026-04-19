@@ -4,24 +4,39 @@
 @inject UserManager<User> UserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Здравей, @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-controller="Users" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link ">Излизане</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-            <a class="nav-link" asp-controller="Users" asp-action="Register">Регистрация</a>
-    </li>
-    <li class="nav-item">
-            <a class="nav-link " asp-controller="Users" asp-action="Login">Влизане</a>
-    </li>
-}
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-area="Identity"
+               asp-page="/Account/Manage/Index"
+               title="Профил">
+                Здравей, @User.Identity?.Name!
+            </a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline"
+                  asp-controller="Users"
+                  asp-action="Logout"
+                  method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="nav-link btn btn-link border-0">
+                    Излизане
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Users" asp-action="Register">
+                Регистрация
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Users" asp-action="Login">
+                Влизане
+            </a>
+        </li>
+    }
 </ul>

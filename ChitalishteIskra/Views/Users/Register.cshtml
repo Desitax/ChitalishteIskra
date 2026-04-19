@@ -1,4 +1,8 @@
-﻿<h2 class="text-center">Регистрация</h2>
+﻿@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<h2 class="text-center">@ViewData["Title"]</h2>
 
 <div class="text-center mt-4">
     <a asp-controller="Users" asp-action="RegisterStudent" class="btn btn-primary m-2">
@@ -9,5 +13,3 @@
         Регистрация на учител
     </a>
 </div>
-
-

@@ -1,6 +1,11 @@
 ﻿@using ChitalishteIskra.Models.Lessons
 @model IEnumerable<LessonIndexViewModel>
 
+@{
+    bool isAdmin = User.IsInRole("Admin");
+    bool isTeacher = User.IsInRole("Teacher");
+}
+
 <h2>Предмети</h2>
 
 @if (TempData["SuccessMessage"] != null)
@@ -13,16 +18,27 @@
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Добави предмет</a>
-</p>
+@if (isAdmin || isTeacher)
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Добави предмет</a>
+    </p>
+}
 
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Име</th>
-            <th>Тип</th>
-            <th>Действия</th>
+
+            @if (isTeacher)
+            {
+                <th>Тип</th>
+            }
+
+            @if (isAdmin)
+            {
+                <th>Действия</th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -31,30 +47,36 @@
             <tr>
                 <td>@lesson.Name</td>
 
-                <td>
-                    @(lesson.TypeName == "Individual" ? "Индивидуален" :
-                        lesson.TypeName == "Group" ? "Групов" :
-                        lesson.TypeName)
-                </td>
+                @if (isTeacher)
+                {
+                    <td>
+                        @(lesson.TypeName == "Individual" ? "Индивидуален" :
+                            lesson.TypeName == "Group" ? "Групов" :
+                            lesson.TypeName)
+                    </td>
+                }
 
-                <td>
-                    <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm">
-                        Редактирай
-                    </a>
+                @if (isAdmin)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-warning btn-sm">
+                            Редактирай
+                        </a>
 
-                    <form asp-action="Delete"
-                          asp-route-id="@lesson.Id"
-                          method="post"
-                          style="display:inline;">
-                        @Html.AntiForgeryToken()
+                        <form asp-action="Delete"
+                              asp-route-id="@lesson.Id"
+                              method="post"
+                              style="display:inline;">
+                            @Html.AntiForgeryToken()
 
-                        <button type="submit"
-                                class="btn btn-danger btn-sm"
-                                onclick="return confirm('Сигурен ли си, че искаш да изтриеш този предмет?')">
-                            Изтрий
-                        </button>
-                    </form>
-                </td>
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Сигурен ли си, че искаш да изтриеш този предмет?')">
+                                Изтрий
+                            </button>
+                        </form>
+                    </td>
+                }
             </tr>
         }
     </tbody>

@@ -3,7 +3,6 @@ using ChitalishteIskra.Core.DTOs.Lessons;
 using ChitalishteIskra.Data;
 using ChitalishteIskra.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using static ChitalishteIskra.Data.Entities.Lesson;
 
 namespace ChitalishteIskra.Core.Services
 {
@@ -25,7 +24,35 @@ namespace ChitalishteIskra.Core.Services
                 {
                     Id = l.Id,
                     Name = l.Name,
-                    TypeName = l.TypeName.ToString()
+                    TypeName = string.Empty
+                })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<LessonDto>> GetByTeacherIdAsync(Guid teacherId)
+        {
+            return await context.TeacherLessons
+                .Where(tl => tl.TeacherId == teacherId && !tl.Lesson.IsDeleted)
+                .OrderBy(tl => tl.Lesson.Name)
+                .Select(tl => new LessonDto
+                {
+                    Id = tl.LessonId,
+                    Name = tl.Lesson.Name,
+                    TypeName = tl.TypeName.ToString()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<LessonDto>> GetAssignedToTeacherAsync(Guid teacherId)
+        {
+            return await context.TeacherLessons
+                .Where(tl => tl.TeacherId == teacherId && !tl.Lesson.IsDeleted)
+                .OrderBy(tl => tl.Lesson.Name)
+                .Select(tl => new LessonDto
+                {
+                    Id = tl.LessonId,
+                    Name = tl.Lesson.Name,
+                    TypeName = tl.TypeName.ToString()
                 })
                 .ToListAsync();
         }
@@ -37,13 +64,10 @@ namespace ChitalishteIskra.Core.Services
                 throw new ArgumentException("Името на предмета е задължително.");
             }
 
-            var parsedType = Enum.Parse<LessonTypeName>(model.TypeName);
-
             bool alreadyExists = await context.Lessons
                 .AnyAsync(l =>
                     !l.IsDeleted &&
-                    l.Name.ToLower() == model.Name.Trim().ToLower() &&
-                    l.TypeName == parsedType);
+                    l.Name.ToLower() == model.Name.Trim().ToLower());
 
             if (alreadyExists)
             {
@@ -54,11 +78,35 @@ namespace ChitalishteIskra.Core.Services
             {
                 Id = Guid.NewGuid(),
                 Name = model.Name.Trim(),
-                TypeName = parsedType,
                 IsDeleted = false
             };
 
             await context.Lessons.AddAsync(lesson);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task CreateForTeacherAsync(TeacherCreateLessonDto model)
+        {
+            var teacherLesson = await context.TeacherLessons
+                .Include(tl => tl.Lesson)
+                .FirstOrDefaultAsync(tl =>
+                    tl.TeacherId == model.TeacherId &&
+                    tl.LessonId == model.LessonId &&
+                    !tl.Lesson.IsDeleted);
+
+            if (teacherLesson == null)
+            {
+                throw new ArgumentException("Нямате право да избирате този предмет.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.TypeName))
+            {
+                throw new ArgumentException("Избери тип.");
+            }
+
+            var parsedType = Enum.Parse<Lesson.LessonTypeName>(model.TypeName);
+            teacherLesson.TypeName = parsedType;
+
             await context.SaveChangesAsync();
         }
 
@@ -70,7 +118,7 @@ namespace ChitalishteIskra.Core.Services
                 {
                     Id = l.Id,
                     Name = l.Name,
-                    TypeName = l.TypeName.ToString()
+                    TypeName = string.Empty
                 })
                 .FirstOrDefaultAsync();
         }
@@ -90,22 +138,18 @@ namespace ChitalishteIskra.Core.Services
                 throw new ArgumentException("Предметът не е намерен.");
             }
 
-            var parsedType = Enum.Parse<LessonTypeName>(model.TypeName);
-
             bool alreadyExists = await context.Lessons
                 .AnyAsync(l =>
                     l.Id != id &&
                     !l.IsDeleted &&
-                    l.Name.ToLower() == model.Name.Trim().ToLower() &&
-                    l.TypeName == parsedType);
+                    l.Name.ToLower() == model.Name.Trim().ToLower());
 
             if (alreadyExists)
             {
-                throw new ArgumentException("Вече съществува друг предмет със същото име и тип.");
+                throw new ArgumentException("Вече съществува друг предмет със същото име.");
             }
 
             lesson.Name = model.Name.Trim();
-            lesson.TypeName = parsedType;
 
             await context.SaveChangesAsync();
         }

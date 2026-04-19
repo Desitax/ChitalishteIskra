@@ -1,7 +1,7 @@
 ﻿using ChitalishteIskra.Core.Contracts;
 using ChitalishteIskra.Core.DTOs.TeacherLessons;
-using ChitalishteIskra.Data.Entities;
 using ChitalishteIskra.Data;
+using ChitalishteIskra.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +30,7 @@ namespace ChitalishteIskra.Core.Services
                     Id = x.Id,
                     TeacherName = x.Teacher.FirstName + " " + x.Teacher.LastName,
                     LessonName = x.Lesson.Name,
-                    LessonType = x.Lesson.TypeName.ToString()
+                    LessonType = x.TypeName.ToString()
                 })
                 .ToListAsync();
         }
@@ -77,7 +77,8 @@ namespace ChitalishteIskra.Core.Services
             {
                 Id = Guid.NewGuid(),
                 TeacherId = model.TeacherId,
-                LessonId = model.LessonId
+                LessonId = model.LessonId,
+                TypeName = Lesson.LessonTypeName.Individual
             };
 
             await context.TeacherLessons.AddAsync(entity);

@@ -76,6 +76,7 @@ namespace ChitalishteIskra.Controllers
                     LessonId = model.LessonId
                 });
 
+                TempData["SuccessMessage"] = "Предметът беше назначен успешно.";
                 return RedirectToAction(nameof(Index));
             }
             catch (ArgumentException ex)

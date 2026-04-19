@@ -13,14 +13,6 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="TypeName" class="form-label">Тип</label>
-        <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control">
-            <option value="">Избери тип</option>
-        </select>
-        <span asp-validation-for="TypeName" class="text-danger"></span>
-    </div>
-
     <button type="submit" class="btn btn-primary">Запази</button>
 </form>
 

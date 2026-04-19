@@ -43,83 +43,49 @@ namespace ChitalishteIskra.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var model = new RegisterViewModel();
-            return View(model);
+            return View(new RegisterViewModel());
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterStudent(RegisterViewModel model)
         {
-            bool hasParentInfo =
-                !string.IsNullOrWhiteSpace(model.ParentInfo.FirstName) &&
-                !string.IsNullOrWhiteSpace(model.ParentInfo.LastName) &&
-                model.ParentInfo.Age.HasValue;
-
-            if (model.ChildInfo.Age < 8 && !hasParentInfo)
-            {
-                ModelState.AddModelError(string.Empty, "Трябва да се регистрирате с родител.");
-            }
-
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var child = new User
+            if (!await roleManager.RoleExistsAsync("Student") ||
+                !await roleManager.RoleExistsAsync("Teacher") ||
+                !await roleManager.RoleExistsAsync("Admin"))
             {
-                FirstName = model.ChildInfo.FirstName,
-                LastName = model.ChildInfo.LastName,
-                Age = model.ChildInfo.Age
+                await SeedRolesInternal();
+            }
+
+            var existingUserByName = await userManager.FindByNameAsync(model.UserName);
+            if (existingUserByName != null)
+            {
+                ModelState.AddModelError(string.Empty, "Потребителското име вече съществува.");
+                return View(model);
+            }
+
+            var existingUserByEmail = await userManager.FindByEmailAsync(model.Email);
+            if (existingUserByEmail != null)
+            {
+                ModelState.AddModelError(string.Empty, "Вече има регистриран потребител с този имейл.");
+                return View(model);
+            }
+
+            var student = new User
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Age = model.Age
             };
 
-            if (hasParentInfo)
-            {
-                string parentFirstName = model.ParentInfo.FirstName!;
-                string parentLastName = model.ParentInfo.LastName!;
-                int parentAge = model.ParentInfo.Age!.Value;
-
-                var parent = new User
-                {
-                    Email = model.Email,
-                    UserName = model.UserName,
-                    FirstName = parentFirstName,
-                    LastName = parentLastName,
-                    Age = parentAge
-                };
-
-                child.Email = "child_" + model.Email;
-                child.UserName = "child_" + model.UserName;
-
-                var parentResult = await userManager.CreateAsync(parent, model.Password);
-
-                if (!parentResult.Succeeded)
-                {
-                    foreach (var item in parentResult.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, item.Description);
-                    }
-
-                    return View(model);
-                }
-
-                var parentRoleResult = await userManager.AddToRoleAsync(parent, "Parent");
-                if (!parentRoleResult.Succeeded)
-                {
-                    foreach (var item in parentRoleResult.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, item.Description);
-                    }
-
-                    return View(model);
-                }
-            }
-            else
-            {
-                child.Email = model.Email;
-                child.UserName = model.UserName;
-            }
-
-            var result = await userManager.CreateAsync(child, model.Password);
+            var result = await userManager.CreateAsync(student, model.Password);
 
             if (!result.Succeeded)
             {
@@ -131,10 +97,11 @@ namespace ChitalishteIskra.Controllers
                 return View(model);
             }
 
-            var childRoleResult = await userManager.AddToRoleAsync(child, "Student");
-            if (!childRoleResult.Succeeded)
+            var roleResult = await userManager.AddToRoleAsync(student, "Student");
+
+            if (!roleResult.Succeeded)
             {
-                foreach (var item in childRoleResult.Errors)
+                foreach (var item in roleResult.Errors)
                 {
                     ModelState.AddModelError(string.Empty, item.Description);
                 }
@@ -142,18 +109,20 @@ namespace ChitalishteIskra.Controllers
                 return View(model);
             }
 
-            await signInManager.SignInAsync(child, isPersistent: false);
-
-            return RedirectToAction("Login", "Users", new
+            return RedirectToAction(nameof(Login), new
             {
-                username = child.UserName,
-                password = model.Password
+                username = student.UserName
             });
         }
 
         [HttpGet]
         public IActionResult Login(string? username, string? password)
         {
+            if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var model = new LoginViewModel();
 
             if (!string.IsNullOrEmpty(username))
@@ -170,6 +139,7 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -181,7 +151,7 @@ namespace ChitalishteIskra.Controllers
 
             if (user != null)
             {
-                if (user.IsTeacherRequest == true && user.IsApprovedTeacher == false)
+                if (user.IsTeacherRequest && !user.IsApprovedTeacher)
                 {
                     ModelState.AddModelError(string.Empty, "Профилът на учителя все още не е одобрен. Свържете се с администратор.");
                     return View(model);
@@ -204,6 +174,7 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
@@ -213,17 +184,40 @@ namespace ChitalishteIskra.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SeedRoles()
         {
-            string[] roles = { "Admin", "Teacher", "Parent", "Student" };
+            await SeedRolesInternal();
+            return Content("Roles seeded.");
+        }
 
-            foreach (var role in roles)
+        [AllowAnonymous]
+        public async Task<IActionResult> FixStudent(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
             {
-                if (!await roleManager.RoleExistsAsync(role))
+                return Content("Липсва username.");
+            }
+
+            await SeedRolesInternal();
+
+            var user = await userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                return Content("Потребителят не е намерен.");
+            }
+
+            var roles = await userManager.GetRolesAsync(user);
+
+            if (!roles.Contains("Student"))
+            {
+                var addResult = await userManager.AddToRoleAsync(user, "Student");
+
+                if (!addResult.Succeeded)
                 {
-                    await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                    return Content("Неуспешно добавяне на роля Student.");
                 }
             }
 
-            return Content("Roles seeded (created if missing).");
+            return Content($"Потребителят {username} вече има роля Student.");
         }
 
         [HttpGet]
@@ -238,10 +232,30 @@ namespace ChitalishteIskra.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterTeacher(TeacherRegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            if (!await roleManager.RoleExistsAsync("Teacher"))
+            {
+                await SeedRolesInternal();
+            }
+
+            var existingUserByName = await userManager.FindByNameAsync(model.UserName);
+            if (existingUserByName != null)
+            {
+                ModelState.AddModelError(string.Empty, "Потребителското име вече съществува.");
+                return View(model);
+            }
+
+            var existingUserByEmail = await userManager.FindByEmailAsync(model.Email);
+            if (existingUserByEmail != null)
+            {
+                ModelState.AddModelError(string.Empty, "Вече има регистриран потребител с този имейл.");
                 return View(model);
             }
 
@@ -330,6 +344,19 @@ namespace ChitalishteIskra.Controllers
             }
 
             return RedirectToAction(nameof(PendingTeachers));
+        }
+
+        private async Task SeedRolesInternal()
+        {
+            string[] roles = { "Admin", "Teacher", "Student" };
+
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                }
+            }
         }
     }
 }

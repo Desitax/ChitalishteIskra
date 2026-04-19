@@ -1,6 +1,6 @@
-﻿namespace ChitalishteIskra.Core.DTOs.TeacherLessons
+﻿namespace ChitalishteIskra.Core.DTOs.Lessons
 {
-    public class CreateTeacherLessonDto
+    public class TeacherCreateLessonDto
     {
         public Guid TeacherId { get; set; }
 

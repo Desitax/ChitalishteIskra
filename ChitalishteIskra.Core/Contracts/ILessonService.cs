@@ -1,9 +1,4 @@
 ﻿using ChitalishteIskra.Core.DTOs.Lessons;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChitalishteIskra.Core.Contracts
 {
@@ -11,7 +6,13 @@ namespace ChitalishteIskra.Core.Contracts
     {
         Task<IEnumerable<LessonDto>> GetAllAsync();
 
+        Task<IEnumerable<LessonDto>> GetByTeacherIdAsync(Guid teacherId);
+
+        Task<IEnumerable<LessonDto>> GetAssignedToTeacherAsync(Guid teacherId);
+
         Task CreateAsync(CreateLessonDto model);
+
+        Task CreateForTeacherAsync(TeacherCreateLessonDto model);
 
         Task<LessonDto?> GetByIdAsync(Guid id);
 

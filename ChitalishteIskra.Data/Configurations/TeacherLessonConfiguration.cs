@@ -31,13 +31,15 @@ namespace ChitalishteIskra.Data.Configurations
                 {
                     Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
                     TeacherId = Guid.Parse("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
-                    LessonId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+                    LessonId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                    TypeName = Lesson.LessonTypeName.Individual
                 },
                 new TeacherLesson
                 {
                     Id = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
                     TeacherId = Guid.Parse("35a5aa59-3911-4fdd-83ca-38f0d7bb91b7"),
-                    LessonId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+                    LessonId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                    TypeName = Lesson.LessonTypeName.Group
                 }
             );
         }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ChitalishteIskra.Data.Entities
 {
@@ -12,17 +6,19 @@ namespace ChitalishteIskra.Data.Entities
     {
         [Key]
         public Guid Id { get; set; }
+
         [Required]
         public string Name { get; set; } = null!;
 
-        public LessonTypeName TypeName { get; set; }
         public ICollection<BookLesson> BookLessons { get; set; } = new List<BookLesson>();
         public ICollection<TeacherLesson> TeacherLessons { get; set; } = new List<TeacherLesson>();
+
+        public bool IsDeleted { get; set; }
+
         public enum LessonTypeName
         {
             Individual,
             Group
         }
-        public bool IsDeleted { get; set; }
     }
 }

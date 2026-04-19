@@ -5,19 +5,33 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Име на предмет</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+    @if (ViewBag.IsAdmin == true)
+    {
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Име на предмет</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    }
 
-    <div class="mb-3">
-        <label asp-for="TypeName" class="form-label">Тип</label>
-        <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control">
-            <option value="">Избери тип</option>
-        </select>
-        <span asp-validation-for="TypeName" class="text-danger"></span>
-    </div>
+    @if (ViewBag.IsTeacher == true)
+    {
+        <div class="mb-3">
+            <label asp-for="LessonId" class="form-label">Име на предмет</label>
+            <select asp-for="LessonId" asp-items="Model.Lessons" class="form-control">
+                <option value="">Избери предмет</option>
+            </select>
+            <span asp-validation-for="LessonId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TypeName" class="form-label">Тип</label>
+            <select asp-for="TypeName" asp-items="ViewBag.LessonTypes" class="form-control">
+                <option value="">Избери тип</option>
+            </select>
+            <span asp-validation-for="TypeName" class="text-danger"></span>
+        </div>
+    }
 
     <button type="submit" class="btn btn-primary">Запази</button>
 </form>
